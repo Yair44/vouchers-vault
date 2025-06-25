@@ -1,73 +1,166 @@
-# Welcome to your Lovable project
 
-## Project info
+# VoucherVault - Digital Wallet for Vouchers
 
-**URL**: https://lovable.dev/projects/a0a4cadc-30e3-4451-b806-4ee4b9f085b0
+A modern, secure web application for managing all your vouchers, coupons, gift cards, and loyalty cards in one place.
 
-## How can I edit this code?
+## 🎯 Features
 
-There are several ways of editing your application.
+### Core Functionality
+- **Add Vouchers**: Store voucher details including name, code, expiry date, balance, notes, and color tags
+- **Smart Dashboard**: View statistics, total value, and expiring vouchers at a glance
+- **Search & Filter**: Find vouchers by name, code, type, or expiry date
+- **Balance Tracking**: Monitor voucher balances and transaction history
+- **Expiry Alerts**: Get notified about vouchers expiring soon
 
-**Use Lovable**
+### Sharing & Collaboration
+- **Share Vouchers**: Share vouchers with other users with view or edit permissions
+- **Webhook Notifications**: Set up custom webhooks for expiry notifications
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/a0a4cadc-30e3-4451-b806-4ee4b9f085b0) and start prompting.
+### Modern Experience
+- **PWA Ready**: Install as an app on your device
+- **Offline Support**: Access your vouchers even without internet
+- **Dark Mode**: Eye-friendly dark theme
+- **Mobile Responsive**: Works perfectly on all devices
 
-Changes made via Lovable will be committed automatically to this repo.
+## 🚀 Getting Started
 
-**Use your preferred IDE**
+### Prerequisites
+- Node.js (v18 or higher)
+- npm or yarn
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+### Installation
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+1. Clone the repository:
+```bash
+git clone <repository-url>
+cd vouchervault
+```
 
-Follow these steps:
+2. Install dependencies:
+```bash
+npm install
+```
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+3. Start the development server:
+```bash
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+4. Open your browser and navigate to `http://localhost:8080`
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## 🏗️ Technology Stack
 
-**Use GitHub Codespaces**
+- **Frontend**: React 18, TypeScript, Tailwind CSS
+- **UI Components**: shadcn/ui, Radix UI
+- **Icons**: Lucide React
+- **State Management**: React Query
+- **Routing**: React Router DOM
+- **PWA**: Service Worker, Web App Manifest
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+## 📊 Database Schema
 
-## What technologies are used for this project?
+The application uses the following main entities:
 
-This project is built with:
+### Users
+- `id` (UUID, Primary Key)
+- `name` (Text)
+- `email` (Text, Unique)
+- `webhook_url` (Text, Optional)
+- `created_at`, `updated_at` (Timestamps)
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+### Vouchers
+- `id` (UUID, Primary Key)
+- `user_id` (UUID, Foreign Key)
+- `name`, `code` (Text)
+- `type` (Enum: gift_card, coupon, loyalty_card, discount, other)
+- `balance`, `original_balance` (Decimal)
+- `expiry_date` (Date)
+- `notes` (Text, Optional)
+- `color_tag` (Text)
+- `image_url` (Text, Optional)
+- `is_active` (Boolean)
+- `created_at`, `updated_at` (Timestamps)
 
-## How can I deploy this project?
+### Transactions
+- `id` (UUID, Primary Key)
+- `voucher_id` (UUID, Foreign Key)
+- `amount`, `previous_balance`, `new_balance` (Decimal)
+- `description` (Text)
+- `created_at` (Timestamp)
 
-Simply open [Lovable](https://lovable.dev/projects/a0a4cadc-30e3-4451-b806-4ee4b9f085b0) and click on Share -> Publish.
+### Shared Vouchers
+- `id` (UUID, Primary Key)
+- `voucher_id` (UUID, Foreign Key)
+- `shared_with_user_id` (UUID, Foreign Key)
+- `permission` (Enum: view, edit)
+- `created_at` (Timestamp)
 
-## Can I connect a custom domain to my Lovable project?
+## 🔧 Development
 
-Yes, you can!
+### Project Structure
+```
+src/
+├── components/          # Reusable UI components
+├── pages/              # Page components
+├── types/              # TypeScript type definitions
+├── lib/                # Utilities and database mock
+├── data/               # Database schema and seed files
+└── hooks/              # Custom React hooks
+```
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+### Available Scripts
+- `npm run dev` - Start development server
+- `npm run build` - Build for production
+- `npm run preview` - Preview production build
+- `npm run lint` - Run ESLint
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+## 📱 PWA Features
+
+The app includes Progressive Web App capabilities:
+- **Installable**: Add to home screen on mobile devices
+- **Offline Access**: Basic offline functionality with service worker
+- **App-like Experience**: Fullscreen mode and native feel
+
+## 🚧 TODO Items
+
+### High Priority
+- [ ] Connect to Supabase for real database functionality
+- [ ] Implement user authentication and registration
+- [ ] Add image upload functionality for vouchers
+- [ ] Implement voucher sharing features
+- [ ] Add webhook notification system
+- [ ] Complete offline functionality with service worker
+
+### Medium Priority
+- [ ] Voucher detail page with full transaction history
+- [ ] Bulk operations (import/export vouchers)
+- [ ] Advanced filtering and sorting options
+- [ ] QR code generation for vouchers
+- [ ] Push notifications for expiring vouchers
+
+### Low Priority
+- [ ] Multiple currency support
+- [ ] Voucher categories and tags
+- [ ] Data export functionality
+- [ ] Advanced statistics and reports
+- [ ] Voucher usage analytics
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature/new-feature`
+3. Commit your changes: `git commit -am 'Add new feature'`
+4. Push to the branch: `git push origin feature/new-feature`
+5. Create a Pull Request
+
+## 📄 License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## 🆘 Support
+
+For support, please open an issue on GitHub or contact the development team.
+
+---
+
+**Note**: This is the initial version with mock data. Full backend integration with Supabase is required for production use.

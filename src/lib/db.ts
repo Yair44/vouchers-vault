@@ -1,0 +1,157 @@
+
+// Mock database implementation
+// TODO: Replace with actual Supabase integration
+
+import { User, Voucher, Transaction, SharedVoucher, VoucherType } from '@/types';
+
+// Mock data storage
+const users: User[] = [
+  {
+    id: '1',
+    name: 'John Doe',
+    email: 'john@example.com',
+    webhookUrl: 'https://api.example.com/webhook',
+    createdAt: new Date('2024-01-01')
+  },
+  {
+    id: '2',
+    name: 'Jane Smith',
+    email: 'jane@example.com',
+    createdAt: new Date('2024-01-01')
+  }
+];
+
+const vouchers: Voucher[] = [
+  {
+    id: '1',
+    userId: '1',
+    name: 'Amazon Gift Card',
+    code: 'AMZN-1234-5678-9012',
+    type: 'gift_card',
+    balance: 85.50,
+    originalBalance: 100.00,
+    expiryDate: new Date('2025-12-31'),
+    notes: 'Birthday gift from mom',
+    colorTag: '#FF6B6B',
+    isActive: true,
+    createdAt: new Date('2024-01-15'),
+    updatedAt: new Date('2024-06-20')
+  },
+  {
+    id: '2',
+    userId: '1',
+    name: 'Starbucks Card',
+    code: 'SB-9876-5432-1098',
+    type: 'gift_card',
+    balance: 23.75,
+    originalBalance: 50.00,
+    expiryDate: new Date('2025-01-15'),
+    notes: 'Office coffee runs',
+    colorTag: '#4ECDC4',
+    isActive: true,
+    createdAt: new Date('2024-02-01'),
+    updatedAt: new Date('2024-06-25')
+  },
+  {
+    id: '3',
+    userId: '1',
+    name: '20% Off Coupon',
+    code: 'SAVE20NOW',
+    type: 'coupon',
+    balance: 1,
+    originalBalance: 1,
+    expiryDate: new Date('2024-07-15'),
+    notes: 'Online shopping discount',
+    colorTag: '#FFE66D',
+    isActive: true,
+    createdAt: new Date('2024-06-01'),
+    updatedAt: new Date('2024-06-01')
+  }
+];
+
+const transactions: Transaction[] = [
+  {
+    id: '1',
+    voucherId: '1',
+    amount: -14.50,
+    previousBalance: 100.00,
+    newBalance: 85.50,
+    description: 'Used for book purchase',
+    createdAt: new Date('2024-06-20')
+  },
+  {
+    id: '2',
+    voucherId: '2',
+    amount: -26.25,
+    previousBalance: 50.00,
+    newBalance: 23.75,
+    description: 'Coffee and snacks',
+    createdAt: new Date('2024-06-25')
+  }
+];
+
+// Mock API functions
+export const db = {
+  users: {
+    findById: (id: string) => users.find(u => u.id === id),
+    findByEmail: (email: string) => users.find(u => u.email === email),
+    create: (userData: Omit<User, 'id' | 'createdAt'>) => {
+      const user: User = {
+        ...userData,
+        id: Math.random().toString(36).substr(2, 9),
+        createdAt: new Date()
+      };
+      users.push(user);
+      return user;
+    }
+  },
+  
+  vouchers: {
+    findByUserId: (userId: string) => vouchers.filter(v => v.userId === userId),
+    findById: (id: string) => vouchers.find(v => v.id === id),
+    create: (voucherData: Omit<Voucher, 'id' | 'createdAt' | 'updatedAt'>) => {
+      const voucher: Voucher = {
+        ...voucherData,
+        id: Math.random().toString(36).substr(2, 9),
+        createdAt: new Date(),
+        updatedAt: new Date()
+      };
+      vouchers.push(voucher);
+      return voucher;
+    },
+    update: (id: string, updates: Partial<Voucher>) => {
+      const index = vouchers.findIndex(v => v.id === id);
+      if (index !== -1) {
+        vouchers[index] = { ...vouchers[index], ...updates, updatedAt: new Date() };
+        return vouchers[index];
+      }
+      return null;
+    },
+    delete: (id: string) => {
+      const index = vouchers.findIndex(v => v.id === id);
+      if (index !== -1) {
+        vouchers.splice(index, 1);
+        return true;
+      }
+      return false;
+    }
+  },
+  
+  transactions: {
+    findByVoucherId: (voucherId: string) => transactions.filter(t => t.voucherId === voucherId),
+    create: (transactionData: Omit<Transaction, 'id' | 'createdAt'>) => {
+      const transaction: Transaction = {
+        ...transactionData,
+        id: Math.random().toString(36).substr(2, 9),
+        createdAt: new Date()
+      };
+      transactions.push(transaction);
+      return transaction;
+    }
+  }
+};
+
+// Mock current user (TODO: Replace with actual authentication)
+export const getCurrentUser = (): User => {
+  return users[0]; // Return first user for demo
+};
