@@ -1,8 +1,7 @@
-
 // Mock database implementation
 // TODO: Replace with actual Supabase integration
 
-import { User, Voucher, Transaction, SharedVoucher, VoucherType } from '@/types';
+import { User, Voucher, Transaction, SharedVoucher } from '@/types';
 
 // Mock data storage
 const users: User[] = [
@@ -32,7 +31,6 @@ const vouchers: Voucher[] = [
     originalBalance: 100.00,
     expiryDate: new Date('2025-12-31'),
     notes: 'Birthday gift from mom',
-    colorTag: '#FF6B6B',
     isActive: true,
     createdAt: new Date('2024-01-15'),
     updatedAt: new Date('2024-06-20')
@@ -47,7 +45,6 @@ const vouchers: Voucher[] = [
     originalBalance: 50.00,
     expiryDate: new Date('2025-01-15'),
     notes: 'Office coffee runs',
-    colorTag: '#4ECDC4',
     isActive: true,
     createdAt: new Date('2024-02-01'),
     updatedAt: new Date('2024-06-25')
@@ -62,7 +59,6 @@ const vouchers: Voucher[] = [
     originalBalance: 1,
     expiryDate: new Date('2024-07-15'),
     notes: 'Online shopping discount',
-    colorTag: '#FFE66D',
     isActive: true,
     createdAt: new Date('2024-06-01'),
     updatedAt: new Date('2024-06-01')

@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Search, Upload, Calendar } from 'lucide-react';
 import { db, getCurrentUser } from '@/lib/db';
-import { Voucher, VoucherType } from '@/types';
+import { Voucher } from '@/types';
 import { Link } from 'react-router-dom';
 
 export const Vouchers = () => {

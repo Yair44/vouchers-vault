@@ -39,11 +39,6 @@ export const VoucherCard = ({ voucher, onClick, className }: VoucherCardProps) =
       )}
       onClick={onClick}
     >
-      <div 
-        className="absolute inset-0 opacity-5 group-hover:opacity-10 transition-opacity"
-        style={{ backgroundColor: voucher.colorTag }}
-      />
-      
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
           <div className="flex-1">
@@ -54,10 +49,6 @@ export const VoucherCard = ({ voucher, onClick, className }: VoucherCardProps) =
               {voucher.code}
             </p>
           </div>
-          <div 
-            className="w-4 h-4 rounded-full border-2 border-white shadow-sm"
-            style={{ backgroundColor: voucher.colorTag }}
-          />
         </div>
       </CardHeader>
 
