@@ -139,10 +139,16 @@ export const AddVoucher = () => {
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="manual" className="w-full">
-            <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="manual">Manual Recording</TabsTrigger>
-              <TabsTrigger value="image">Image Upload</TabsTrigger>
-              <TabsTrigger value="text">Text Extraction</TabsTrigger>
+            <TabsList className="grid w-full grid-cols-3 h-auto p-1">
+              <TabsTrigger value="manual" className="text-xs sm:text-sm px-2 py-2 whitespace-nowrap">
+                Manual Recording
+              </TabsTrigger>
+              <TabsTrigger value="image" className="text-xs sm:text-sm px-2 py-2 whitespace-nowrap">
+                Image Upload
+              </TabsTrigger>
+              <TabsTrigger value="text" className="text-xs sm:text-sm px-2 py-2 whitespace-nowrap">
+                Text Extraction
+              </TabsTrigger>
             </TabsList>
             
             <TabsContent value="manual" className="mt-6">
