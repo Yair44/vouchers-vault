@@ -1,4 +1,3 @@
-
 export interface User {
   id: string;
   name: string;
@@ -12,13 +11,14 @@ export interface Voucher {
   userId: string;
   name: string;
   code: string;
-  type: VoucherType;
+  type: string; // Changed from VoucherType to string to support custom types
   balance: number;
   originalBalance: number;
   expiryDate: Date;
   notes?: string;
-  colorTag: string;
   imageUrl?: string;
+  eligibleBusinessesUrl?: string;
+  voucherUrl?: string;
   isActive: boolean;
   createdAt: Date;
   updatedAt: Date;
@@ -42,11 +42,18 @@ export interface SharedVoucher {
   createdAt: Date;
 }
 
-export type VoucherType = 'gift_card' | 'coupon' | 'loyalty_card' | 'discount' | 'other';
+// Keep default types but allow custom ones too
+export const DEFAULT_VOUCHER_TYPES = ['gift_card', 'coupon', 'loyalty_card', 'discount', 'other'] as const;
 
 export interface VoucherStats {
   totalVouchers: number;
   totalValue: number;
   expiringCount: number;
   activeCount: number;
+}
+
+export interface CustomVoucherType {
+  id: string;
+  name: string;
+  createdAt: Date;
 }
