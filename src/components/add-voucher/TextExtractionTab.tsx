@@ -1,10 +1,10 @@
-
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Loader2 } from 'lucide-react';
 
 interface TextExtractionTabProps {
@@ -26,6 +26,7 @@ export const TextExtractionTab = ({ formData, onInputChange, isLoading, onSubmit
   const [rawText, setRawText] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [extractedData, setExtractedData] = useState<any>(null);
+  const [isFormOpen, setIsFormOpen] = useState(false);
 
   const extractVoucherInfo = async (text: string) => {
     setIsProcessing(true);
@@ -59,6 +60,9 @@ export const TextExtractionTab = ({ formData, onInputChange, isLoading, onSubmit
       if (extracted.code) onInputChange('code', extracted.code);
       if (extracted.expiryDate) onInputChange('expiryDate', extracted.expiryDate);
       if (extracted.urls[0]) onInputChange('voucherUrl', extracted.urls[0]);
+      
+      // Automatically open the form after extraction
+      setIsFormOpen(true);
       
     } catch (error) {
       console.error('Text extraction failed:', error);
@@ -198,108 +202,112 @@ export const TextExtractionTab = ({ formData, onInputChange, isLoading, onSubmit
         </Card>
       )}
 
-      {/* Form Fields */}
-      <form onSubmit={onSubmit} className="space-y-4">
-        {/* Mandatory Fields */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <Label htmlFor="name">Voucher Name *</Label>
-            <Input
-              id="name"
-              value={formData.name}
-              onChange={(e) => onInputChange('name', e.target.value)}
-              placeholder="e.g., Amazon Gift Card"
-              required
-            />
-          </div>
-          <div>
-            <Label htmlFor="balance">Balance/Value *</Label>
-            <Input
-              id="balance"
-              type="number"
-              step="0.01"
-              min="0"
-              value={formData.balance}
-              onChange={(e) => onInputChange('balance', e.target.value)}
-              placeholder="0.00"
-              required
-            />
-          </div>
-        </div>
+      {/* Collapsible Form Fields */}
+      <Collapsible open={isFormOpen} onOpenChange={setIsFormOpen}>
+        <CollapsibleContent className="space-y-4">
+          <form onSubmit={onSubmit} className="space-y-4">
+            {/* Mandatory Fields */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="name">Voucher Name *</Label>
+                <Input
+                  id="name"
+                  value={formData.name}
+                  onChange={(e) => onInputChange('name', e.target.value)}
+                  placeholder="e.g., Amazon Gift Card"
+                  required
+                />
+              </div>
+              <div>
+                <Label htmlFor="balance">Balance/Value *</Label>
+                <Input
+                  id="balance"
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  value={formData.balance}
+                  onChange={(e) => onInputChange('balance', e.target.value)}
+                  placeholder="0.00"
+                  required
+                />
+              </div>
+            </div>
 
-        <div>
-          <Label htmlFor="expiryDate">Expiry Date *</Label>
-          <Input
-            id="expiryDate"
-            type="date"
-            value={formData.expiryDate}
-            onChange={(e) => onInputChange('expiryDate', e.target.value)}
-            min={new Date().toISOString().split('T')[0]}
-            required
-          />
-        </div>
+            <div>
+              <Label htmlFor="expiryDate">Expiry Date *</Label>
+              <Input
+                id="expiryDate"
+                type="date"
+                value={formData.expiryDate}
+                onChange={(e) => onInputChange('expiryDate', e.target.value)}
+                min={new Date().toISOString().split('T')[0]}
+                required
+              />
+            </div>
 
-        {/* URL Fields */}
-        <div className="space-y-4">
-          <div>
-            <Label htmlFor="eligibleBusinessesUrl">Eligible Businesses for Usage</Label>
-            <Input
-              id="eligibleBusinessesUrl"
-              type="url"
-              value={formData.eligibleBusinessesUrl}
-              onChange={(e) => onInputChange('eligibleBusinessesUrl', e.target.value)}
-              placeholder="https://example.com/eligible-businesses"
-              className={!validateUrl(formData.eligibleBusinessesUrl) ? 'border-red-500' : ''}
-            />
-          </div>
-          <div>
-            <Label htmlFor="voucherUrl">Voucher Link</Label>
-            <Input
-              id="voucherUrl"
-              type="url"
-              value={formData.voucherUrl}
-              onChange={(e) => onInputChange('voucherUrl', e.target.value)}
-              placeholder="https://example.com/voucher"
-              className={!validateUrl(formData.voucherUrl) ? 'border-red-500' : ''}
-            />
-          </div>
-        </div>
+            {/* URL Fields */}
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="eligibleBusinessesUrl">Eligible Businesses for Usage</Label>
+                <Input
+                  id="eligibleBusinessesUrl"
+                  type="url"
+                  value={formData.eligibleBusinessesUrl}
+                  onChange={(e) => onInputChange('eligibleBusinessesUrl', e.target.value)}
+                  placeholder="https://example.com/eligible-businesses"
+                  className={!validateUrl(formData.eligibleBusinessesUrl) ? 'border-red-500' : ''}
+                />
+              </div>
+              <div>
+                <Label htmlFor="voucherUrl">Voucher Link</Label>
+                <Input
+                  id="voucherUrl"
+                  type="url"
+                  value={formData.voucherUrl}
+                  onChange={(e) => onInputChange('voucherUrl', e.target.value)}
+                  placeholder="https://example.com/voucher"
+                  className={!validateUrl(formData.voucherUrl) ? 'border-red-500' : ''}
+                />
+              </div>
+            </div>
 
-        {/* Optional Fields */}
-        <div>
-          <Label htmlFor="code">Voucher Code</Label>
-          <Input
-            id="code"
-            value={formData.code}
-            onChange={(e) => onInputChange('code', e.target.value)}
-            placeholder="e.g., ABCD-1234-EFGH"
-          />
-        </div>
+            {/* Optional Fields */}
+            <div>
+              <Label htmlFor="code">Voucher Code</Label>
+              <Input
+                id="code"
+                value={formData.code}
+                onChange={(e) => onInputChange('code', e.target.value)}
+                placeholder="e.g., ABCD-1234-EFGH"
+              />
+            </div>
 
-        <div>
-          <Label htmlFor="notes">Notes (Optional)</Label>
-          <Textarea
-            id="notes"
-            value={formData.notes}
-            onChange={(e) => onInputChange('notes', e.target.value)}
-            placeholder="Add any additional notes or details about this voucher..."
-            rows={3}
-          />
-        </div>
+            <div>
+              <Label htmlFor="notes">Notes (Optional)</Label>
+              <Textarea
+                id="notes"
+                value={formData.notes}
+                onChange={(e) => onInputChange('notes', e.target.value)}
+                placeholder="Add any additional notes or details about this voucher..."
+                rows={3}
+              />
+            </div>
 
-        {/* TODO: Link Processing */}
-        <div className="text-sm text-gray-500 bg-gray-50 dark:bg-gray-800 p-3 rounded">
-          <p><strong>TODO:</strong> Enhanced link processing to fetch and analyze content from detected URLs.</p>
-        </div>
+            {/* TODO: Link Processing */}
+            <div className="text-sm text-gray-500 bg-gray-50 dark:bg-gray-800 p-3 rounded">
+              <p><strong>TODO:</strong> Enhanced link processing to fetch and analyze content from detected URLs.</p>
+            </div>
 
-        <Button
-          type="submit"
-          disabled={isLoading}
-          className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
-        >
-          {isLoading ? 'Adding...' : 'Add Voucher'}
-        </Button>
-      </form>
+            <Button
+              type="submit"
+              disabled={isLoading}
+              className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+            >
+              {isLoading ? 'Adding...' : 'Add Voucher'}
+            </Button>
+          </form>
+        </CollapsibleContent>
+      </Collapsible>
     </div>
   );
 };

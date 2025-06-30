@@ -112,40 +112,40 @@ export const AddVoucher = () => {
       {/* Header */}
       <div className="text-center">
         <h1 className="text-2xl font-bold">Add New Voucher</h1>
-        <p className="text-gray-600 dark:text-gray-400">Manual Type, Past the entire text or just upload a screenshot</p>
+        <p className="text-gray-600 dark:text-gray-400">Manual Type, Paste the entire text or just upload a screenshot</p>
       </div>
 
       {/* Main Card with Tabs */}
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center">
+          <CardTitle className="flex items-center justify-center">
             <Calendar className="h-5 w-5 mr-2" />
             Voucher Details
           </CardTitle>
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="manual" className="w-full">
-            <TabsList className="w-full justify-center bg-zinc-200">
-              <TabsTrigger value="manual" className="bg-violet-400 hover:bg-violet-300 text-center rounded-2xl font-normal">
+            <TabsList className="mb-6">
+              <TabsTrigger value="manual">
                 Manual Recording
               </TabsTrigger>
-              <TabsTrigger value="image" className="bg-violet-400 hover:bg-violet-300 text-center rounded-2xl font-normal">
+              <TabsTrigger value="image">
                 Image Upload
               </TabsTrigger>
-              <TabsTrigger value="text" className="bg-violet-400 hover:bg-violet-300 text-center rounded-2xl">
+              <TabsTrigger value="text">
                 Text Extraction
               </TabsTrigger>
             </TabsList>
             
-            <TabsContent value="manual" className="mt-6">
+            <TabsContent value="manual">
               <ManualRecordingTab formData={formData} onInputChange={handleInputChange} isLoading={isLoading} onSubmit={handleSubmit} />
             </TabsContent>
             
-            <TabsContent value="image" className="mt-6">
+            <TabsContent value="image">
               <ImageUploadTab formData={formData} onInputChange={handleInputChange} isLoading={isLoading} onSubmit={handleSubmit} />
             </TabsContent>
             
-            <TabsContent value="text" className="mt-6">
+            <TabsContent value="text">
               <TextExtractionTab formData={formData} onInputChange={handleInputChange} isLoading={isLoading} onSubmit={handleSubmit} />
             </TabsContent>
           </Tabs>
