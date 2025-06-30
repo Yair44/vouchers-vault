@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { Collapsible, CollapsibleContent } from '@/components/ui/collapsible';
 import { Loader2 } from 'lucide-react';
 
 interface TextExtractionTabProps {
@@ -39,8 +39,6 @@ export const TextExtractionTab = ({ formData, onInputChange, isLoading, onSubmit
       // Process any detected URLs
       if (urls.length > 0) {
         console.log('Detected URLs:', urls);
-        // TODO: Implement URL fetching and content extraction
-        // For now, just log the URLs
       }
 
       // Basic text extraction patterns
@@ -72,7 +70,6 @@ export const TextExtractionTab = ({ formData, onInputChange, isLoading, onSubmit
   };
 
   const extractName = (text: string): string => {
-    // Look for common voucher/gift card patterns
     const patterns = [
       /([A-Za-z\s]+(?:gift card|voucher|coupon))/gi,
       /(amazon|walmart|target|starbucks|apple|google)[^.!?]*(?:gift card|voucher|card)/gi,
@@ -87,7 +84,6 @@ export const TextExtractionTab = ({ formData, onInputChange, isLoading, onSubmit
   };
 
   const extractBalance = (text: string): string => {
-    // Look for currency amounts
     const patterns = [
       /\$(\d+(?:\.\d{2})?)/g,
       /(\d+(?:\.\d{2})?) ?(?:USD|dollars?)/gi,
@@ -106,7 +102,6 @@ export const TextExtractionTab = ({ formData, onInputChange, isLoading, onSubmit
   };
 
   const extractCode = (text: string): string => {
-    // Look for alphanumeric codes
     const patterns = [
       /(?:code|voucher code|gift card code):\s*([A-Z0-9-]{4,})/gi,
       /([A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4})/g,
@@ -122,7 +117,6 @@ export const TextExtractionTab = ({ formData, onInputChange, isLoading, onSubmit
   };
 
   const extractDate = (text: string): string => {
-    // Look for dates in various formats
     const patterns = [
       /(?:expires?|expiry|valid until):\s*(\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4})/gi,
       /(\d{4}-\d{2}-\d{2})/g,
@@ -132,7 +126,6 @@ export const TextExtractionTab = ({ formData, onInputChange, isLoading, onSubmit
       const match = text.match(pattern);
       if (match) {
         const dateStr = match[0].replace(/.*:\s*/, '');
-        // Convert to YYYY-MM-DD format
         const date = new Date(dateStr);
         if (!isNaN(date.getTime())) {
           return date.toISOString().split('T')[0];
@@ -166,11 +159,12 @@ export const TextExtractionTab = ({ formData, onInputChange, isLoading, onSubmit
           rows={6}
           className="mt-2"
         />
-        <div className="mt-2">
+        <div className="mt-4 flex justify-center">
           <Button
             type="button"
             onClick={() => extractVoucherInfo(rawText)}
             disabled={!rawText.trim() || isProcessing}
+            className="bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700"
           >
             {isProcessing ? (
               <>
@@ -204,7 +198,7 @@ export const TextExtractionTab = ({ formData, onInputChange, isLoading, onSubmit
 
       {/* Collapsible Form Fields */}
       <Collapsible open={isFormOpen} onOpenChange={setIsFormOpen}>
-        <CollapsibleContent className="space-y-4">
+        <CollapsibleContent className="space-y-4 mt-4">
           <form onSubmit={onSubmit} className="space-y-4">
             {/* Mandatory Fields */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -291,11 +285,6 @@ export const TextExtractionTab = ({ formData, onInputChange, isLoading, onSubmit
                 placeholder="Add any additional notes or details about this voucher..."
                 rows={3}
               />
-            </div>
-
-            {/* TODO: Link Processing */}
-            <div className="text-sm text-gray-500 bg-gray-50 dark:bg-gray-800 p-3 rounded">
-              <p><strong>TODO:</strong> Enhanced link processing to fetch and analyze content from detected URLs.</p>
             </div>
 
             <Button

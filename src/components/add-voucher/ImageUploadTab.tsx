@@ -166,40 +166,8 @@ export const ImageUploadTab = ({ formData, onInputChange, isLoading, onSubmit }:
 
       {/* Collapsible Form Fields */}
       <Collapsible open={isFormOpen} onOpenChange={setIsFormOpen}>
-        <CollapsibleContent className="space-y-4">
+        <CollapsibleContent className="space-y-4 mt-4">
           <form onSubmit={onSubmit} className="space-y-4">
-            {/* URL Fields */}
-            <div className="space-y-4">
-              <div>
-                <Label htmlFor="eligibleBusinessesUrl">Eligible Businesses for Usage</Label>
-                <Input
-                  id="eligibleBusinessesUrl"
-                  type="url"
-                  value={formData.eligibleBusinessesUrl}
-                  onChange={(e) => onInputChange('eligibleBusinessesUrl', e.target.value)}
-                  placeholder="https://example.com/eligible-businesses"
-                  className={!validateUrl(formData.eligibleBusinessesUrl) ? 'border-red-500' : ''}
-                />
-                {formData.eligibleBusinessesUrl && !validateUrl(formData.eligibleBusinessesUrl) && (
-                  <p className="text-sm text-red-500 mt-1">Please enter a valid URL</p>
-                )}
-              </div>
-              <div>
-                <Label htmlFor="voucherUrl">Voucher Link</Label>
-                <Input
-                  id="voucherUrl"
-                  type="url"
-                  value={formData.voucherUrl}
-                  onChange={(e) => onInputChange('voucherUrl', e.target.value)}
-                  placeholder="https://example.com/voucher"
-                  className={!validateUrl(formData.voucherUrl) ? 'border-red-500' : ''}
-                />
-                {formData.voucherUrl && !validateUrl(formData.voucherUrl) && (
-                  <p className="text-sm text-red-500 mt-1">Please enter a valid URL</p>
-                )}
-              </div>
-            </div>
-
             {/* Mandatory Fields */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
@@ -237,6 +205,38 @@ export const ImageUploadTab = ({ formData, onInputChange, isLoading, onSubmit }:
                 min={new Date().toISOString().split('T')[0]}
                 required
               />
+            </div>
+
+            {/* URL Fields */}
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="eligibleBusinessesUrl">Eligible Businesses for Usage</Label>
+                <Input
+                  id="eligibleBusinessesUrl"
+                  type="url"
+                  value={formData.eligibleBusinessesUrl}
+                  onChange={(e) => onInputChange('eligibleBusinessesUrl', e.target.value)}
+                  placeholder="https://example.com/eligible-businesses"
+                  className={!validateUrl(formData.eligibleBusinessesUrl) ? 'border-red-500' : ''}
+                />
+                {formData.eligibleBusinessesUrl && !validateUrl(formData.eligibleBusinessesUrl) && (
+                  <p className="text-sm text-red-500 mt-1">Please enter a valid URL</p>
+                )}
+              </div>
+              <div>
+                <Label htmlFor="voucherUrl">Voucher Link</Label>
+                <Input
+                  id="voucherUrl"
+                  type="url"
+                  value={formData.voucherUrl}
+                  onChange={(e) => onInputChange('voucherUrl', e.target.value)}
+                  placeholder="https://example.com/voucher"
+                  className={!validateUrl(formData.voucherUrl) ? 'border-red-500' : ''}
+                />
+                {formData.voucherUrl && !validateUrl(formData.voucherUrl) && (
+                  <p className="text-sm text-red-500 mt-1">Please enter a valid URL</p>
+                )}
+              </div>
             </div>
 
             {/* Optional Fields */}
