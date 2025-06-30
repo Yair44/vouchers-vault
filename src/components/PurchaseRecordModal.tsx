@@ -5,9 +5,14 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { CalendarIcon } from 'lucide-react';
+import { format } from 'date-fns';
 import { Voucher } from '@/types';
 import { db } from '@/lib/db';
 import { toast } from '@/hooks/use-toast';
+import { cn } from '@/lib/utils';
 
 interface PurchaseRecordModalProps {
   open: boolean;
@@ -24,6 +29,7 @@ export const PurchaseRecordModal = ({
 }: PurchaseRecordModalProps) => {
   const [amount, setAmount] = useState('');
   const [description, setDescription] = useState('');
+  const [purchaseDate, setPurchaseDate] = useState<Date>(new Date());
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -57,7 +63,8 @@ export const PurchaseRecordModal = ({
         amount: -purchaseAmount, // Negative for expenditure
         previousBalance: voucher.balance,
         newBalance: voucher.balance - purchaseAmount,
-        description: description || 'Purchase recorded'
+        description: description || 'Purchase recorded',
+        purchaseDate
       });
 
       // Update voucher balance
@@ -75,6 +82,7 @@ export const PurchaseRecordModal = ({
         // Reset form and close
         setAmount('');
         setDescription('');
+        setPurchaseDate(new Date());
         onClose();
       }
     } catch (error) {
@@ -128,6 +136,33 @@ export const PurchaseRecordModal = ({
               placeholder="0.00"
               required
             />
+          </div>
+
+          <div>
+            <Label>Purchase Date *</Label>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  className={cn(
+                    "w-full justify-start text-left font-normal",
+                    !purchaseDate && "text-muted-foreground"
+                  )}
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {purchaseDate ? format(purchaseDate, "PPP") : "Pick a date"}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0">
+                <Calendar
+                  mode="single"
+                  selected={purchaseDate}
+                  onSelect={(date) => date && setPurchaseDate(date)}
+                  disabled={(date) => date > new Date()}
+                  initialFocus
+                />
+              </PopoverContent>
+            </Popover>
           </div>
 
           <div>

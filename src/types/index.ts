@@ -1,4 +1,3 @@
-
 export interface User {
   id: string;
   name: string;
@@ -22,6 +21,9 @@ export interface Voucher {
   eligibleBusinessesUrl?: string;
   voucherUrl?: string;
   isActive: boolean;
+  offerForSale?: boolean;
+  salePrice?: number;
+  contactInfo?: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -33,6 +35,7 @@ export interface Transaction {
   previousBalance: number;
   newBalance: number;
   description: string;
+  purchaseDate?: Date;
   createdAt: Date;
 }
 

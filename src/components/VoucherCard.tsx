@@ -3,12 +3,13 @@ import { useState } from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Calendar, Images, Edit, ShoppingCart, Clock } from 'lucide-react';
+import { Calendar, Images, Edit, ShoppingCart, Clock, DollarSign } from 'lucide-react';
 import { Voucher } from '@/types';
 import { cn } from '@/lib/utils';
 import { VoucherImagePreview } from './VoucherImagePreview';
 import { VoucherEditModal } from './VoucherEditModal';
 import { PurchaseRecordModal } from './PurchaseRecordModal';
+import { OfferForSaleModal } from './OfferForSaleModal';
 
 interface VoucherCardProps {
   voucher: Voucher;
@@ -22,6 +23,7 @@ export const VoucherCard = ({ voucher, onClick, className, onVoucherUpdated }: V
   const [showImagePreview, setShowImagePreview] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showPurchaseModal, setShowPurchaseModal] = useState(false);
+  const [showSaleModal, setShowSaleModal] = useState(false);
   
   const daysUntilExpiry = Math.ceil((voucher.expiryDate.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
   const isExpiringSoon = daysUntilExpiry <= 30 && daysUntilExpiry > 0;
@@ -58,6 +60,7 @@ export const VoucherCard = ({ voucher, onClick, className, onVoucherUpdated }: V
         className={cn(
           "hover:shadow-lg transition-all duration-200 cursor-pointer group relative overflow-hidden",
           isExpired && "opacity-60",
+          voucher.offerForSale && "ring-2 ring-orange-200 dark:ring-orange-800",
           className
         )}
         onClick={handleCardClick}
@@ -72,12 +75,19 @@ export const VoucherCard = ({ voucher, onClick, className, onVoucherUpdated }: V
                 {voucher.code}
               </p>
             </div>
-            {hasImages && (
-              <Badge variant="outline" className="ml-2">
-                <Images className="h-3 w-3 mr-1" />
-                {imageIds.length}
-              </Badge>
-            )}
+            <div className="flex space-x-2">
+              {hasImages && (
+                <Badge variant="outline" className="ml-2">
+                  <Images className="h-3 w-3 mr-1" />
+                  {imageIds.length}
+                </Badge>
+              )}
+              {voucher.offerForSale && (
+                <Badge className="bg-orange-100 text-orange-800 dark:bg-orange-900/20 dark:text-orange-400">
+                  For Sale
+                </Badge>
+              )}
+            </div>
           </div>
         </CardHeader>
 
@@ -101,6 +111,11 @@ export const VoucherCard = ({ voucher, onClick, className, onVoucherUpdated }: V
               </p>
               <p className="text-sm text-gray-500 dark:text-gray-400">
                 of ${voucher.originalBalance.toFixed(2)}
+                {voucher.offerForSale && voucher.salePrice && (
+                  <span className="ml-2 text-orange-600 dark:text-orange-400">
+                    • Sale: ${voucher.salePrice.toFixed(2)}
+                  </span>
+                )}
               </p>
             </div>
             
@@ -131,8 +146,8 @@ export const VoucherCard = ({ voucher, onClick, className, onVoucherUpdated }: V
             </p>
           )}
 
-          {/* Action Buttons */}
-          <div className="grid grid-cols-3 gap-2">
+          {/* Action Buttons - Updated to 4 columns */}
+          <div className="grid grid-cols-4 gap-2">
             {hasImages ? (
               <Button 
                 variant="outline" 
@@ -144,7 +159,7 @@ export const VoucherCard = ({ voucher, onClick, className, onVoucherUpdated }: V
                 className="flex items-center justify-center"
               >
                 <Images className="h-4 w-4 mr-1" />
-                <span className="hidden sm:inline">Preview</span>
+                <span className="hidden sm:inline">Show preview</span>
               </Button>
             ) : (
               <div></div>
@@ -176,6 +191,20 @@ export const VoucherCard = ({ voucher, onClick, className, onVoucherUpdated }: V
               <ShoppingCart className="h-4 w-4 mr-1" />
               <span className="hidden sm:inline">Use</span>
             </Button>
+
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={(e) => {
+                e.stopPropagation();
+                setShowSaleModal(true);
+              }}
+              disabled={voucher.balance <= 0 || isExpired || voucher.offerForSale}
+              className="flex items-center justify-center"
+            >
+              <DollarSign className="h-4 w-4 mr-1" />
+              <span className="hidden sm:inline">Offer Sale</span>
+            </Button>
           </div>
         </CardContent>
       </Card>
@@ -202,6 +231,13 @@ export const VoucherCard = ({ voucher, onClick, className, onVoucherUpdated }: V
         onClose={() => setShowPurchaseModal(false)}
         voucher={voucher}
         onPurchaseRecorded={handleVoucherUpdate}
+      />
+
+      <OfferForSaleModal
+        open={showSaleModal}
+        onClose={() => setShowSaleModal(false)}
+        voucher={voucher}
+        onVoucherUpdated={handleVoucherUpdate}
       />
     </>
   );
