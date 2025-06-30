@@ -44,7 +44,7 @@ export const VoucherCard = ({ voucher, onClick, className, onVoucherUpdated }: V
   const handleCardClick = (e: React.MouseEvent) => {
     // Only trigger onClick if clicking on the card itself, not on buttons
     if (e.target === e.currentTarget || (e.target as Element).closest('.card-content')) {
-      onClick?.(e);
+      onClick?.();
     }
   };
 
