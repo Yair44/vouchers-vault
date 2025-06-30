@@ -132,7 +132,7 @@ export const AddVoucher = () => {
               <TabsTrigger value="image" className="bg-violet-500 hover:bg-violet-300">
                 Image Upload
               </TabsTrigger>
-              <TabsTrigger value="text">
+              <TabsTrigger value="text" className="bg-violet-500 hover:bg-violet-300">
                 Text Extraction
               </TabsTrigger>
             </TabsList>
