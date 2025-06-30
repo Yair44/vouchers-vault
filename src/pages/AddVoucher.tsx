@@ -129,7 +129,7 @@ export const AddVoucher = () => {
               <TabsTrigger value="manual" className="bg-violet-500 hover:bg-violet-300">
                 Manual Recording
               </TabsTrigger>
-              <TabsTrigger value="image">
+              <TabsTrigger value="image" className="bg-violet-500 hover:bg-violet-300">
                 Image Upload
               </TabsTrigger>
               <TabsTrigger value="text">
