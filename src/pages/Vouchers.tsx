@@ -1,5 +1,6 @@
 
 import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { VoucherCard } from '@/components/VoucherCard';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -16,6 +17,7 @@ export const Vouchers = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState<string>('all');
   const [sortBy, setSortBy] = useState<string>('updated');
+  const [searchParams] = useSearchParams();
 
   const user = getCurrentUser();
 
@@ -24,6 +26,14 @@ export const Vouchers = () => {
     setVouchers(userVouchers);
     setFilteredVouchers(userVouchers);
   }, [user.id]);
+
+  // Handle URL search parameter on component mount
+  useEffect(() => {
+    const searchFromUrl = searchParams.get('search');
+    if (searchFromUrl) {
+      setSearchTerm(decodeURIComponent(searchFromUrl));
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     let filtered = vouchers;

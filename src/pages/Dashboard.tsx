@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { StatsCard } from '@/components/StatsCard';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -21,6 +21,7 @@ export const Dashboard = () => {
   const [voucherAnalytics, setVoucherAnalytics] = useState<Array<{name: string, value: number}>>([]);
 
   const user = getCurrentUser();
+  const navigate = useNavigate();
 
   useEffect(() => {
     // Load user's vouchers
@@ -58,6 +59,12 @@ export const Dashboard = () => {
 
     setVoucherAnalytics(analyticsData);
   }, [user.id]);
+
+  const handleBarClick = (data: any) => {
+    if (data && data.name) {
+      navigate(`/vouchers?search=${encodeURIComponent(data.name)}`);
+    }
+  };
 
   const chartConfig = {
     value: {
@@ -107,40 +114,47 @@ export const Dashboard = () => {
         />
       </div>
 
-      {/* Analytics Chart */}
+      {/* Analytics Chart - Full Width */}
       {voucherAnalytics.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Voucher Value Analytics</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ChartContainer config={chartConfig} className="h-[300px]">
-              <BarChart data={voucherAnalytics}>
-                <XAxis 
-                  dataKey="name" 
-                  tick={{ fontSize: 12 }}
-                  angle={-45}
-                  textAnchor="end"
-                  height={80}
-                />
-                <YAxis 
-                  tick={{ fontSize: 12 }}
-                  tickFormatter={(value) => `$${value}`}
-                />
-                <ChartTooltip 
-                  content={<ChartTooltipContent 
-                    formatter={(value) => [`$${value}`, "Value"]}
-                  />} 
-                />
-                <Bar 
-                  dataKey="value" 
-                  fill="var(--color-value)"
-                  radius={[4, 4, 0, 0]}
-                />
-              </BarChart>
-            </ChartContainer>
-          </CardContent>
-        </Card>
+        <div className="mx-4">
+          <Card className="w-full">
+            <CardHeader>
+              <CardTitle>Voucher Value Analytics</CardTitle>
+              <p className="text-sm text-gray-600 dark:text-gray-400">Click on any column to filter vouchers</p>
+            </CardHeader>
+            <CardContent>
+              <ChartContainer config={chartConfig} className="h-[400px] w-full">
+                <BarChart data={voucherAnalytics} margin={{ top: 20, right: 30, left: 20, bottom: 80 }}>
+                  <XAxis 
+                    dataKey="name" 
+                    tick={{ fontSize: 11 }}
+                    angle={-45}
+                    textAnchor="end"
+                    height={100}
+                    interval={0}
+                  />
+                  <YAxis 
+                    tick={{ fontSize: 12 }}
+                    tickFormatter={(value) => `$${value}`}
+                  />
+                  <ChartTooltip 
+                    content={<ChartTooltipContent 
+                      formatter={(value) => [`$${value}`, "Value"]}
+                    />} 
+                  />
+                  <Bar 
+                    dataKey="value" 
+                    fill="var(--color-value)"
+                    radius={[4, 4, 0, 0]}
+                    onClick={handleBarClick}
+                    style={{ cursor: 'pointer' }}
+                    className="hover:opacity-80 transition-opacity"
+                  />
+                </BarChart>
+              </ChartContainer>
+            </CardContent>
+          </Card>
+        </div>
       )}
     </div>
   );

@@ -62,6 +62,76 @@ const vouchers: Voucher[] = [
     isActive: true,
     createdAt: new Date('2024-06-01'),
     updatedAt: new Date('2024-06-01')
+  },
+  {
+    id: '4',
+    userId: '1',
+    name: 'Target Gift Card',
+    code: 'TGT-4567-8901-2345',
+    type: 'gift_card',
+    balance: 45.25,
+    originalBalance: 50.00,
+    expiryDate: new Date('2025-08-30'),
+    notes: 'Shopping voucher',
+    isActive: true,
+    createdAt: new Date('2024-03-10'),
+    updatedAt: new Date('2024-06-15')
+  },
+  {
+    id: '5',
+    userId: '1',
+    name: 'Best Buy Electronics Card',
+    code: 'BB-7890-1234-5678',
+    type: 'gift_card',
+    balance: 120.00,
+    originalBalance: 120.00,
+    expiryDate: new Date('2025-11-20'),
+    notes: 'Electronics purchase',
+    isActive: true,
+    createdAt: new Date('2024-04-05'),
+    updatedAt: new Date('2024-04-05')
+  },
+  {
+    id: '6',
+    userId: '1',
+    name: 'Netflix Premium Voucher',
+    code: 'NF-PREM-9876-5432',
+    type: 'coupon',
+    balance: 15.99,
+    originalBalance: 15.99,
+    expiryDate: new Date('2025-02-28'),
+    notes: 'Streaming service',
+    isActive: true,
+    createdAt: new Date('2024-05-12'),
+    updatedAt: new Date('2024-05-12')
+  },
+  {
+    id: '7',
+    userId: '1',
+    name: 'McDonald\'s Meal Card',
+    code: 'MCD-MEAL-1111-2222',
+    type: 'gift_card',
+    balance: 25.50,
+    originalBalance: 30.00,
+    expiryDate: new Date('2025-04-15'),
+    notes: 'Fast food voucher',
+    isActive: true,
+    createdAt: new Date('2024-06-01'),
+    updatedAt: new Date('2024-06-20')
+  },
+  {
+    id: '8',
+    userId: '1',
+    name: 'Home Depot Card',
+    code: 'HD-HOME-3333-4444',
+    type: 'gift_card',
+    balance: 75.80,
+    originalBalance: 100.00,
+    expiryDate: new Date('2025-09-10'),
+    notes: 'Home improvement store',
+    isActive: true,
+    createdAt: new Date('2024-02-20'),
+    updatedAt: new Date('2024-05-30')
   }
 ];
 
