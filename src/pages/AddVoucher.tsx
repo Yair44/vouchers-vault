@@ -126,13 +126,13 @@ export const AddVoucher = () => {
         <CardContent>
           <Tabs defaultValue="manual" className="w-full">
             <TabsList className="w-full justify-center bg-zinc-200">
-              <TabsTrigger value="manual" className="bg-violet-400 hover:bg-violet-300 rounded">
+              <TabsTrigger value="manual" className="bg-violet-400 hover:bg-violet-300 rounded font-bold">
                 Manual Recording
               </TabsTrigger>
-              <TabsTrigger value="image" className="rounded text-inherit bg-violet-400 hover:bg-violet-300 text-base font-medium">
+              <TabsTrigger value="image" className="rounded text-inherit bg-violet-400 hover:bg-violet-300 text-base font-bold">
                 Image Upload
               </TabsTrigger>
-              <TabsTrigger value="text">
+              <TabsTrigger value="text" className="rounded bg-violet-400 hover:bg-violet-300 text-inherit font-normal">
                 Text Extraction
               </TabsTrigger>
             </TabsList>
