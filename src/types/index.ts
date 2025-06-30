@@ -1,3 +1,4 @@
+
 export interface User {
   id: string;
   name: string;
@@ -16,7 +17,8 @@ export interface Voucher {
   originalBalance: number;
   expiryDate: Date;
   notes?: string;
-  imageUrl?: string;
+  imageUrl?: string; // Keep for backward compatibility
+  imageUrls?: string[]; // New field for multiple images (up to 2)
   eligibleBusinessesUrl?: string;
   voucherUrl?: string;
   isActive: boolean;

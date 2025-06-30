@@ -23,7 +23,8 @@ export const AddVoucher = () => {
     voucherUrl: ''
   });
   const [isLoading, setIsLoading] = useState(false);
-  const handleSubmit = async (e: React.FormEvent) => {
+  
+  const handleSubmit = async (e: React.FormEvent, imageIds?: string[]) => {
     e.preventDefault();
     setIsLoading(true);
     try {
@@ -73,7 +74,7 @@ export const AddVoucher = () => {
         return;
       }
 
-      // Create voucher
+      // Create voucher with image support
       const voucher = db.vouchers.create({
         userId: user.id,
         name: formData.name,
@@ -85,8 +86,10 @@ export const AddVoucher = () => {
         notes: formData.notes || undefined,
         eligibleBusinessesUrl: formData.eligibleBusinessesUrl || undefined,
         voucherUrl: formData.voucherUrl || undefined,
+        imageUrls: imageIds && imageIds.length > 0 ? imageIds : undefined,
         isActive: true
       });
+      
       toast({
         title: "Voucher Added",
         description: `${voucher.name} has been added successfully.`
@@ -102,12 +105,14 @@ export const AddVoucher = () => {
       setIsLoading(false);
     }
   };
+  
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({
       ...prev,
       [field]: value
     }));
   };
+  
   return <div className="max-w-4xl mx-auto space-y-6">
       {/* Header */}
       <div className="text-center">

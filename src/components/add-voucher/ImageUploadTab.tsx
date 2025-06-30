@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -6,6 +5,9 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Collapsible, CollapsibleContent } from '@/components/ui/collapsible';
 import { Upload, FileImage, X, Scan } from 'lucide-react';
+import { compressImage, validateImageFile } from '@/lib/imageCompression';
+import { ImageStorage } from '@/lib/imageStorage';
+import { toast } from '@/hooks/use-toast';
 
 interface ImageUploadTabProps {
   formData: {
@@ -19,27 +21,76 @@ interface ImageUploadTabProps {
   };
   onInputChange: (field: string, value: string) => void;
   isLoading: boolean;
-  onSubmit: (e: React.FormEvent) => void;
+  onSubmit: (e: React.FormEvent, imageIds?: string[]) => void;
 }
 
 export const ImageUploadTab = ({ formData, onInputChange, isLoading, onSubmit }: ImageUploadTabProps) => {
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
+  const [imageIds, setImageIds] = useState<string[]>([]);
   const [dragOver, setDragOver] = useState(false);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isScanning, setIsScanning] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
 
-  const handleFileUpload = (files: FileList | null) => {
-    if (!files) return;
+  const handleFileUpload = async (files: FileList | null) => {
+    if (!files || imageIds.length >= 2) return;
     
     const validFiles = Array.from(files).filter(file => 
-      file.type.startsWith('image/') || file.type === 'application/pdf'
+      validateImageFile(file)
     );
     
-    setUploadedFiles(prev => [...prev, ...validFiles]);
+    if (validFiles.length === 0) {
+      toast({
+        title: "Invalid Files",
+        description: "Please upload valid image files (JPEG, PNG, WebP) under 10MB.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setIsUploading(true);
+    try {
+      for (const file of validFiles.slice(0, 2 - imageIds.length)) {
+        const compressedImage = await compressImage(file, {
+          maxWidth: 1200,
+          maxHeight: 1200,
+          quality: 0.85,
+          maxSizeKB: 500
+        });
+        
+        const tempId = `temp_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+        const imageId = await ImageStorage.uploadImage(compressedImage, tempId);
+        setImageIds(prev => [...prev, imageId]);
+      }
+      
+      setUploadedFiles(prev => [...prev, ...validFiles]);
+      
+      toast({
+        title: "Images Uploaded",
+        description: `${validFiles.length} image(s) uploaded and compressed successfully.`
+      });
+    } catch (error) {
+      toast({
+        title: "Upload Failed",
+        description: "Failed to upload images. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsUploading(false);
+    }
   };
 
-  const removeFile = (index: number) => {
-    setUploadedFiles(prev => prev.filter((_, i) => i !== index));
+  const removeFile = async (index: number) => {
+    const imageId = imageIds[index];
+    try {
+      if (imageId) {
+        await ImageStorage.deleteImage(imageId);
+      }
+      setUploadedFiles(prev => prev.filter((_, i) => i !== index));
+      setImageIds(prev => prev.filter((_, i) => i !== index));
+    } catch (error) {
+      console.error('Failed to delete image:', error);
+    }
   };
 
   const handleDrop = (e: React.DragEvent) => {
@@ -80,6 +131,10 @@ export const ImageUploadTab = ({ formData, onInputChange, isLoading, onSubmit }:
     }
   };
 
+  const handleFormSubmit = (e: React.FormEvent) => {
+    onSubmit(e, imageIds);
+  };
+
   return (
     <div className="space-y-6">
       {/* Image Upload Area */}
@@ -95,21 +150,32 @@ export const ImageUploadTab = ({ formData, onInputChange, isLoading, onSubmit }:
       >
         <Upload className="h-8 w-8 mx-auto text-gray-400 mb-2" />
         <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">
-          Drag and drop voucher images or PDFs here, or click to browse
+          Drag and drop voucher images here, or click to browse (up to 2 images)
         </p>
         <input
           type="file"
           multiple
-          accept="image/*,application/pdf"
+          accept="image/*"
           onChange={(e) => handleFileUpload(e.target.files)}
           className="hidden"
           id="file-upload"
+          disabled={isUploading || imageIds.length >= 2}
         />
         <label htmlFor="file-upload">
-          <Button type="button" variant="outline" asChild>
-            <span>Browse Files</span>
+          <Button 
+            type="button" 
+            variant="outline" 
+            asChild 
+            disabled={isUploading || imageIds.length >= 2}
+          >
+            <span>
+              {isUploading ? 'Uploading...' : `Browse Files (${imageIds.length}/2)`}
+            </span>
           </Button>
         </label>
+        <p className="text-xs text-gray-500 mt-2">
+          Images will be automatically compressed while maintaining clarity for reading text/numbers
+        </p>
       </div>
 
       {/* Uploaded Files Preview */}
@@ -125,6 +191,7 @@ export const ImageUploadTab = ({ formData, onInputChange, isLoading, onSubmit }:
                   <span className="text-xs text-gray-500">
                     ({(file.size / 1024 / 1024).toFixed(2)} MB)
                   </span>
+                  <span className="text-xs text-green-600">Compressed</span>
                 </div>
                 <Button
                   type="button"
@@ -167,7 +234,7 @@ export const ImageUploadTab = ({ formData, onInputChange, isLoading, onSubmit }:
       {/* Collapsible Form Fields */}
       <Collapsible open={isFormOpen} onOpenChange={setIsFormOpen}>
         <CollapsibleContent className="space-y-4 mt-4">
-          <form onSubmit={onSubmit} className="space-y-4">
+          <form onSubmit={handleFormSubmit} className="space-y-4">
             {/* Mandatory Fields */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
@@ -264,7 +331,7 @@ export const ImageUploadTab = ({ formData, onInputChange, isLoading, onSubmit }:
             <Button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+              className="w-full"
             >
               {isLoading ? 'Adding...' : 'Add Voucher'}
             </Button>

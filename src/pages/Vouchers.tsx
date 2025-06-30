@@ -20,6 +20,12 @@ export const Vouchers = () => {
 
   const user = getCurrentUser();
 
+  const handleVoucherUpdate = (updatedVoucher: Voucher) => {
+    setVouchers(prev => 
+      prev.map(v => v.id === updatedVoucher.id ? updatedVoucher : v)
+    );
+  };
+
   useEffect(() => {
     const userVouchers = db.vouchers.findByUserId(user.id);
     setVouchers(userVouchers);
@@ -155,6 +161,7 @@ export const Vouchers = () => {
             <VoucherCard 
               key={voucher.id} 
               voucher={voucher}
+              onVoucherUpdated={handleVoucherUpdate}
               onClick={() => {
                 // TODO: Navigate to voucher detail
                 console.log('Navigate to voucher', voucher.id);
