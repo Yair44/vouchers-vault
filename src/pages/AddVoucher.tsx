@@ -125,11 +125,11 @@ export const AddVoucher = () => {
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="manual" className="w-full">
-            <TabsList className="w-full justify-center">
-              <TabsTrigger value="manual">
+            <TabsList className="w-full justify-center bg-zinc-200">
+              <TabsTrigger value="manual" className="bg-violet-400 hover:bg-violet-300 rounded">
                 Manual Recording
               </TabsTrigger>
-              <TabsTrigger value="image">
+              <TabsTrigger value="image" className="text-indigo-900 text-base font-normal rounded">
                 Image Upload
               </TabsTrigger>
               <TabsTrigger value="text">
