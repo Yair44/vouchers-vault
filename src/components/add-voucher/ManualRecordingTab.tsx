@@ -96,6 +96,12 @@ export const ManualRecordingTab = ({ formData, onInputChange, isLoading, onSubmi
     onSubmit(e, imageIds);
   };
 
+  const handleTypeChange = (value: string) => {
+    // Convert "none" back to empty string for the form data
+    const actualValue = value === "none" ? "" : value;
+    onInputChange('type', actualValue);
+  };
+
   return (
     <>
       <form onSubmit={handleFormSubmit} className="space-y-6">
@@ -184,12 +190,12 @@ export const ManualRecordingTab = ({ formData, onInputChange, isLoading, onSubmi
                 <Settings className="h-4 w-4" />
               </Button>
             </div>
-            <Select value={formData.type} onValueChange={(value) => onInputChange('type', value)}>
+            <Select value={formData.type || "none"} onValueChange={handleTypeChange}>
               <SelectTrigger>
                 <SelectValue placeholder="Select type (optional)" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">No Type</SelectItem>
+                <SelectItem value="none">No Type</SelectItem>
                 {allTypes.map((type) => (
                   <SelectItem key={type.id} value={type.name}>
                     <span className="capitalize">{type.name.replace('_', ' ')}</span>
