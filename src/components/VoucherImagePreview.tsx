@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight, Download, X } from 'lucide-react';
@@ -62,11 +62,11 @@ export const VoucherImagePreview = ({
   };
 
   // Load current image when dialog opens or index changes
-  useState(() => {
+  useEffect(() => {
     if (open && imageIds[currentImageIndex]) {
       loadImage(imageIds[currentImageIndex]);
     }
-  });
+  }, [open, currentImageIndex, imageIds]);
 
   const currentImageId = imageIds[currentImageIndex];
   const currentImage = imageData[currentImageId];
