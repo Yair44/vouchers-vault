@@ -9,13 +9,14 @@ import { toast } from '@/hooks/use-toast';
 import { ManualRecordingTab } from '@/components/add-voucher/ManualRecordingTab';
 import { ImageUploadTab } from '@/components/add-voucher/ImageUploadTab';
 import { TextExtractionTab } from '@/components/add-voucher/TextExtractionTab';
+
 export const AddVoucher = () => {
   const navigate = useNavigate();
   const user = getCurrentUser();
   const [formData, setFormData] = useState({
     name: '',
     code: '',
-    type: 'gift_card',
+    type: '',
     balance: '',
     expiryDate: '',
     notes: '',
@@ -74,12 +75,12 @@ export const AddVoucher = () => {
         return;
       }
 
-      // Create voucher with image support
+      // Create voucher with optional type
       const voucher = db.vouchers.create({
         userId: user.id,
         name: formData.name,
         code: formData.code,
-        type: formData.type,
+        type: formData.type || undefined, // Make type optional
         balance: balance,
         originalBalance: balance,
         expiryDate: expiryDate,

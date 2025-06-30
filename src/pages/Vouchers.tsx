@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { VoucherCard } from '@/components/VoucherCard';
@@ -5,10 +6,12 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Search, Upload, Calendar } from 'lucide-react';
+import { Search, Upload, Calendar, Download } from 'lucide-react';
 import { db, getCurrentUser } from '@/lib/db';
 import { Voucher } from '@/types';
 import { Link } from 'react-router-dom';
+import { exportVouchersToExcel } from '@/lib/excelExport';
+import { toast } from '@/hooks/use-toast';
 
 export const Vouchers = () => {
   const [vouchers, setVouchers] = useState<Voucher[]>([]);
@@ -16,6 +19,7 @@ export const Vouchers = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState<string>('all');
   const [sortBy, setSortBy] = useState<string>('updated');
+  const [isExporting, setIsExporting] = useState(false);
   const [searchParams] = useSearchParams();
 
   const user = getCurrentUser();
@@ -24,6 +28,25 @@ export const Vouchers = () => {
     setVouchers(prev => 
       prev.map(v => v.id === updatedVoucher.id ? updatedVoucher : v)
     );
+  };
+
+  const handleExportToExcel = async () => {
+    setIsExporting(true);
+    try {
+      exportVouchersToExcel(filteredVouchers);
+      toast({
+        title: "Export Successful",
+        description: `Exported ${filteredVouchers.length} vouchers to Excel.`
+      });
+    } catch (error) {
+      toast({
+        title: "Export Failed",
+        description: "Failed to export vouchers. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsExporting(false);
+    }
   };
 
   useEffect(() => {
@@ -96,12 +119,23 @@ export const Vouchers = () => {
           </p>
         </div>
         
-        <Link to="/add">
-          <Button className="flex items-center">
-            <Upload className="h-4 w-4 mr-2" />
-            Add Voucher
+        <div className="flex space-x-2">
+          <Button
+            onClick={handleExportToExcel}
+            disabled={isExporting || filteredVouchers.length === 0}
+            variant="outline"
+            className="flex items-center"
+          >
+            <Download className="h-4 w-4 mr-2" />
+            {isExporting ? 'Exporting...' : 'Export to Excel'}
           </Button>
-        </Link>
+          <Link to="/add">
+            <Button className="flex items-center">
+              <Upload className="h-4 w-4 mr-2" />
+              Add Voucher
+            </Button>
+          </Link>
+        </div>
       </div>
 
       {/* Filters and Search */}

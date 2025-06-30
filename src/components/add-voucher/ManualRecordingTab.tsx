@@ -174,7 +174,7 @@ export const ManualRecordingTab = ({ formData, onInputChange, isLoading, onSubmi
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <div className="flex items-center justify-between">
-              <Label htmlFor="type">Type *</Label>
+              <Label htmlFor="type">Type</Label>
               <Button
                 type="button"
                 variant="ghost"
@@ -186,9 +186,10 @@ export const ManualRecordingTab = ({ formData, onInputChange, isLoading, onSubmi
             </div>
             <Select value={formData.type} onValueChange={(value) => onInputChange('type', value)}>
               <SelectTrigger>
-                <SelectValue placeholder="Select type" />
+                <SelectValue placeholder="Select type (optional)" />
               </SelectTrigger>
               <SelectContent>
+                <SelectItem value="">No Type</SelectItem>
                 {allTypes.map((type) => (
                   <SelectItem key={type.id} value={type.name}>
                     <span className="capitalize">{type.name.replace('_', ' ')}</span>

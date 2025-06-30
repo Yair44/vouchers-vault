@@ -1,3 +1,4 @@
+
 export interface User {
   id: string;
   name: string;
@@ -11,7 +12,7 @@ export interface Voucher {
   userId: string;
   name: string;
   code: string;
-  type: string; // Changed from VoucherType to string to support custom types
+  type?: string; // Made optional - no longer required
   balance: number;
   originalBalance: number;
   expiryDate: Date;
