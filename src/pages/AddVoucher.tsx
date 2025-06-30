@@ -112,7 +112,8 @@ export const AddVoucher = () => {
       {/* Header */}
       <div className="text-center">
         <h1 className="text-2xl font-bold">Add New Voucher</h1>
-        <p className="text-gray-600 dark:text-gray-400">Manual Type, Paste the entire text or just upload a screenshot</p>
+        <p className="text-gray-600 dark:text-gray-400">Manual Type, paste the entire text 
+or just upload a screenshot</p>
       </div>
 
       {/* Main Card with Tabs */}
