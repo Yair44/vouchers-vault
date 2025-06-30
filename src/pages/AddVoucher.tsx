@@ -126,7 +126,7 @@ export const AddVoucher = () => {
         <CardContent>
           <Tabs defaultValue="manual" className="w-full">
             <TabsList className="mb-6">
-              <TabsTrigger value="manual">
+              <TabsTrigger value="manual" className="bg-violet-500 hover:bg-violet-300">
                 Manual Recording
               </TabsTrigger>
               <TabsTrigger value="image">
