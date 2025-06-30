@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { VoucherCard } from '@/components/VoucherCard';
@@ -85,14 +84,14 @@ export const Vouchers = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
         <div>
-          <h1 className="text-2xl font-bold">My Vouchers</h1>
+          <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent">My Vouchers</h1>
           <p className="text-gray-600 dark:text-gray-400">
             Manage your {vouchers.length} vouchers
           </p>
         </div>
         
         <Link to="/add">
-          <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
+          <Button className="flex items-center">
             <Upload className="h-4 w-4 mr-2" />
             Add Voucher
           </Button>
@@ -102,7 +101,7 @@ export const Vouchers = () => {
       {/* Filters and Search */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg">Filter & Search</CardTitle>
+          <CardTitle className="text-lg bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent">Filter & Search</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

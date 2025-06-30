@@ -69,20 +69,20 @@ export const Dashboard = () => {
   const chartConfig = {
     value: {
       label: "Value",
-      color: "hsl(var(--chart-1))",
+      color: "url(#gradient-purple-pink)",
     },
   };
 
   return (
     <div className="space-y-6">
-      {/* New Header */}
+      {/* Header */}
       <div className="space-y-4">
-        <h1 className="text-4xl font-bold text-purple-600">Dashboard</h1>
+        <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent">Dashboard</h1>
         <p className="text-gray-600 dark:text-gray-400 text-lg">
           Manage your digital voucher portfolio
         </p>
         <Link to="/add">
-          <Button className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg flex items-center space-x-2">
+          <Button className="px-6 py-3 rounded-lg flex items-center space-x-2">
             <Plus className="h-5 w-5" />
             <span>Add New Voucher</span>
           </Button>
@@ -114,17 +114,25 @@ export const Dashboard = () => {
         />
       </div>
 
-      {/* Analytics Chart - Full Width */}
+      {/* Analytics Chart - Full Width with minimal margins */}
       {voucherAnalytics.length > 0 && (
-        <div className="mx-4">
+        <div className="mx-1">
           <Card className="w-full">
             <CardHeader>
-              <CardTitle>Voucher Value Analytics</CardTitle>
+              <CardTitle className="bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent">
+                Voucher Value Analytics
+              </CardTitle>
               <p className="text-sm text-gray-600 dark:text-gray-400">Click on any column to filter vouchers</p>
             </CardHeader>
             <CardContent>
               <ChartContainer config={chartConfig} className="h-[400px] w-full">
                 <BarChart data={voucherAnalytics} margin={{ top: 20, right: 30, left: 20, bottom: 80 }}>
+                  <defs>
+                    <linearGradient id="gradient-purple-pink" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stopColor="#9333ea" />
+                      <stop offset="100%" stopColor="#ec4899" />
+                    </linearGradient>
+                  </defs>
                   <XAxis 
                     dataKey="name" 
                     tick={{ fontSize: 11 }}
@@ -144,7 +152,7 @@ export const Dashboard = () => {
                   />
                   <Bar 
                     dataKey="value" 
-                    fill="var(--color-value)"
+                    fill="url(#gradient-purple-pink)"
                     radius={[4, 4, 0, 0]}
                     onClick={handleBarClick}
                     style={{ cursor: 'pointer' }}

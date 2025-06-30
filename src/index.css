@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -51,6 +52,8 @@
     --sidebar-border: 220 13% 91%;
 
     --sidebar-ring: 217.2 91.2% 59.8%;
+
+    --chart-1: linear-gradient(135deg, #9333ea 0%, #ec4899 100%);
   }
 
   .dark {
@@ -89,6 +92,8 @@
     --sidebar-accent-foreground: 240 4.8% 95.9%;
     --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 217.2 91.2% 59.8%;
+
+    --chart-1: linear-gradient(135deg, #a855f7 0%, #f472b6 100%);
   }
 }
 
@@ -99,5 +104,20 @@
 
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+/* Custom gradient classes for fintech styling */
+@layer utilities {
+  .gradient-primary {
+    @apply bg-gradient-to-r from-purple-600 to-pink-500 hover:from-purple-700 hover:to-pink-600;
+  }
+  
+  .gradient-secondary {
+    @apply bg-gradient-to-r from-purple-100 to-pink-100 hover:from-purple-200 hover:to-pink-200 text-purple-800;
+  }
+  
+  .dark .gradient-secondary {
+    @apply from-purple-900 to-pink-900 hover:from-purple-800 hover:to-pink-800 text-purple-200;
   }
 }

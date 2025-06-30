@@ -111,15 +111,15 @@ export const AddVoucher = () => {
   return <div className="max-w-4xl mx-auto space-y-6">
       {/* Header */}
       <div className="text-center">
-        <h1 className="text-2xl font-bold">Add New Voucher</h1>
-        <p className="text-gray-600 dark:text-gray-400">Manual Type, paste the entire text 
+        <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent">Add New Voucher</h1>
+        <p className="text-gray-600 dark:text-gray-400">Manual Type, paste the entire text 
 or just upload a screenshot</p>
       </div>
 
       {/* Main Card with Tabs */}
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center justify-center">
+          <CardTitle className="flex items-center justify-center bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent">
             <Calendar className="h-5 w-5 mr-2" />
             Voucher Details
           </CardTitle>
@@ -127,13 +127,22 @@ or just upload a screenshot</p>
         <CardContent>
           <Tabs defaultValue="manual" className="w-full">
             <TabsList className="mb-6">
-              <TabsTrigger value="manual" className="data-[state=active]:bg-violet-300 data-[state=active]:text-zinc-950">
+              <TabsTrigger 
+                value="manual" 
+                className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500 data-[state=active]:to-pink-400 data-[state=active]:text-white"
+              >
                 Manual Recording
               </TabsTrigger>
-              <TabsTrigger value="image" className="data-[state=active]:bg-violet-300 data-[state=active]:text-zinc-950">
+              <TabsTrigger 
+                value="image" 
+                className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500 data-[state=active]:to-pink-400 data-[state=active]:text-white"
+              >
                 Image Upload
               </TabsTrigger>
-              <TabsTrigger value="text" className="data-[state=active]:bg-violet-300 data-[state=active]:text-zinc-950">
+              <TabsTrigger 
+                value="text" 
+                className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500 data-[state=active]:to-pink-400 data-[state=active]:text-white"
+              >
                 Text Extraction
               </TabsTrigger>
             </TabsList>
