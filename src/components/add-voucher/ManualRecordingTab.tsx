@@ -1,11 +1,10 @@
-
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useVoucherTypes } from '@/hooks/useVoucherTypes';
+import { useVoucherCategories } from '@/hooks/useVoucherCategories';
 import { VoucherTypeManager } from '@/components/VoucherTypeManager';
 import { Settings, Upload, X } from 'lucide-react';
 import { compressImage, validateImageFile } from '@/lib/imageCompression';
@@ -16,7 +15,7 @@ interface ManualRecordingTabProps {
   formData: {
     name: string;
     code: string;
-    type: string;
+    category: string;
     balance: string;
     expiryDate: string;
     notes: string;
@@ -29,11 +28,11 @@ interface ManualRecordingTabProps {
 }
 
 export const ManualRecordingTab = ({ formData, onInputChange, isLoading, onSubmit }: ManualRecordingTabProps) => {
-  const { getAllTypes } = useVoucherTypes();
+  const { getAllCategories } = useVoucherCategories();
   const [showTypeManager, setShowTypeManager] = useState(false);
   const [imageIds, setImageIds] = useState<string[]>([]);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
-  const allTypes = getAllTypes();
+  const allCategories = getAllCategories();
 
   const handleImageUpload = async (files: FileList | null) => {
     if (!files || imageIds.length >= 2) return;
@@ -96,10 +95,10 @@ export const ManualRecordingTab = ({ formData, onInputChange, isLoading, onSubmi
     onSubmit(e, imageIds);
   };
 
-  const handleTypeChange = (value: string) => {
+  const handleCategoryChange = (value: string) => {
     // Convert "none" back to empty string for the form data
     const actualValue = value === "none" ? "" : value;
-    onInputChange('type', actualValue);
+    onInputChange('category', actualValue);
   };
 
   return (
@@ -176,11 +175,11 @@ export const ManualRecordingTab = ({ formData, onInputChange, isLoading, onSubmi
           </div>
         </div>
 
-        {/* Type and Balance */}
+        {/* Category and Balance */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <div className="flex items-center justify-between">
-              <Label htmlFor="type">Type</Label>
+              <Label htmlFor="category">Category</Label>
               <Button
                 type="button"
                 variant="ghost"
@@ -190,18 +189,18 @@ export const ManualRecordingTab = ({ formData, onInputChange, isLoading, onSubmi
                 <Settings className="h-4 w-4" />
               </Button>
             </div>
-            <Select value={formData.type || "none"} onValueChange={handleTypeChange}>
+            <Select value={formData.category || "none"} onValueChange={handleCategoryChange}>
               <SelectTrigger>
-                <SelectValue placeholder="Select type (optional)" />
+                <SelectValue placeholder="Select category (optional)" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="none">No Type</SelectItem>
-                {allTypes.map((type) => (
-                  <SelectItem key={type.id} value={type.name}>
-                    <span className="capitalize">{type.name.replace('_', ' ')}</span>
+                <SelectItem value="none">No Category</SelectItem>
+                {allCategories.map((category) => (
+                  <SelectItem key={category.id} value={category.name}>
+                    <span className="capitalize">{category.name.replace('_', ' ')}</span>
                   </SelectItem>
                 ))}
-                <SelectItem value="__new_type__">+ Add New Type</SelectItem>
+                <SelectItem value="__new_category__">+ Add New Category</SelectItem>
               </SelectContent>
             </Select>
           </div>
