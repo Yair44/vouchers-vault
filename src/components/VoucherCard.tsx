@@ -1,9 +1,8 @@
-
 import { useState } from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Eye, Clock } from 'lucide-react';
+import { Eye, Clock, Edit } from 'lucide-react';
 import { Voucher } from '@/types';
 import { cn } from '@/lib/utils';
 import { VoucherProgress } from './VoucherProgress';
@@ -23,6 +22,17 @@ export const VoucherCard = ({ voucher, className }: VoucherCardProps) => {
   const daysUntilExpiry = Math.ceil((voucher.expiryDate.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
   const isExpiringSoon = daysUntilExpiry <= 30 && daysUntilExpiry > 0;
   const isExpired = status === 'expired';
+
+  const getCategoryColor = (category: string) => {
+    switch (category) {
+      case 'retail': return 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400';
+      case 'restaurants': return 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400';
+      case 'entertainment': return 'bg-purple-100 text-purple-800 dark:bg-purple-900/20 dark:text-purple-400';
+      case 'travel': return 'bg-orange-100 text-orange-800 dark:bg-orange-900/20 dark:text-orange-400';
+      case 'services': return 'bg-pink-100 text-pink-800 dark:bg-pink-900/20 dark:text-pink-400';
+      default: return 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400';
+    }
+  };
 
   const handleFullDetails = () => {
     navigate(`/voucher/${voucher.id}`);
@@ -66,7 +76,7 @@ export const VoucherCard = ({ voucher, className }: VoucherCardProps) => {
           </div>
           
           {voucher.category && (
-            <Badge className="bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400">
+            <Badge className={getCategoryColor(voucher.category)}>
               {voucher.category.charAt(0).toUpperCase() + voucher.category.slice(1)}
             </Badge>
           )}
@@ -102,8 +112,8 @@ export const VoucherCard = ({ voucher, className }: VoucherCardProps) => {
           onClick={handleFullDetails}
           className="w-full flex items-center justify-center"
         >
-          <Eye className="h-4 w-4 mr-2" />
-          Full Details
+          <Edit className="h-4 w-4 mr-2" />
+          Edit Details
         </Button>
       </CardContent>
     </Card>
