@@ -4,11 +4,15 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Eye, Download, Upload, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { VoucherStatusBadge } from './VoucherStatusBadge';
+import { Voucher, Transaction } from '@/types';
 
 interface VoucherCodeSectionProps {
   code: string;
   imageIds?: string[];
   voucherName: string;
+  voucher?: Voucher;
+  transactions?: Transaction[];
   onImagePreview?: () => void;
   onImageUpload?: (files: FileList) => void;
   onImageRemove?: (index: number) => void;
@@ -20,6 +24,8 @@ export const VoucherCodeSection = ({
   code, 
   imageIds = [], 
   voucherName,
+  voucher,
+  transactions = [],
   onImagePreview,
   onImageUpload,
   onImageRemove,
@@ -32,11 +38,16 @@ export const VoucherCodeSection = ({
     <Card className={cn("overflow-hidden shadow-md", className)}>
       <CardContent className="p-6">
         <div className="space-y-4">
-          {/* Voucher Code */}
+          {/* Voucher Code with Status Badge */}
           <div className="text-center">
-            <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">
-              Voucher Code
-            </h3>
+            <div className="flex items-center justify-center space-x-3 mb-2">
+              {voucher && (
+                <VoucherStatusBadge voucher={voucher} transactions={transactions} />
+              )}
+              <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                Voucher Code
+              </h3>
+            </div>
             <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 border-2 border-dashed border-gray-200 dark:border-gray-700">
               <p className="text-xl font-mono font-bold text-gray-900 dark:text-gray-100 tracking-wider">
                 {code}

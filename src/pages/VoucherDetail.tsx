@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, DollarSign, Calendar, Clock, ExternalLink, Upload } from 'lucide-react';
+import { ArrowLeft, DollarSign, Calendar, Clock, ExternalLink, Upload, Edit } from 'lucide-react';
 import { db } from '@/lib/db';
 import { Voucher, Transaction, getVoucherStatus } from '@/types';
 import { VoucherProgress } from '@/components/VoucherProgress';
@@ -123,17 +123,24 @@ export const VoucherDetail = () => {
     }
   };
   return <div className="space-y-6">
-      {/* Header */}
+      {/* Header with Edit Details button moved here */}
       <div className="flex items-center justify-between">
         <Button variant="ghost" onClick={() => navigate('/vouchers')}>
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back to Vouchers
         </Button>
         
-        {voucher.balance > 0 && !isExpired && !voucher.offerForSale && <Button onClick={() => setShowSaleModal(true)} className="bg-green-600 hover:bg-green-700 text-white flex items-center shadow-md">
-            <DollarSign className="h-4 w-4 mr-2" />
-            Offer for Sale
-          </Button>}
+        <div className="flex items-center space-x-3">
+          <Button variant="outline" onClick={() => setShowEditModal(true)}>
+            <Edit className="h-4 w-4 mr-2" />
+            Edit Details
+          </Button>
+          
+          {voucher.balance > 0 && !isExpired && !voucher.offerForSale && <Button onClick={() => setShowSaleModal(true)} className="bg-green-600 hover:bg-green-700 text-white flex items-center shadow-md">
+              <DollarSign className="h-4 w-4 mr-2" />
+              Offer for Sale
+            </Button>}
+        </div>
       </div>
 
       {/* Voucher Name - Centered and Styled */}
@@ -143,26 +150,18 @@ export const VoucherDetail = () => {
         </h1>
       </div>
 
-      {/* Status and Expiry Header */}
-      <Card className="shadow-md">
-        <CardContent className="p-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <VoucherStatusBadge voucher={voucher} transactions={transactions} />
-              <div className="flex items-center space-x-1 text-gray-600 dark:text-gray-400">
-                
-                
-              </div>
-            </div>
-            <Button variant="outline" onClick={() => setShowEditModal(true)}>
-              Edit Details
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Voucher Code and Images */}
-      <VoucherCodeSection code={voucher.code} imageIds={imageIds} voucherName={voucher.name} onImagePreview={imageIds.length > 0 ? () => setShowImagePreview(true) : undefined} onImageUpload={handleImageUpload} onImageRemove={handleImageRemove} isUploadingImage={isUploadingImage} />
+      {/* Voucher Code and Images with Status Badge */}
+      <VoucherCodeSection 
+        code={voucher.code} 
+        imageIds={imageIds} 
+        voucherName={voucher.name} 
+        voucher={voucher}
+        transactions={transactions}
+        onImagePreview={imageIds.length > 0 ? () => setShowImagePreview(true) : undefined} 
+        onImageUpload={handleImageUpload} 
+        onImageRemove={handleImageRemove} 
+        isUploadingImage={isUploadingImage} 
+      />
 
       {/* Voucher Details */}
       <Card className="shadow-md">
