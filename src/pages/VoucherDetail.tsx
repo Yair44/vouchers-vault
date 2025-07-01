@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -17,9 +16,12 @@ import { OfferForSaleModal } from '@/components/OfferForSaleModal';
 import { toast } from '@/hooks/use-toast';
 import { compressImage, validateImageFile } from '@/lib/imageCompression';
 import { ImageStorage } from '@/lib/imageStorage';
-
 export const VoucherDetail = () => {
-  const { id } = useParams<{ id: string }>();
+  const {
+    id
+  } = useParams<{
+    id: string;
+  }>();
   const navigate = useNavigate();
   const [voucher, setVoucher] = useState<Voucher | null>(null);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -29,39 +31,31 @@ export const VoucherDetail = () => {
   const [showSaleModal, setShowSaleModal] = useState(false);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
   const [loading, setLoading] = useState(true);
-
   useEffect(() => {
     if (!id) {
       navigate('/vouchers');
       return;
     }
-
     const voucherData = db.vouchers.findById(id);
     if (!voucherData) {
       navigate('/vouchers');
       return;
     }
-
     const voucherTransactions = db.transactions.findByVoucherId(id);
     setVoucher(voucherData);
     setTransactions(voucherTransactions);
     setLoading(false);
   }, [id, navigate]);
-
   const handleVoucherUpdate = (updatedVoucher: Voucher) => {
     setVoucher(updatedVoucher);
   };
-
   const handleImageUpload = async (files: FileList) => {
     if (!voucher || !files) return;
-
     const imageIds = voucher.imageUrls || [];
     if (imageIds.length >= 2) return;
-
     setIsUploadingImage(true);
     try {
       const validFiles = Array.from(files).filter(validateImageFile);
-      
       for (const file of validFiles.slice(0, 2 - imageIds.length)) {
         const compressedImage = await compressImage(file, {
           maxWidth: 1200,
@@ -69,12 +63,10 @@ export const VoucherDetail = () => {
           quality: 0.85,
           maxSizeKB: 500
         });
-        
         const imageId = await ImageStorage.uploadImage(compressedImage, voucher.id);
         const updatedVoucher = db.vouchers.update(voucher.id, {
           imageUrls: [...imageIds, imageId]
         });
-        
         if (updatedVoucher) {
           setVoucher(updatedVoucher);
         }
@@ -89,19 +81,15 @@ export const VoucherDetail = () => {
       setIsUploadingImage(false);
     }
   };
-
   const handleImageRemove = async (index: number) => {
     if (!voucher) return;
-    
     const imageIds = voucher.imageUrls || [];
     const imageId = imageIds[index];
-    
     try {
       await ImageStorage.deleteImage(imageId);
       const updatedVoucher = db.vouchers.update(voucher.id, {
         imageUrls: imageIds.filter((_, i) => i !== index)
       });
-      
       if (updatedVoucher) {
         setVoucher(updatedVoucher);
       }
@@ -109,34 +97,32 @@ export const VoucherDetail = () => {
       console.error('Failed to delete image:', error);
     }
   };
-
   if (loading || !voucher) {
-    return (
-      <div className="flex items-center justify-center min-h-64">
+    return <div className="flex items-center justify-center min-h-64">
         <div className="text-center">Loading...</div>
-      </div>
-    );
+      </div>;
   }
-
   const daysUntilExpiry = Math.ceil((voucher.expiryDate.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
   const isExpiringSoon = daysUntilExpiry <= 30 && daysUntilExpiry > 0;
   const isExpired = daysUntilExpiry <= 0;
-  
   const imageIds = voucher.imageUrls || (voucher.imageUrl ? [voucher.imageUrl] : []);
-
   const getCategoryColor = (category: string) => {
     switch (category) {
-      case 'retail': return 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400';
-      case 'restaurants': return 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400';
-      case 'entertainment': return 'bg-purple-100 text-purple-800 dark:bg-purple-900/20 dark:text-purple-400';
-      case 'travel': return 'bg-orange-100 text-orange-800 dark:bg-orange-900/20 dark:text-orange-400';
-      case 'services': return 'bg-pink-100 text-pink-800 dark:bg-pink-900/20 dark:text-pink-400';
-      default: return 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400';
+      case 'retail':
+        return 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400';
+      case 'restaurants':
+        return 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400';
+      case 'entertainment':
+        return 'bg-purple-100 text-purple-800 dark:bg-purple-900/20 dark:text-purple-400';
+      case 'travel':
+        return 'bg-orange-100 text-orange-800 dark:bg-orange-900/20 dark:text-orange-400';
+      case 'services':
+        return 'bg-pink-100 text-pink-800 dark:bg-pink-900/20 dark:text-pink-400';
+      default:
+        return 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400';
     }
   };
-
-  return (
-    <div className="space-y-6">
+  return <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <Button variant="ghost" onClick={() => navigate('/vouchers')}>
@@ -144,15 +130,10 @@ export const VoucherDetail = () => {
           Back to Vouchers
         </Button>
         
-        {voucher.balance > 0 && !isExpired && !voucher.offerForSale && (
-          <Button 
-            onClick={() => setShowSaleModal(true)}
-            className="bg-green-600 hover:bg-green-700 text-white flex items-center shadow-md"
-          >
+        {voucher.balance > 0 && !isExpired && !voucher.offerForSale && <Button onClick={() => setShowSaleModal(true)} className="bg-green-600 hover:bg-green-700 text-white flex items-center shadow-md">
             <DollarSign className="h-4 w-4 mr-2" />
             Offer for Sale
-          </Button>
-        )}
+          </Button>}
       </div>
 
       {/* Voucher Name - Centered and Styled */}
@@ -169,10 +150,8 @@ export const VoucherDetail = () => {
             <div className="flex items-center space-x-4">
               <VoucherStatusBadge voucher={voucher} transactions={transactions} />
               <div className="flex items-center space-x-1 text-gray-600 dark:text-gray-400">
-                <Clock className="h-4 w-4" />
-                <span className={`font-medium ${isExpired ? 'text-red-600' : isExpiringSoon ? 'text-orange-600' : ''}`}>
-                  {isExpired ? 'Expired' : isExpiringSoon ? `${daysUntilExpiry} days left` : `${daysUntilExpiry} days`}
-                </span>
+                
+                
               </div>
             </div>
             <Button variant="outline" onClick={() => setShowEditModal(true)}>
@@ -183,15 +162,7 @@ export const VoucherDetail = () => {
       </Card>
 
       {/* Voucher Code and Images */}
-      <VoucherCodeSection
-        code={voucher.code}
-        imageIds={imageIds}
-        voucherName={voucher.name}
-        onImagePreview={imageIds.length > 0 ? () => setShowImagePreview(true) : undefined}
-        onImageUpload={handleImageUpload}
-        onImageRemove={handleImageRemove}
-        isUploadingImage={isUploadingImage}
-      />
+      <VoucherCodeSection code={voucher.code} imageIds={imageIds} voucherName={voucher.name} onImagePreview={imageIds.length > 0 ? () => setShowImagePreview(true) : undefined} onImageUpload={handleImageUpload} onImageRemove={handleImageRemove} isUploadingImage={isUploadingImage} />
 
       {/* Voucher Details */}
       <Card className="shadow-md">
@@ -213,61 +184,39 @@ export const VoucherDetail = () => {
             </div>
             
             <div className="space-y-4">
-              {voucher.category && (
-                <div>
+              {voucher.category && <div>
                   <label className="text-sm font-medium text-gray-500">Category</label>
                   <div className="mt-1">
                     <Badge className={getCategoryColor(voucher.category)}>
                       {voucher.category.charAt(0).toUpperCase() + voucher.category.slice(1)}
                     </Badge>
                   </div>
-                </div>
-              )}
+                </div>}
               
-              {voucher.eligibleBusinessesUrl && (
-                <div>
+              {voucher.eligibleBusinessesUrl && <div>
                   <label className="text-sm font-medium text-gray-500">Eligible Businesses</label>
-                  <a
-                    href={voucher.eligibleBusinessesUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center text-blue-600 hover:text-blue-800 mt-1"
-                  >
+                  <a href={voucher.eligibleBusinessesUrl} target="_blank" rel="noopener noreferrer" className="flex items-center text-blue-600 hover:text-blue-800 mt-1">
                     <ExternalLink className="h-4 w-4 mr-1" />
                     View eligible businesses
                   </a>
-                </div>
-              )}
+                </div>}
               
-              {voucher.voucherUrl && (
-                <div>
+              {voucher.voucherUrl && <div>
                   <label className="text-sm font-medium text-gray-500">Voucher URL</label>
-                  <a
-                    href={voucher.voucherUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center text-blue-600 hover:text-blue-800 mt-1"
-                  >
+                  <a href={voucher.voucherUrl} target="_blank" rel="noopener noreferrer" className="flex items-center text-blue-600 hover:text-blue-800 mt-1">
                     <ExternalLink className="h-4 w-4 mr-1" />
                     View voucher online
                   </a>
-                </div>
-              )}
+                </div>}
             </div>
           </div>
 
-          <VoucherProgress 
-            current={voucher.balance} 
-            original={voucher.originalBalance}
-            className="mt-6"
-          />
+          <VoucherProgress current={voucher.balance} original={voucher.originalBalance} className="mt-6" />
 
-          {voucher.notes && (
-            <div>
+          {voucher.notes && <div>
               <label className="text-sm font-medium text-gray-500">Notes</label>
               <p className="text-gray-700 dark:text-gray-300 mt-1">{voucher.notes}</p>
-            </div>
-          )}
+            </div>}
         </CardContent>
       </Card>
 
@@ -275,21 +224,14 @@ export const VoucherDetail = () => {
       <Card className="shadow-md">
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>Purchase History</CardTitle>
-          <Button 
-            variant="outline" 
-            size="sm" 
-            onClick={() => setShowPurchaseModal(true)}
-            disabled={voucher.balance <= 0 || isExpired}
-          >
+          <Button variant="outline" size="sm" onClick={() => setShowPurchaseModal(true)} disabled={voucher.balance <= 0 || isExpired}>
             <Upload className="h-4 w-4 mr-2" />
             Record Purchase
           </Button>
         </CardHeader>
         <CardContent>
-          {transactions.length > 0 ? (
-            <div className="space-y-3">
-              {transactions.map((transaction) => (
-                <div key={transaction.id} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+          {transactions.length > 0 ? <div className="space-y-3">
+              {transactions.map(transaction => <div key={transaction.id} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
                   <div>
                     <p className="font-medium">{transaction.description}</p>
                     <p className="text-sm text-gray-600 dark:text-gray-400">
@@ -304,47 +246,20 @@ export const VoucherDetail = () => {
                       Balance: ${transaction.newBalance.toFixed(2)}
                     </p>
                   </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <p className="text-gray-600 dark:text-gray-400 text-center py-8">
+                </div>)}
+            </div> : <p className="text-gray-600 dark:text-gray-400 text-center py-8">
               No purchase history yet
-            </p>
-          )}
+            </p>}
         </CardContent>
       </Card>
 
       {/* Modals */}
-      <VoucherEditModal
-        open={showEditModal}
-        onClose={() => setShowEditModal(false)}
-        voucher={voucher}
-        onVoucherUpdated={handleVoucherUpdate}
-      />
+      <VoucherEditModal open={showEditModal} onClose={() => setShowEditModal(false)} voucher={voucher} onVoucherUpdated={handleVoucherUpdate} />
 
-      {imageIds.length > 0 && (
-        <VoucherImagePreview
-          open={showImagePreview}
-          onClose={() => setShowImagePreview(false)}
-          imageIds={imageIds}
-          voucherName={voucher.name}
-        />
-      )}
+      {imageIds.length > 0 && <VoucherImagePreview open={showImagePreview} onClose={() => setShowImagePreview(false)} imageIds={imageIds} voucherName={voucher.name} />}
 
-      <PurchaseRecordModal
-        open={showPurchaseModal}
-        onClose={() => setShowPurchaseModal(false)}
-        voucher={voucher}
-        onPurchaseRecorded={handleVoucherUpdate}
-      />
+      <PurchaseRecordModal open={showPurchaseModal} onClose={() => setShowPurchaseModal(false)} voucher={voucher} onPurchaseRecorded={handleVoucherUpdate} />
 
-      <OfferForSaleModal
-        open={showSaleModal}
-        onClose={() => setShowSaleModal(false)}
-        voucher={voucher}
-        onVoucherUpdated={handleVoucherUpdate}
-      />
-    </div>
-  );
+      <OfferForSaleModal open={showSaleModal} onClose={() => setShowSaleModal(false)} voucher={voucher} onVoucherUpdated={handleVoucherUpdate} />
+    </div>;
 };
