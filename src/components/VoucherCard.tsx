@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -113,7 +114,7 @@ export const VoucherCard = ({ voucher, className }: VoucherCardProps) => {
           className="w-full flex items-center justify-center"
         >
           <Edit className="h-4 w-4 mr-2" />
-          Edit Details
+          Full Details
         </Button>
       </CardContent>
     </Card>
