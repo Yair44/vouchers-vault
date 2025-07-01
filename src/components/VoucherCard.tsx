@@ -90,8 +90,8 @@ export const VoucherCard = ({ voucher, className }: VoucherCardProps) => {
 
         {/* Only show expiry details if not expired */}
         {!isExpired && (
-          <div className="flex items-center justify-between text-sm">
-            <div className="flex items-center space-x-1 text-gray-500 dark:text-gray-400">
+          <div className="flex items-center justify-between text-sm text-gray-400 bg-gray-100 dark:bg-gray-800 dark:text-gray-400 p-2 rounded">
+            <div className="flex items-center space-x-1">
               <Clock className="h-4 w-4" />
               <span>
                 {isExpiringSoon ? `${daysUntilExpiry} days left` : voucher.expiryDate.toLocaleDateString()}
