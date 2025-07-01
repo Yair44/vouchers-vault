@@ -15,6 +15,11 @@ export const VoucherStatusBadge = ({ voucher, transactions = [], className }: Vo
   
   const getStatusConfig = (status: string) => {
     switch (status) {
+      case 'expired':
+        return {
+          label: 'Expired',
+          className: 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400'
+        };
       case 'new':
         return {
           label: 'New',
@@ -23,7 +28,7 @@ export const VoucherStatusBadge = ({ voucher, transactions = [], className }: Vo
       case 'unused':
         return {
           label: 'Unused',
-          className: 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400 animate-pulse shadow-md shadow-green-200'
+          className: 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400'
         };
       case 'partially_used':
         return {
@@ -33,7 +38,7 @@ export const VoucherStatusBadge = ({ voucher, transactions = [], className }: Vo
       case 'fully_used':
         return {
           label: 'Fully Used',
-          className: 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400'
+          className: 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400'
         };
       default:
         return {

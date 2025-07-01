@@ -79,7 +79,7 @@ export const Vouchers = () => {
         const thirtyDaysFromNow = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
         filtered = filtered.filter(v => v.isActive && v.expiryDate <= thirtyDaysFromNow && v.expiryDate > new Date());
       } else {
-        filtered = filtered.filter(voucher => voucher.type === filterType);
+        filtered = filtered.filter(voucher => voucher.category === filterType);
       }
     }
 
@@ -151,17 +151,18 @@ export const Vouchers = () => {
             
             <Select value={filterType} onValueChange={setFilterType}>
               <SelectTrigger>
-                <SelectValue placeholder="Filter by type" />
+                <SelectValue placeholder="Filter by category" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Vouchers</SelectItem>
                 <SelectItem value="active">Active</SelectItem>
                 <SelectItem value="expired">Expired</SelectItem>
                 <SelectItem value="expiring">Expiring Soon</SelectItem>
-                <SelectItem value="gift_card">Gift Cards</SelectItem>
-                <SelectItem value="coupon">Coupons</SelectItem>
-                <SelectItem value="loyalty_card">Loyalty Cards</SelectItem>
-                <SelectItem value="discount">Discounts</SelectItem>
+                <SelectItem value="retail">Retail</SelectItem>
+                <SelectItem value="restaurants">Restaurants</SelectItem>
+                <SelectItem value="entertainment">Entertainment</SelectItem>
+                <SelectItem value="travel">Travel</SelectItem>
+                <SelectItem value="services">Services</SelectItem>
                 <SelectItem value="other">Other</SelectItem>
               </SelectContent>
             </Select>

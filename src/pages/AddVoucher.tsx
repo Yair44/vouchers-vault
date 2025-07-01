@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -16,7 +17,7 @@ export const AddVoucher = () => {
   const [formData, setFormData] = useState({
     name: '',
     code: '',
-    type: '',
+    category: '',
     balance: '',
     expiryDate: '',
     notes: '',
@@ -75,12 +76,12 @@ export const AddVoucher = () => {
         return;
       }
 
-      // Create voucher with optional type
+      // Create voucher with optional category
       const voucher = db.vouchers.create({
         userId: user.id,
         name: formData.name,
         code: formData.code,
-        type: formData.type || undefined, // Make type optional
+        category: formData.category || undefined,
         balance: balance,
         originalBalance: balance,
         expiryDate: expiryDate,

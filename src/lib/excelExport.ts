@@ -7,7 +7,7 @@ export const exportVouchersToExcel = (vouchers: Voucher[], filename?: string) =>
   const excelData = vouchers.map(voucher => ({
     'Name': voucher.name,
     'Code': voucher.code,
-    'Type': voucher.type || 'Unspecified',
+    'Category': voucher.category || 'Unspecified',
     'Current Balance': voucher.balance,
     'Original Balance': voucher.originalBalance,
     'Expiry Date': voucher.expiryDate.toLocaleDateString(),

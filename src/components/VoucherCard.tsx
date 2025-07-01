@@ -3,11 +3,12 @@ import { useState } from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Eye, Clock } from 'lucide-react';
+import { Eye, Clock, Edit } from 'lucide-react';
 import { Voucher } from '@/types';
 import { cn } from '@/lib/utils';
 import { VoucherProgress } from './VoucherProgress';
 import { VoucherStatusBadge } from './VoucherStatusBadge';
+import { getVoucherStatus } from '@/types';
 import { useNavigate } from 'react-router-dom';
 
 interface VoucherCardProps {
@@ -17,10 +18,11 @@ interface VoucherCardProps {
 
 export const VoucherCard = ({ voucher, className }: VoucherCardProps) => {
   const navigate = useNavigate();
+  const status = getVoucherStatus(voucher);
   
   const daysUntilExpiry = Math.ceil((voucher.expiryDate.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
   const isExpiringSoon = daysUntilExpiry <= 30 && daysUntilExpiry > 0;
-  const isExpired = daysUntilExpiry <= 0;
+  const isExpired = status === 'expired';
 
   const getCategoryColor = (category: string) => {
     switch (category) {
@@ -41,7 +43,6 @@ export const VoucherCard = ({ voucher, className }: VoucherCardProps) => {
     <Card 
       className={cn(
         "hover:shadow-lg transition-all duration-200 relative overflow-hidden shadow-md",
-        isExpired && "opacity-60",
         voucher.offerForSale && "ring-2 ring-orange-200 dark:ring-orange-800",
         className
       )}
@@ -87,21 +88,24 @@ export const VoucherCard = ({ voucher, className }: VoucherCardProps) => {
           original={voucher.originalBalance}
         />
 
-        <div className="flex items-center justify-between text-sm">
-          <div className="flex items-center space-x-1 text-gray-500 dark:text-gray-400">
-            <Clock className="h-4 w-4" />
-            <span>
-              {isExpired ? 'Expired' : isExpiringSoon ? `${daysUntilExpiry} days left` : voucher.expiryDate.toLocaleDateString()}
-            </span>
+        {/* Only show expiry details if not expired */}
+        {!isExpired && (
+          <div className="flex items-center justify-between text-sm">
+            <div className="flex items-center space-x-1 text-gray-500 dark:text-gray-400">
+              <Clock className="h-4 w-4" />
+              <span>
+                {isExpiringSoon ? `${daysUntilExpiry} days left` : voucher.expiryDate.toLocaleDateString()}
+              </span>
+            </div>
+            
+            {isExpiringSoon && (
+              <Badge variant="destructive" className="text-xs">
+                <Clock className="h-3 w-3 mr-1" />
+                Expiring Soon
+              </Badge>
+            )}
           </div>
-          
-          {isExpiringSoon && (
-            <Badge variant="destructive" className="text-xs">
-              <Clock className="h-3 w-3 mr-1" />
-              Expiring Soon
-            </Badge>
-          )}
-        </div>
+        )}
 
         <Button 
           variant="outline" 
@@ -109,8 +113,8 @@ export const VoucherCard = ({ voucher, className }: VoucherCardProps) => {
           onClick={handleFullDetails}
           className="w-full flex items-center justify-center"
         >
-          <Eye className="h-4 w-4 mr-2" />
-          Full Details
+          <Edit className="h-4 w-4 mr-2" />
+          Edit Details
         </Button>
       </CardContent>
     </Card>

@@ -66,6 +66,11 @@ export interface CustomVoucherCategory {
 
 // Utility functions for voucher status
 export const getVoucherStatus = (voucher: Voucher, transactions: Transaction[] = []) => {
+  // Check expiry first - expired status takes priority
+  if (!voucher.isActive || voucher.expiryDate <= new Date()) {
+    return 'expired';
+  }
+  
   const daysSinceCreation = Math.floor((new Date().getTime() - voucher.createdAt.getTime()) / (1000 * 60 * 60 * 24));
   const hasTransactions = transactions.length > 0;
   
