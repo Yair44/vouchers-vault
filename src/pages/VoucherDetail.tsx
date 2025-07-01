@@ -4,16 +4,19 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Edit, Trash2, DollarSign, Calendar, Clock, CheckCircle, XCircle, ExternalLink, Download, Upload, Eye } from 'lucide-react';
+import { ArrowLeft, DollarSign, Calendar, Clock, ExternalLink, Upload } from 'lucide-react';
 import { db } from '@/lib/db';
-import { Voucher, Transaction } from '@/types';
+import { Voucher, Transaction, getVoucherStatus } from '@/types';
 import { VoucherProgress } from '@/components/VoucherProgress';
 import { VoucherEditModal } from '@/components/VoucherEditModal';
-import { VoucherDeleteModal } from '@/components/VoucherDeleteModal';
+import { VoucherCodeSection } from '@/components/VoucherCodeSection';
+import { VoucherStatusBadge } from '@/components/VoucherStatusBadge';
 import { VoucherImagePreview } from '@/components/VoucherImagePreview';
 import { PurchaseRecordModal } from '@/components/PurchaseRecordModal';
 import { OfferForSaleModal } from '@/components/OfferForSaleModal';
 import { toast } from '@/hooks/use-toast';
+import { compressImage, validateImageFile } from '@/lib/imageCompression';
+import { ImageStorage } from '@/lib/imageStorage';
 
 export const VoucherDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -21,10 +24,10 @@ export const VoucherDetail = () => {
   const [voucher, setVoucher] = useState<Voucher | null>(null);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [showEditModal, setShowEditModal] = useState(false);
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showImagePreview, setShowImagePreview] = useState(false);
   const [showPurchaseModal, setShowPurchaseModal] = useState(false);
   const [showSaleModal, setShowSaleModal] = useState(false);
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -49,22 +52,61 @@ export const VoucherDetail = () => {
     setVoucher(updatedVoucher);
   };
 
-  const handleDeleteVoucher = () => {
-    if (!voucher) return;
-    
-    const success = db.vouchers.delete(voucher.id);
-    if (success) {
+  const handleImageUpload = async (files: FileList) => {
+    if (!voucher || !files) return;
+
+    const imageIds = voucher.imageUrls || [];
+    if (imageIds.length >= 2) return;
+
+    setIsUploadingImage(true);
+    try {
+      const validFiles = Array.from(files).filter(validateImageFile);
+      
+      for (const file of validFiles.slice(0, 2 - imageIds.length)) {
+        const compressedImage = await compressImage(file, {
+          maxWidth: 1200,
+          maxHeight: 1200,
+          quality: 0.85,
+          maxSizeKB: 500
+        });
+        
+        const imageId = await ImageStorage.uploadImage(compressedImage, voucher.id);
+        const updatedVoucher = db.vouchers.update(voucher.id, {
+          imageUrls: [...imageIds, imageId]
+        });
+        
+        if (updatedVoucher) {
+          setVoucher(updatedVoucher);
+        }
+      }
+    } catch (error) {
       toast({
-        title: "Voucher Deleted",
-        description: `${voucher.name} has been permanently deleted.`
-      });
-      navigate('/vouchers');
-    } else {
-      toast({
-        title: "Delete Failed",
-        description: "Failed to delete the voucher. Please try again.",
+        title: "Upload Failed",
+        description: "Failed to upload image. Please try again.",
         variant: "destructive"
       });
+    } finally {
+      setIsUploadingImage(false);
+    }
+  };
+
+  const handleImageRemove = async (index: number) => {
+    if (!voucher) return;
+    
+    const imageIds = voucher.imageUrls || [];
+    const imageId = imageIds[index];
+    
+    try {
+      await ImageStorage.deleteImage(imageId);
+      const updatedVoucher = db.vouchers.update(voucher.id, {
+        imageUrls: imageIds.filter((_, i) => i !== index)
+      });
+      
+      if (updatedVoucher) {
+        setVoucher(updatedVoucher);
+      }
+    } catch (error) {
+      console.error('Failed to delete image:', error);
     }
   };
 
@@ -81,14 +123,14 @@ export const VoucherDetail = () => {
   const isExpired = daysUntilExpiry <= 0;
   
   const imageIds = voucher.imageUrls || (voucher.imageUrl ? [voucher.imageUrl] : []);
-  const hasImages = imageIds.length > 0;
 
-  const getTypeColor = (type: string) => {
-    switch (type) {
-      case 'gift_card': return 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400';
-      case 'coupon': return 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400';
-      case 'loyalty_card': return 'bg-purple-100 text-purple-800 dark:bg-purple-900/20 dark:text-purple-400';
-      case 'discount': return 'bg-orange-100 text-orange-800 dark:bg-orange-900/20 dark:text-orange-400';
+  const getCategoryColor = (category: string) => {
+    switch (category) {
+      case 'retail': return 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400';
+      case 'restaurants': return 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400';
+      case 'entertainment': return 'bg-purple-100 text-purple-800 dark:bg-purple-900/20 dark:text-purple-400';
+      case 'travel': return 'bg-orange-100 text-orange-800 dark:bg-orange-900/20 dark:text-orange-400';
+      case 'services': return 'bg-pink-100 text-pink-800 dark:bg-pink-900/20 dark:text-pink-400';
       default: return 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400';
     }
   };
@@ -97,17 +139,15 @@ export const VoucherDetail = () => {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-4">
-          <Button variant="ghost" onClick={() => navigate('/vouchers')}>
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Vouchers
-          </Button>
-        </div>
+        <Button variant="ghost" onClick={() => navigate('/vouchers')}>
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          Back to Vouchers
+        </Button>
         
         {voucher.balance > 0 && !isExpired && !voucher.offerForSale && (
           <Button 
             onClick={() => setShowSaleModal(true)}
-            className="flex items-center"
+            className="bg-green-600 hover:bg-green-700 text-white flex items-center shadow-md"
           >
             <DollarSign className="h-4 w-4 mr-2" />
             Offer for Sale
@@ -115,57 +155,47 @@ export const VoucherDetail = () => {
         )}
       </div>
 
-      {/* Voucher Header */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-start justify-between">
-            <div className="flex-1">
-              <CardTitle className="text-3xl mb-2">{voucher.name}</CardTitle>
-              <p className="text-lg text-gray-600 dark:text-gray-400 font-mono">
-                {voucher.code}
-              </p>
-            </div>
-            <div className="flex items-center space-x-3">
-              <div className="flex items-center space-x-1">
+      {/* Voucher Name - Centered and Styled */}
+      <div className="text-center">
+        <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent mb-2">
+          {voucher.name}
+        </h1>
+      </div>
+
+      {/* Status and Expiry Header */}
+      <Card className="shadow-md">
+        <CardContent className="p-6">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <VoucherStatusBadge voucher={voucher} transactions={transactions} />
+              <div className="flex items-center space-x-1 text-gray-600 dark:text-gray-400">
                 <Clock className="h-4 w-4" />
-                <span className={`font-medium ${isExpired ? 'text-red-600' : isExpiringSoon ? 'text-orange-600' : 'text-gray-600'}`}>
+                <span className={`font-medium ${isExpired ? 'text-red-600' : isExpiringSoon ? 'text-orange-600' : ''}`}>
                   {isExpired ? 'Expired' : isExpiringSoon ? `${daysUntilExpiry} days left` : `${daysUntilExpiry} days`}
                 </span>
               </div>
-              <div className="flex items-center space-x-1">
-                {voucher.isActive ? (
-                  <>
-                    <CheckCircle className="h-4 w-4 text-green-500" />
-                    <span className="text-green-600 font-medium">Active</span>
-                  </>
-                ) : (
-                  <>
-                    <XCircle className="h-4 w-4 text-red-500" />
-                    <span className="text-red-600 font-medium">Inactive</span>
-                  </>
-                )}
-              </div>
             </div>
-          </div>
-        </CardHeader>
-      </Card>
-
-      {/* Voucher Details */}
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle>Voucher Information</CardTitle>
-          <div className="space-x-2">
-            <Button variant="outline" size="sm" onClick={() => setShowEditModal(true)}>
-              <Edit className="h-4 w-4 mr-2" />
+            <Button variant="outline" onClick={() => setShowEditModal(true)}>
               Edit Details
             </Button>
-            <Button variant="outline" size="sm" onClick={() => setShowDeleteModal(true)} className="text-red-600 hover:text-red-700">
-              <Trash2 className="h-4 w-4 mr-2" />
-              Delete Voucher
-            </Button>
           </div>
-        </CardHeader>
-        <CardContent className="space-y-6">
+        </CardContent>
+      </Card>
+
+      {/* Voucher Code and Images */}
+      <VoucherCodeSection
+        code={voucher.code}
+        imageIds={imageIds}
+        voucherName={voucher.name}
+        onImagePreview={imageIds.length > 0 ? () => setShowImagePreview(true) : undefined}
+        onImageUpload={handleImageUpload}
+        onImageRemove={handleImageRemove}
+        isUploadingImage={isUploadingImage}
+      />
+
+      {/* Voucher Details */}
+      <Card className="shadow-md">
+        <CardContent className="space-y-6 p-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-4">
               <div>
@@ -183,12 +213,12 @@ export const VoucherDetail = () => {
             </div>
             
             <div className="space-y-4">
-              {voucher.type && (
+              {voucher.category && (
                 <div>
-                  <label className="text-sm font-medium text-gray-500">Type</label>
+                  <label className="text-sm font-medium text-gray-500">Category</label>
                   <div className="mt-1">
-                    <Badge className={getTypeColor(voucher.type)}>
-                      {voucher.type.replace('_', ' ')}
+                    <Badge className={getCategoryColor(voucher.category)}>
+                      {voucher.category.charAt(0).toUpperCase() + voucher.category.slice(1)}
                     </Badge>
                   </div>
                 </div>
@@ -241,28 +271,8 @@ export const VoucherDetail = () => {
         </CardContent>
       </Card>
 
-      {/* Images */}
-      {hasImages && (
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle>Images</CardTitle>
-            <div className="space-x-2">
-              <Button variant="outline" size="sm" onClick={() => setShowImagePreview(true)}>
-                <Eye className="h-4 w-4 mr-2" />
-                View Images
-              </Button>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-gray-600 dark:text-gray-400">
-              {imageIds.length} image{imageIds.length > 1 ? 's' : ''} attached
-            </p>
-          </CardContent>
-        </Card>
-      )}
-
       {/* Purchase History */}
-      <Card>
+      <Card className="shadow-md">
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>Purchase History</CardTitle>
           <Button 
@@ -313,14 +323,7 @@ export const VoucherDetail = () => {
         onVoucherUpdated={handleVoucherUpdate}
       />
 
-      <VoucherDeleteModal
-        open={showDeleteModal}
-        onClose={() => setShowDeleteModal(false)}
-        voucherName={voucher.name}
-        onConfirmDelete={handleDeleteVoucher}
-      />
-
-      {hasImages && (
+      {imageIds.length > 0 && (
         <VoucherImagePreview
           open={showImagePreview}
           onClose={() => setShowImagePreview(false)}

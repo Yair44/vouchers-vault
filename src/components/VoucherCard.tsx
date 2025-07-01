@@ -3,10 +3,11 @@ import { useState } from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Eye, Clock, CheckCircle, XCircle } from 'lucide-react';
+import { Eye, Clock } from 'lucide-react';
 import { Voucher } from '@/types';
 import { cn } from '@/lib/utils';
 import { VoucherProgress } from './VoucherProgress';
+import { VoucherStatusBadge } from './VoucherStatusBadge';
 import { useNavigate } from 'react-router-dom';
 
 interface VoucherCardProps {
@@ -21,12 +22,13 @@ export const VoucherCard = ({ voucher, className }: VoucherCardProps) => {
   const isExpiringSoon = daysUntilExpiry <= 30 && daysUntilExpiry > 0;
   const isExpired = daysUntilExpiry <= 0;
 
-  const getTypeColor = (type: string) => {
-    switch (type) {
-      case 'gift_card': return 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400';
-      case 'coupon': return 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400';
-      case 'loyalty_card': return 'bg-purple-100 text-purple-800 dark:bg-purple-900/20 dark:text-purple-400';
-      case 'discount': return 'bg-orange-100 text-orange-800 dark:bg-orange-900/20 dark:text-orange-400';
+  const getCategoryColor = (category: string) => {
+    switch (category) {
+      case 'retail': return 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400';
+      case 'restaurants': return 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400';
+      case 'entertainment': return 'bg-purple-100 text-purple-800 dark:bg-purple-900/20 dark:text-purple-400';
+      case 'travel': return 'bg-orange-100 text-orange-800 dark:bg-orange-900/20 dark:text-orange-400';
+      case 'services': return 'bg-pink-100 text-pink-800 dark:bg-pink-900/20 dark:text-pink-400';
       default: return 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400';
     }
   };
@@ -38,7 +40,7 @@ export const VoucherCard = ({ voucher, className }: VoucherCardProps) => {
   return (
     <Card 
       className={cn(
-        "hover:shadow-lg transition-all duration-200 relative overflow-hidden",
+        "hover:shadow-lg transition-all duration-200 relative overflow-hidden shadow-md",
         isExpired && "opacity-60",
         voucher.offerForSale && "ring-2 ring-orange-200 dark:ring-orange-800",
         className
@@ -50,16 +52,9 @@ export const VoucherCard = ({ voucher, className }: VoucherCardProps) => {
             <h3 className="font-semibold text-lg mb-1 line-clamp-2">
               {voucher.name}
             </h3>
-            <p className="text-sm text-gray-500 dark:text-gray-400 font-mono">
-              {voucher.code}
-            </p>
           </div>
           <div className="flex items-center space-x-2">
-            {voucher.isActive ? (
-              <CheckCircle className="h-4 w-4 text-green-500" />
-            ) : (
-              <XCircle className="h-4 w-4 text-red-500" />
-            )}
+            <VoucherStatusBadge voucher={voucher} />
             {voucher.offerForSale && (
               <Badge className="bg-orange-100 text-orange-800 dark:bg-orange-900/20 dark:text-orange-400">
                 For Sale
@@ -80,9 +75,9 @@ export const VoucherCard = ({ voucher, className }: VoucherCardProps) => {
             </p>
           </div>
           
-          {voucher.type && (
-            <Badge className={getTypeColor(voucher.type)}>
-              {voucher.type.replace('_', ' ')}
+          {voucher.category && (
+            <Badge className={getCategoryColor(voucher.category)}>
+              {voucher.category.charAt(0).toUpperCase() + voucher.category.slice(1)}
             </Badge>
           )}
         </div>

@@ -1,9 +1,6 @@
 
 import { useState } from 'react';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Trash2 } from 'lucide-react';
 
 interface VoucherDeleteModalProps {
@@ -19,12 +16,9 @@ export const VoucherDeleteModal = ({
   voucherName, 
   onConfirmDelete 
 }: VoucherDeleteModalProps) => {
-  const [confirmText, setConfirmText] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);
 
   const handleDelete = async () => {
-    if (confirmText !== 'DELETE') return;
-    
     setIsDeleting(true);
     try {
       await onConfirmDelete();
@@ -36,13 +30,8 @@ export const VoucherDeleteModal = ({
     }
   };
 
-  const handleClose = () => {
-    setConfirmText('');
-    onClose();
-  };
-
   return (
-    <AlertDialog open={open} onOpenChange={handleClose}>
+    <AlertDialog open={open} onOpenChange={onClose}>
       <AlertDialogContent className="max-w-md">
         <AlertDialogHeader>
           <AlertDialogTitle className="flex items-center space-x-2 text-red-600">
@@ -56,27 +45,15 @@ export const VoucherDeleteModal = ({
             <p className="text-red-600 font-medium">
               This action cannot be undone. All transaction history will also be deleted.
             </p>
-            <div className="space-y-2">
-              <Label htmlFor="confirm-delete">
-                Type <strong>DELETE</strong> to confirm:
-              </Label>
-              <Input
-                id="confirm-delete"
-                value={confirmText}
-                onChange={(e) => setConfirmText(e.target.value)}
-                placeholder="Type DELETE here"
-                className="font-mono"
-              />
-            </div>
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel onClick={handleClose}>
+          <AlertDialogCancel onClick={onClose}>
             Cancel
           </AlertDialogCancel>
           <AlertDialogAction
             onClick={handleDelete}
-            disabled={confirmText !== 'DELETE' || isDeleting}
+            disabled={isDeleting}
             className="bg-red-600 hover:bg-red-700 focus:ring-red-600"
           >
             {isDeleting ? 'Deleting...' : 'Delete Forever'}

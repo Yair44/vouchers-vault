@@ -12,7 +12,7 @@ export interface Voucher {
   userId: string;
   name: string;
   code: string;
-  type?: string; // Made optional - no longer required
+  category?: string; // Changed from type to category
   balance: number;
   originalBalance: number;
   expiryDate: Date;
@@ -48,8 +48,8 @@ export interface SharedVoucher {
   createdAt: Date;
 }
 
-// Keep default types but allow custom ones too
-export const DEFAULT_VOUCHER_TYPES = ['gift_card', 'coupon', 'loyalty_card', 'discount', 'other'] as const;
+// Updated category system
+export const DEFAULT_VOUCHER_CATEGORIES = ['retail', 'restaurants', 'entertainment', 'travel', 'services', 'other'] as const;
 
 export interface VoucherStats {
   totalVouchers: number;
@@ -58,8 +58,19 @@ export interface VoucherStats {
   activeCount: number;
 }
 
-export interface CustomVoucherType {
+export interface CustomVoucherCategory {
   id: string;
   name: string;
   createdAt: Date;
 }
+
+// Utility functions for voucher status
+export const getVoucherStatus = (voucher: Voucher, transactions: Transaction[] = []) => {
+  const daysSinceCreation = Math.floor((new Date().getTime() - voucher.createdAt.getTime()) / (1000 * 60 * 60 * 24));
+  const hasTransactions = transactions.length > 0;
+  
+  if (voucher.balance === 0) return 'fully_used';
+  if (hasTransactions) return 'partially_used';
+  if (daysSinceCreation <= 7) return 'new';
+  return 'unused';
+};
