@@ -3,35 +3,23 @@ import { useState } from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Calendar, Images, Edit, ShoppingCart, Clock, DollarSign } from 'lucide-react';
+import { Eye, Clock, CheckCircle, XCircle } from 'lucide-react';
 import { Voucher } from '@/types';
 import { cn } from '@/lib/utils';
-import { VoucherImagePreview } from './VoucherImagePreview';
-import { VoucherEditModal } from './VoucherEditModal';
-import { PurchaseRecordModal } from './PurchaseRecordModal';
-import { OfferForSaleModal } from './OfferForSaleModal';
+import { VoucherProgress } from './VoucherProgress';
+import { useNavigate } from 'react-router-dom';
 
 interface VoucherCardProps {
   voucher: Voucher;
-  onClick?: () => void;
   className?: string;
-  onVoucherUpdated?: (updatedVoucher: Voucher) => void;
 }
 
-export const VoucherCard = ({ voucher, onClick, className, onVoucherUpdated }: VoucherCardProps) => {
-  const [imageError, setImageError] = useState(false);
-  const [showImagePreview, setShowImagePreview] = useState(false);
-  const [showEditModal, setShowEditModal] = useState(false);
-  const [showPurchaseModal, setShowPurchaseModal] = useState(false);
-  const [showSaleModal, setShowSaleModal] = useState(false);
+export const VoucherCard = ({ voucher, className }: VoucherCardProps) => {
+  const navigate = useNavigate();
   
   const daysUntilExpiry = Math.ceil((voucher.expiryDate.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
   const isExpiringSoon = daysUntilExpiry <= 30 && daysUntilExpiry > 0;
   const isExpired = daysUntilExpiry <= 0;
-
-  // Get image URLs - support both old single imageUrl and new imageUrls array
-  const imageIds = voucher.imageUrls || (voucher.imageUrl ? [voucher.imageUrl] : []);
-  const hasImages = imageIds.length > 0;
 
   const getTypeColor = (type: string) => {
     switch (type) {
@@ -43,202 +31,93 @@ export const VoucherCard = ({ voucher, onClick, className, onVoucherUpdated }: V
     }
   };
 
-  const handleCardClick = (e: React.MouseEvent) => {
-    // Only trigger onClick if clicking on the card itself, not on buttons
-    if (e.target === e.currentTarget || (e.target as Element).closest('.card-content')) {
-      onClick?.();
-    }
-  };
-
-  const handleVoucherUpdate = (updatedVoucher: Voucher) => {
-    onVoucherUpdated?.(updatedVoucher);
+  const handleFullDetails = () => {
+    navigate(`/voucher/${voucher.id}`);
   };
 
   return (
-    <>
-      <Card 
-        className={cn(
-          "hover:shadow-lg transition-all duration-200 cursor-pointer group relative overflow-hidden",
-          isExpired && "opacity-60",
-          voucher.offerForSale && "ring-2 ring-orange-200 dark:ring-orange-800",
-          className
-        )}
-        onClick={handleCardClick}
-      >
-        <CardHeader className="pb-3">
-          <div className="flex items-start justify-between">
-            <div className="flex-1 card-content">
-              <h3 className="font-semibold text-lg mb-1 group-hover:text-blue-600 transition-colors">
-                {voucher.name}
-              </h3>
-              <p className="text-sm text-gray-500 dark:text-gray-400 font-mono">
-                {voucher.code}
-              </p>
-            </div>
-            <div className="flex space-x-2">
-              {hasImages && (
-                <Badge variant="outline" className="ml-2">
-                  <Images className="h-3 w-3 mr-1" />
-                  {imageIds.length}
-                </Badge>
-              )}
-              {voucher.offerForSale && (
-                <Badge className="bg-orange-100 text-orange-800 dark:bg-orange-900/20 dark:text-orange-400">
-                  For Sale
-                </Badge>
-              )}
-            </div>
+    <Card 
+      className={cn(
+        "hover:shadow-lg transition-all duration-200 relative overflow-hidden",
+        isExpired && "opacity-60",
+        voucher.offerForSale && "ring-2 ring-orange-200 dark:ring-orange-800",
+        className
+      )}
+    >
+      <CardHeader className="pb-3">
+        <div className="flex items-start justify-between">
+          <div className="flex-1">
+            <h3 className="font-semibold text-lg mb-1 line-clamp-2">
+              {voucher.name}
+            </h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400 font-mono">
+              {voucher.code}
+            </p>
           </div>
-        </CardHeader>
-
-        <CardContent className="space-y-4">
-          {/* Legacy single image support */}
-          {voucher.imageUrl && !voucher.imageUrls && !imageError && (
-            <div className="aspect-video w-full bg-gray-100 dark:bg-gray-800 rounded-lg overflow-hidden">
-              <img
-                src={voucher.imageUrl}
-                alt={voucher.name}
-                className="w-full h-full object-cover"
-                onError={() => setImageError(true)}
-              />
-            </div>
-          )}
-
-          <div className="flex items-center justify-between card-content">
-            <div>
-              <p className="text-2xl font-bold text-green-600 dark:text-green-400">
-                ${voucher.balance.toFixed(2)}
-              </p>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
-                of ${voucher.originalBalance.toFixed(2)}
-                {voucher.offerForSale && voucher.salePrice && (
-                  <span className="ml-2 text-orange-600 dark:text-orange-400">
-                    • Sale: ${voucher.salePrice.toFixed(2)}
-                  </span>
-                )}
-              </p>
-            </div>
-            
-            <Badge className={getTypeColor(voucher.type)}>
-              {voucher.type.replace('_', ' ')}
-            </Badge>
-          </div>
-
-          <div className="flex items-center justify-between text-sm card-content">
-            <div className="flex items-center space-x-1 text-gray-500 dark:text-gray-400">
-              <Calendar className="h-4 w-4" />
-              <span>
-                {isExpired ? 'Expired' : isExpiringSoon ? `${daysUntilExpiry} days left` : voucher.expiryDate.toLocaleDateString()}
-              </span>
-            </div>
-            
-            {isExpiringSoon && (
-              <Badge variant="destructive" className="text-xs">
-                <Clock className="h-3 w-3 mr-1" />
-                Expiring Soon
+          <div className="flex items-center space-x-2">
+            {voucher.isActive ? (
+              <CheckCircle className="h-4 w-4 text-green-500" />
+            ) : (
+              <XCircle className="h-4 w-4 text-red-500" />
+            )}
+            {voucher.offerForSale && (
+              <Badge className="bg-orange-100 text-orange-800 dark:bg-orange-900/20 dark:text-orange-400">
+                For Sale
               </Badge>
             )}
           </div>
+        </div>
+      </CardHeader>
 
-          {voucher.notes && (
-            <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-2 card-content">
-              {voucher.notes}
+      <CardContent className="space-y-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-2xl font-bold text-green-600 dark:text-green-400">
+              ${voucher.balance.toFixed(2)}
             </p>
-          )}
-
-          {/* Action Buttons - Updated to 4 columns */}
-          <div className="grid grid-cols-4 gap-2">
-            {hasImages ? (
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setShowImagePreview(true);
-                }}
-                className="flex items-center justify-center"
-              >
-                <Images className="h-4 w-4 mr-1" />
-                <span className="hidden sm:inline">Show preview</span>
-              </Button>
-            ) : (
-              <div></div>
-            )}
-            
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={(e) => {
-                e.stopPropagation();
-                setShowEditModal(true);
-              }}
-              className="flex items-center justify-center"
-            >
-              <Edit className="h-4 w-4 mr-1" />
-              <span className="hidden sm:inline">Edit</span>
-            </Button>
-            
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={(e) => {
-                e.stopPropagation();
-                setShowPurchaseModal(true);
-              }}
-              disabled={voucher.balance <= 0 || isExpired}
-              className="flex items-center justify-center"
-            >
-              <ShoppingCart className="h-4 w-4 mr-1" />
-              <span className="hidden sm:inline">Use</span>
-            </Button>
-
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={(e) => {
-                e.stopPropagation();
-                setShowSaleModal(true);
-              }}
-              disabled={voucher.balance <= 0 || isExpired || voucher.offerForSale}
-              className="flex items-center justify-center"
-            >
-              <DollarSign className="h-4 w-4 mr-1" />
-              <span className="hidden sm:inline">Offer Sale</span>
-            </Button>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              of ${voucher.originalBalance.toFixed(2)}
+            </p>
           </div>
-        </CardContent>
-      </Card>
+          
+          {voucher.type && (
+            <Badge className={getTypeColor(voucher.type)}>
+              {voucher.type.replace('_', ' ')}
+            </Badge>
+          )}
+        </div>
 
-      {/* Modals */}
-      {hasImages && (
-        <VoucherImagePreview
-          open={showImagePreview}
-          onClose={() => setShowImagePreview(false)}
-          imageIds={imageIds}
-          voucherName={voucher.name}
+        <VoucherProgress 
+          current={voucher.balance} 
+          original={voucher.originalBalance}
         />
-      )}
 
-      <VoucherEditModal
-        open={showEditModal}
-        onClose={() => setShowEditModal(false)}
-        voucher={voucher}
-        onVoucherUpdated={handleVoucherUpdate}
-      />
+        <div className="flex items-center justify-between text-sm">
+          <div className="flex items-center space-x-1 text-gray-500 dark:text-gray-400">
+            <Clock className="h-4 w-4" />
+            <span>
+              {isExpired ? 'Expired' : isExpiringSoon ? `${daysUntilExpiry} days left` : voucher.expiryDate.toLocaleDateString()}
+            </span>
+          </div>
+          
+          {isExpiringSoon && (
+            <Badge variant="destructive" className="text-xs">
+              <Clock className="h-3 w-3 mr-1" />
+              Expiring Soon
+            </Badge>
+          )}
+        </div>
 
-      <PurchaseRecordModal
-        open={showPurchaseModal}
-        onClose={() => setShowPurchaseModal(false)}
-        voucher={voucher}
-        onPurchaseRecorded={handleVoucherUpdate}
-      />
-
-      <OfferForSaleModal
-        open={showSaleModal}
-        onClose={() => setShowSaleModal(false)}
-        voucher={voucher}
-        onVoucherUpdated={handleVoucherUpdate}
-      />
-    </>
+        <Button 
+          variant="outline" 
+          size="sm" 
+          onClick={handleFullDetails}
+          className="w-full flex items-center justify-center"
+        >
+          <Eye className="h-4 w-4 mr-2" />
+          Full Details
+        </Button>
+      </CardContent>
+    </Card>
   );
 };

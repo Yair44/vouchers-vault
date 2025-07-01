@@ -24,12 +24,6 @@ export const Vouchers = () => {
 
   const user = getCurrentUser();
 
-  const handleVoucherUpdate = (updatedVoucher: Voucher) => {
-    setVouchers(prev => 
-      prev.map(v => v.id === updatedVoucher.id ? updatedVoucher : v)
-    );
-  };
-
   const handleExportToExcel = async () => {
     setIsExporting(true);
     try {
@@ -195,11 +189,6 @@ export const Vouchers = () => {
             <VoucherCard 
               key={voucher.id} 
               voucher={voucher}
-              onVoucherUpdated={handleVoucherUpdate}
-              onClick={() => {
-                // TODO: Navigate to voucher detail
-                console.log('Navigate to voucher', voucher.id);
-              }}
             />
           ))}
         </div>
