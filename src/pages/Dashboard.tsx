@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { StatsCard } from '@/components/StatsCard';
@@ -6,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Cell } from 'recharts';
-import { Plus, Ticket, Banknote, Clock, X } from 'lucide-react';
+import { Plus, Ticket, DollarSign, Clock, X } from 'lucide-react';
 import { db, getCurrentUser } from '@/lib/db';
 import { Voucher, VoucherStats } from '@/types';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -197,7 +196,7 @@ export const Dashboard = () => {
         <StatsCard
           title="Total Value"
           value={`$${stats.totalValue.toFixed(2)}`}
-          icon={Banknote}
+          icon={DollarSign}
           change="Available balance"
           changeType="positive"
         />
