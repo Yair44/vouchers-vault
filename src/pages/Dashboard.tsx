@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { StatsCard } from '@/components/StatsCard';
@@ -243,7 +242,7 @@ export const Dashboard = () => {
                   )}
                   <Bar 
                     dataKey="value" 
-                    fill={(entry: any) => entry.fillColor}
+                    fill={(entry: any, index: number) => voucherAnalytics[index]?.fillColor || "url(#gradient-purple-pink)"}
                     radius={[4, 4, 0, 0]}
                     onClick={handleBarInteraction}
                     style={{ cursor: 'pointer' }}
