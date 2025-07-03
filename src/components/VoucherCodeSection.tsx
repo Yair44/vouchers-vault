@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Eye, Download, Upload, X, DollarSign } from 'lucide-react';
+import { Eye, Download, Upload, X, Tag } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { VoucherStatusBadge } from './VoucherStatusBadge';
 import { Voucher, Transaction } from '@/types';
@@ -57,9 +57,9 @@ export const VoucherCodeSection = ({
                   variant="outline" 
                   size="sm" 
                   onClick={onOfferForSale}
-                  className="bg-green-50 hover:bg-green-100 border-green-200 text-green-700 dark:bg-green-900/20 dark:hover:bg-green-900/30 dark:border-green-700 dark:text-green-400"
+                  className="bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 border-red-400 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 dark:from-red-600 dark:to-orange-600 dark:hover:from-red-700 dark:hover:to-orange-700"
                 >
-                  <DollarSign className="h-4 w-4" />
+                  <Tag className="h-4 w-4" />
                 </Button>
               )}
             </div>
