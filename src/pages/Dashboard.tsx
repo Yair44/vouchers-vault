@@ -242,7 +242,7 @@ export const Dashboard = () => {
                   )}
                   <Bar 
                     dataKey="value" 
-                    fill={(entry: any, index: number) => voucherAnalytics[index]?.fillColor || "url(#gradient-purple-pink)"}
+                    fill="fillColor"
                     radius={[4, 4, 0, 0]}
                     onClick={handleBarInteraction}
                     style={{ cursor: 'pointer' }}
