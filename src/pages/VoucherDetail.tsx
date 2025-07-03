@@ -168,59 +168,76 @@ export const VoucherDetail = () => {
         canOfferForSale={voucher.balance > 0 && !isExpired && !voucher.offerForSale}
       />
 
-      {/* Voucher Details */}
+      {/* Voucher Details - New Layout */}
       <Card className="shadow-md">
         <CardContent className="space-y-6 p-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="space-y-4">
-              <div>
-                <label className="text-sm font-medium text-gray-500">Original Value</label>
-                <p className="text-xl font-semibold">${voucher.originalBalance.toFixed(2)}</p>
-              </div>
-              <div>
-                <label className="text-sm font-medium text-gray-500">Current Value</label>
-                <p className="text-xl font-semibold text-green-600">${voucher.balance.toFixed(2)}</p>
-              </div>
-              <div>
-                <label className="text-sm font-medium text-gray-500">Expiry Date</label>
-                <p className="text-lg">{voucher.expiryDate.toLocaleDateString()}</p>
-              </div>
+          {/* Row 1: Original Value and Current Value */}
+          <div className="flex flex-col sm:flex-row sm:space-x-8 space-y-4 sm:space-y-0">
+            <div className="flex-1">
+              <label className="text-sm font-medium text-gray-500">Original Value</label>
+              <p className="text-xl font-semibold">${voucher.originalBalance.toFixed(2)}</p>
             </div>
-            
-            <div className="space-y-4">
-              {voucher.category && <div>
+            <div className="flex-1">
+              <label className="text-sm font-medium text-gray-500">Current Value</label>
+              <p className="text-xl font-semibold text-green-600">${voucher.balance.toFixed(2)}</p>
+            </div>
+          </div>
+
+          {/* Row 2: Progress Bar */}
+          <VoucherProgress current={voucher.balance} original={voucher.originalBalance} />
+
+          {/* Row 3: Expiry Date and Category */}
+          <div className="flex flex-col sm:flex-row sm:space-x-8 space-y-4 sm:space-y-0">
+            <div className="flex-1">
+              <label className="text-sm font-medium text-gray-500">Expiry Date</label>
+              <p className="text-lg">{voucher.expiryDate.toLocaleDateString()}</p>
+            </div>
+            <div className="flex-1">
+              {voucher.category && (
+                <>
                   <label className="text-sm font-medium text-gray-500">Category</label>
                   <div className="mt-1">
                     <Badge className={getCategoryColor(voucher.category)}>
                       {voucher.category.charAt(0).toUpperCase() + voucher.category.slice(1)}
                     </Badge>
                   </div>
-                </div>}
-              
-              {voucher.eligibleBusinessesUrl && <div>
+                </>
+              )}
+            </div>
+          </div>
+
+          {/* Row 4: Notes */}
+          {voucher.notes && (
+            <div>
+              <label className="text-sm font-medium text-gray-500">Notes</label>
+              <p className="text-gray-700 dark:text-gray-300 mt-1">{voucher.notes}</p>
+            </div>
+          )}
+
+          {/* Additional Rows: URLs */}
+          {(voucher.eligibleBusinessesUrl || voucher.voucherUrl) && (
+            <div className="space-y-4 pt-2 border-t border-gray-200 dark:border-gray-700">
+              {voucher.eligibleBusinessesUrl && (
+                <div>
                   <label className="text-sm font-medium text-gray-500">Eligible Businesses</label>
                   <a href={voucher.eligibleBusinessesUrl} target="_blank" rel="noopener noreferrer" className="flex items-center text-blue-600 hover:text-blue-800 mt-1">
                     <ExternalLink className="h-4 w-4 mr-1" />
                     View eligible businesses
                   </a>
-                </div>}
+                </div>
+              )}
               
-              {voucher.voucherUrl && <div>
+              {voucher.voucherUrl && (
+                <div>
                   <label className="text-sm font-medium text-gray-500">Voucher URL</label>
                   <a href={voucher.voucherUrl} target="_blank" rel="noopener noreferrer" className="flex items-center text-blue-600 hover:text-blue-800 mt-1">
                     <ExternalLink className="h-4 w-4 mr-1" />
                     View voucher online
                   </a>
-                </div>}
+                </div>
+              )}
             </div>
-          </div>
-
-          <VoucherProgress current={voucher.balance} original={voucher.originalBalance} className="mt-6" />
-
-          {voucher.notes && <div>
-              <label className="text-sm font-medium text-gray-500">Notes</label>
-              <p className="text-gray-700 dark:text-gray-300 mt-1">{voucher.notes}</p>
-            </div>}
+          )}
         </CardContent>
       </Card>
 
