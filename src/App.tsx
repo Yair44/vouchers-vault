@@ -26,7 +26,6 @@ const App = () => (
             <Route path="/voucher/:id" element={<VoucherDetail />} />
             <Route path="/add" element={<AddVoucher />} />
             <Route path="/shared" element={<div className="text-center py-12"><h2 className="text-xl font-semibold">Shared Vouchers - Coming Soon!</h2><p className="text-gray-600 dark:text-gray-400 mt-2">View vouchers shared with you by other users.</p></div>} />
-            <Route path="/expiring" element={<div className="text-center py-12"><h2 className="text-xl font-semibold">Expiring Soon - Coming Soon!</h2><p className="text-gray-600 dark:text-gray-400 mt-2">Dedicated view for vouchers expiring in the next 30 days.</p></div>} />
             <Route path="/profile" element={<div className="text-center py-12"><h2 className="text-xl font-semibold">Profile Settings - Coming Soon!</h2><p className="text-gray-600 dark:text-gray-400 mt-2">Manage your account settings and webhook notifications.</p></div>} />
             <Route path="*" element={<NotFound />} />
           </Routes>

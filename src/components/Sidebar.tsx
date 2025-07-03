@@ -1,7 +1,6 @@
-
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
-import { Calendar, Share, Upload, Users, User, Clock } from 'lucide-react';
+import { Calendar, Share, Upload, Users, User } from 'lucide-react';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -24,10 +23,6 @@ const navigation = [{
   name: 'Shared with Me',
   href: '/shared',
   icon: Share
-}, {
-  name: 'Expiring Soon',
-  href: '/expiring',
-  icon: Clock
 }, {
   name: 'Profile',
   href: '/profile',
