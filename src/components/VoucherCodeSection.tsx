@@ -45,7 +45,7 @@ export const VoucherCodeSection = ({
               {voucher && <VoucherStatusBadge voucher={voucher} transactions={transactions} />}
             </div>
             <div className="flex-shrink-0">
-              {showSaleButton && canOfferForSale && onOfferForSale && <Button variant="outline" size="sm" onClick={onOfferForSale} className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 border-purple-400 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 dark:from-purple-600 dark:to-pink-600 dark:hover:from-purple-700 dark:hover:to-pink-700">
+              {showSaleButton && canOfferForSale && onOfferForSale && <Button variant="outline" size="sm" onClick={onOfferForSale} className="bg-gradient-to-r from-green-500 to-purple-500 hover:from-green-600 hover:to-purple-600 border-green-400 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 dark:from-green-600 dark:to-purple-600 dark:hover:from-green-700 dark:hover:to-purple-700 bg-inherit">
                   <Tag className="h-4 w-4" />
                 </Button>}
             </div>
