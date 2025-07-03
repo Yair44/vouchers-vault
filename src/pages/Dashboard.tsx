@@ -1,10 +1,11 @@
+
 import { useState, useEffect, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { StatsCard } from '@/components/StatsCard';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
-import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Cell } from 'recharts';
 import { Plus, Calendar, User, Clock, X } from 'lucide-react';
 import { db, getCurrentUser } from '@/lib/db';
 import { Voucher, VoucherStats } from '@/types';
@@ -18,7 +19,7 @@ export const Dashboard = () => {
     expiringCount: 0,
     activeCount: 0
   });
-  const [voucherAnalytics, setVoucherAnalytics] = useState<Array<{name: string, value: number, fillColor: string}>>([]);
+  const [voucherAnalytics, setVoucherAnalytics] = useState<Array<{name: string, value: number}>>([]);
   const [isScrolling, setIsScrolling] = useState(false);
   const [selectedColumn, setSelectedColumn] = useState<string | null>(null);
   const [showDataPopup, setShowDataPopup] = useState(false);
@@ -123,7 +124,7 @@ export const Dashboard = () => {
       activeCount: activeVouchers.length
     });
 
-    // Calculate analytics - sum of values by voucher name with dynamic fill colors
+    // Calculate analytics - sum of values by voucher name
     const vouchersByName = activeVouchers.reduce((acc, voucher) => {
       if (acc[voucher.name]) {
         acc[voucher.name] += voucher.balance;
@@ -134,15 +135,11 @@ export const Dashboard = () => {
     }, {} as Record<string, number>);
 
     const analyticsData = Object.entries(vouchersByName)
-      .map(([name, value]) => ({ 
-        name, 
-        value,
-        fillColor: selectedColumn === name ? "url(#gradient-purple-pink-selected)" : "url(#gradient-purple-pink)"
-      }))
+      .map(([name, value]) => ({ name, value }))
       .sort((a, b) => b.value - a.value);
 
     setVoucherAnalytics(analyticsData);
-  }, [user.id, selectedColumn]);
+  }, [user.id]);
 
   const chartConfig = {
     value: {
@@ -212,10 +209,6 @@ export const Dashboard = () => {
                       <stop offset="0%" stopColor="#9333ea" />
                       <stop offset="100%" stopColor="#ec4899" />
                     </linearGradient>
-                    <linearGradient id="gradient-purple-pink-bright" x1="0%" y1="0%" x2="100%" y2="100%">
-                      <stop offset="0%" stopColor="#a855f7" />
-                      <stop offset="100%" stopColor="#f472b6" />
-                    </linearGradient>
                     <linearGradient id="gradient-purple-pink-selected" x1="0%" y1="0%" x2="100%" y2="100%">
                       <stop offset="0%" stopColor="#c084fc" />
                       <stop offset="100%" stopColor="#fb7cc0" />
@@ -242,13 +235,19 @@ export const Dashboard = () => {
                   )}
                   <Bar 
                     dataKey="value" 
-                    fill="fillColor"
                     radius={[4, 4, 0, 0]}
                     onClick={handleBarInteraction}
                     style={{ cursor: 'pointer' }}
                     className="hover:opacity-80 transition-opacity"
                     isAnimationActive={!isMobile || !isScrolling}
-                  />
+                  >
+                    {voucherAnalytics.map((entry, index) => (
+                      <Cell 
+                        key={`cell-${index}`} 
+                        fill={selectedColumn === entry.name ? "url(#gradient-purple-pink-selected)" : "url(#gradient-purple-pink)"}
+                      />
+                    ))}
+                  </Bar>
                 </BarChart>
               </ChartContainer>
             </CardContent>
