@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Cell } from 'recharts';
-import { Plus, Calendar, User, Clock, X } from 'lucide-react';
+import { Plus, Ticket, User, Clock, X } from 'lucide-react';
 import { db, getCurrentUser } from '@/lib/db';
 import { Voucher, VoucherStats } from '@/types';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -189,7 +189,7 @@ export const Dashboard = () => {
         <StatsCard
           title="Total Vouchers"
           value={stats.totalVouchers}
-          icon={Calendar}
+          icon={Ticket}
           change={`${stats.activeCount} active`}
           changeType="positive"
         />
