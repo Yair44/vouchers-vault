@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { StatsCard } from '@/components/StatsCard';
@@ -226,11 +225,13 @@ export const Dashboard = () => {
                     tick={{ fontSize: 12 }}
                     tickFormatter={(value) => `$${value}`}
                   />
-                  <ChartTooltip 
-                    content={<ChartTooltipContent 
-                      formatter={(value) => [`$${value}`, "Value"]}
-                    />} 
-                  />
+                  {!isMobile && (
+                    <ChartTooltip 
+                      content={<ChartTooltipContent 
+                        formatter={(value) => [`$${value}`, "Value"]}
+                      />} 
+                    />
+                  )}
                   <Bar 
                     dataKey="value" 
                     fill="url(#gradient-purple-pink)"
