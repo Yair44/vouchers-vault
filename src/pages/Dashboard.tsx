@@ -116,7 +116,7 @@ export const Dashboard = () => {
 
       {/* Analytics Chart - Full Width with minimal margins */}
       {voucherAnalytics.length > 0 && (
-        <div className="mx-1">
+        <div>
           <Card className="w-full">
             <CardHeader>
               <CardTitle className="bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent">
@@ -124,9 +124,9 @@ export const Dashboard = () => {
               </CardTitle>
               <p className="text-sm text-gray-600 dark:text-gray-400">Click on any column to filter vouchers</p>
             </CardHeader>
-            <CardContent>
+            <CardContent className="px-2">
               <ChartContainer config={chartConfig} className="h-[400px] w-full">
-                <BarChart data={voucherAnalytics} margin={{ top: 20, right: 30, left: 20, bottom: 80 }}>
+                <BarChart data={voucherAnalytics} margin={{ top: 20, right: 5, left: 5, bottom: 80 }}>
                   <defs>
                     <linearGradient id="gradient-purple-pink" x1="0%" y1="0%" x2="100%" y2="100%">
                       <stop offset="0%" stopColor="#9333ea" />
