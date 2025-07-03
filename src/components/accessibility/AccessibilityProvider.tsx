@@ -44,14 +44,17 @@ export const AccessibilityProvider = ({ children }: AccessibilityProviderProps) 
   const applyAccessibilitySettings = (settings: AccessibilitySettings) => {
     const root = document.documentElement;
     
-    // Font size
+    // Font size with scaling factor
     const fontSizeMap = {
-      'small': '0.875rem',
-      'medium': '1rem',
-      'large': '1.125rem',
-      'extra-large': '1.25rem'
+      'small': { size: '0.875rem', scale: 0.875 },
+      'medium': { size: '1rem', scale: 1 },
+      'large': { size: '1.125rem', scale: 1.125 },
+      'extra-large': { size: '1.25rem', scale: 1.25 }
     };
-    root.style.setProperty('--accessibility-font-size', fontSizeMap[settings.fontSize]);
+    
+    const fontConfig = fontSizeMap[settings.fontSize];
+    root.style.setProperty('--accessibility-font-size', fontConfig.size);
+    root.style.setProperty('--accessibility-font-scale', fontConfig.scale.toString());
     
     // High contrast
     root.classList.toggle('accessibility-high-contrast', settings.highContrast);

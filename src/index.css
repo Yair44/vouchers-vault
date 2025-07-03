@@ -57,6 +57,7 @@
 
     /* Accessibility variables */
     --accessibility-font-size: 1rem;
+    --accessibility-font-scale: 1;
   }
 
   .dark {
@@ -109,6 +110,27 @@
     @apply bg-background text-foreground;
     font-size: var(--accessibility-font-size);
   }
+
+  /* Apply font scaling to all text elements */
+  h1, h2, h3, h4, h5, h6 {
+    font-size: calc(var(--accessibility-font-scale) * 1em);
+  }
+
+  p, span, div, a, button, input, textarea, select, label {
+    font-size: calc(var(--accessibility-font-scale) * 1em);
+  }
+
+  /* Specific Tailwind text size overrides */
+  .text-xs { font-size: calc(0.75rem * var(--accessibility-font-scale)) !important; }
+  .text-sm { font-size: calc(0.875rem * var(--accessibility-font-scale)) !important; }
+  .text-base { font-size: calc(1rem * var(--accessibility-font-scale)) !important; }
+  .text-lg { font-size: calc(1.125rem * var(--accessibility-font-scale)) !important; }
+  .text-xl { font-size: calc(1.25rem * var(--accessibility-font-scale)) !important; }
+  .text-2xl { font-size: calc(1.5rem * var(--accessibility-font-scale)) !important; }
+  .text-3xl { font-size: calc(1.875rem * var(--accessibility-font-scale)) !important; }
+  .text-4xl { font-size: calc(2.25rem * var(--accessibility-font-scale)) !important; }
+  .text-5xl { font-size: calc(3rem * var(--accessibility-font-scale)) !important; }
+  .text-6xl { font-size: calc(3.75rem * var(--accessibility-font-scale)) !important; }
 }
 
 /* Custom gradient classes for fintech styling */
