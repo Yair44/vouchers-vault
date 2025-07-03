@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { StatsCard } from '@/components/StatsCard';
@@ -208,6 +209,10 @@ export const Dashboard = () => {
                       <stop offset="0%" stopColor="#9333ea" />
                       <stop offset="100%" stopColor="#ec4899" />
                     </linearGradient>
+                    <linearGradient id="gradient-purple-pink-bright" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stopColor="#a855f7" />
+                      <stop offset="100%" stopColor="#f472b6" />
+                    </linearGradient>
                   </defs>
                   <XAxis 
                     dataKey="name" 
@@ -228,9 +233,7 @@ export const Dashboard = () => {
                   />
                   <Bar 
                     dataKey="value" 
-                    fill={(entry: any) => 
-                      selectedColumn === entry.name ? "url(#gradient-purple-pink-bright)" : "url(#gradient-purple-pink)"
-                    }
+                    fill="url(#gradient-purple-pink)"
                     radius={[4, 4, 0, 0]}
                     onClick={handleBarInteraction}
                     style={{ cursor: 'pointer' }}
