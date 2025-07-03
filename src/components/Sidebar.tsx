@@ -1,6 +1,7 @@
+
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
-import { Calendar, Share, Upload, Users, User } from 'lucide-react';
+import { Calendar, Share, Upload, Users, User, Ticket } from 'lucide-react';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -14,7 +15,7 @@ const navigation = [{
 }, {
   name: 'My Vouchers',
   href: '/vouchers',
-  icon: Calendar
+  icon: Ticket
 }, {
   name: 'Add Voucher',
   href: '/add',
