@@ -1,14 +1,14 @@
-
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { StatsCard } from '@/components/StatsCard';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer } from 'recharts';
-import { Plus, Calendar, User, Clock } from 'lucide-react';
+import { Plus, Calendar, User, Clock, X } from 'lucide-react';
 import { db, getCurrentUser } from '@/lib/db';
 import { Voucher, VoucherStats } from '@/types';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 export const Dashboard = () => {
   const [vouchers, setVouchers] = useState<Voucher[]>([]);
@@ -19,9 +19,89 @@ export const Dashboard = () => {
     activeCount: 0
   });
   const [voucherAnalytics, setVoucherAnalytics] = useState<Array<{name: string, value: number}>>([]);
+  const [isScrolling, setIsScrolling] = useState(false);
+  const [selectedColumn, setSelectedColumn] = useState<string | null>(null);
+  const [showDataPopup, setShowDataPopup] = useState(false);
+  const [popupData, setPopupData] = useState<{name: string, value: number} | null>(null);
+  const [clickTimeout, setClickTimeout] = useState<NodeJS.Timeout | null>(null);
 
   const user = getCurrentUser();
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
+
+  // Scroll detection for mobile
+  const handleScroll = useCallback(() => {
+    if (!isMobile) return;
+    
+    setIsScrolling(true);
+    
+    // Clear existing timeout
+    if (clickTimeout) {
+      clearTimeout(clickTimeout);
+    }
+    
+    // Set new timeout to detect when scrolling stops
+    const timeout = setTimeout(() => {
+      setIsScrolling(false);
+    }, 150);
+    
+    setClickTimeout(timeout);
+  }, [isMobile, clickTimeout]);
+
+  useEffect(() => {
+    if (isMobile) {
+      window.addEventListener('scroll', handleScroll, { passive: true });
+      return () => {
+        window.removeEventListener('scroll', handleScroll);
+        if (clickTimeout) {
+          clearTimeout(clickTimeout);
+        }
+      };
+    }
+  }, [isMobile, handleScroll, clickTimeout]);
+
+  // Reset click state after timeout
+  useEffect(() => {
+    if (selectedColumn && showDataPopup) {
+      const resetTimeout = setTimeout(() => {
+        resetClickState();
+      }, 3000);
+      
+      return () => clearTimeout(resetTimeout);
+    }
+  }, [selectedColumn, showDataPopup]);
+
+  const resetClickState = () => {
+    setSelectedColumn(null);
+    setShowDataPopup(false);
+    setPopupData(null);
+  };
+
+  // Enhanced bar click handler
+  const handleBarInteraction = (data: any) => {
+    if (!data || !data.name) return;
+    
+    // If scrolling on mobile, ignore clicks
+    if (isMobile && isScrolling) return;
+    
+    // Desktop behavior - direct navigation
+    if (!isMobile) {
+      navigate(`/vouchers?search=${encodeURIComponent(data.name)}`);
+      return;
+    }
+    
+    // Mobile behavior - two-step interaction
+    if (selectedColumn === data.name && showDataPopup) {
+      // Second click - navigate
+      navigate(`/vouchers?search=${encodeURIComponent(data.name)}`);
+      resetClickState();
+    } else {
+      // First click - show popup
+      setSelectedColumn(data.name);
+      setPopupData(data);
+      setShowDataPopup(true);
+    }
+  };
 
   useEffect(() => {
     // Load user's vouchers
@@ -59,12 +139,6 @@ export const Dashboard = () => {
 
     setVoucherAnalytics(analyticsData);
   }, [user.id]);
-
-  const handleBarClick = (data: any) => {
-    if (data && data.name) {
-      navigate(`/vouchers?search=${encodeURIComponent(data.name)}`);
-    }
-  };
 
   const chartConfig = {
     value: {
@@ -116,13 +190,15 @@ export const Dashboard = () => {
 
       {/* Analytics Chart - Full Width with minimal margins */}
       {voucherAnalytics.length > 0 && (
-        <div>
+        <div className="relative">
           <Card className="w-full">
             <CardHeader>
               <CardTitle className="bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent">
                 Voucher Value Analytics
               </CardTitle>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Click on any column to filter vouchers</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                {isMobile ? "Tap once to see details, tap again to filter vouchers" : "Click on any column to filter vouchers"}
+              </p>
             </CardHeader>
             <CardContent className="px-2">
               <ChartContainer config={chartConfig} className="h-[400px] w-full">
@@ -152,16 +228,39 @@ export const Dashboard = () => {
                   />
                   <Bar 
                     dataKey="value" 
-                    fill="url(#gradient-purple-pink)"
+                    fill={(entry: any) => 
+                      selectedColumn === entry.name ? "url(#gradient-purple-pink-bright)" : "url(#gradient-purple-pink)"
+                    }
                     radius={[4, 4, 0, 0]}
-                    onClick={handleBarClick}
+                    onClick={handleBarInteraction}
                     style={{ cursor: 'pointer' }}
                     className="hover:opacity-80 transition-opacity"
+                    isAnimationActive={!isMobile || !isScrolling}
                   />
                 </BarChart>
               </ChartContainer>
             </CardContent>
           </Card>
+
+          {/* Data Popup for Mobile */}
+          {showDataPopup && popupData && isMobile && (
+            <div className="absolute top-4 right-4 bg-white dark:bg-gray-800 rounded-lg shadow-lg border p-4 z-10 min-w-[200px]">
+              <div className="flex justify-between items-start mb-2">
+                <h3 className="font-medium text-sm">Voucher Details</h3>
+                <button 
+                  onClick={resetClickState}
+                  className="text-gray-400 hover:text-gray-600 p-1"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+              <div className="space-y-2">
+                <p className="text-sm font-medium">{popupData.name}</p>
+                <p className="text-lg font-bold text-green-600">${popupData.value.toFixed(2)}</p>
+                <p className="text-xs text-gray-500">Tap column again to view vouchers</p>
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>
