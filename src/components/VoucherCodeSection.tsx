@@ -1,12 +1,10 @@
-
 import { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Eye, Download, Upload, X } from 'lucide-react';
+import { Eye, Download, Upload, X, Tag } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { VoucherStatusBadge } from './VoucherStatusBadge';
 import { Voucher, Transaction } from '@/types';
-
 interface VoucherCodeSectionProps {
   code: string;
   imageIds?: string[];
@@ -22,10 +20,9 @@ interface VoucherCodeSectionProps {
   canOfferForSale?: boolean;
   className?: string;
 }
-
-export const VoucherCodeSection = ({ 
-  code, 
-  imageIds = [], 
+export const VoucherCodeSection = ({
+  code,
+  imageIds = [],
   voucherName,
   voucher,
   transactions = [],
@@ -36,32 +33,21 @@ export const VoucherCodeSection = ({
   showSaleButton = false,
   onOfferForSale,
   canOfferForSale = false,
-  className 
+  className
 }: VoucherCodeSectionProps) => {
   const hasImages = imageIds.length > 0;
-
-  return (
-    <Card className={cn("overflow-hidden shadow-md", className)}>
+  return <Card className={cn("overflow-hidden shadow-md", className)}>
       <CardContent className="p-6">
         <div className="space-y-4">
           {/* Header Row with Status Badge and Sale Button */}
           <div className="flex items-start justify-between">
             <div className="flex-shrink-0">
-              {voucher && (
-                <VoucherStatusBadge voucher={voucher} transactions={transactions} />
-              )}
+              {voucher && <VoucherStatusBadge voucher={voucher} transactions={transactions} />}
             </div>
             <div className="flex-shrink-0">
-              {showSaleButton && canOfferForSale && onOfferForSale && (
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  onClick={onOfferForSale}
-                  className="bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 border-red-400 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 dark:from-red-600 dark:to-orange-600 dark:hover:from-red-700 dark:hover:to-orange-700"
-                >
-                  List for sale
-                </Button>
-              )}
+              {showSaleButton && canOfferForSale && onOfferForSale && <Button variant="outline" size="sm" onClick={onOfferForSale} className="bg-gradient-to-r from-green-500 to-purple-500 hover:from-green-600 hover:to-purple-600 border-green-400 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 dark:from-green-600 dark:to-purple-600 dark:hover:from-green-700 dark:hover:to-purple-700 bg-inherit">
+                  <Tag className="h-4 w-4" />
+                </Button>}
             </div>
           </div>
 
@@ -85,48 +71,29 @@ export const VoucherCodeSection = ({
                   Images ({imageIds.length}/2)
                 </h4>
               </div>
-              {hasImages && onImagePreview && (
-                <div className="flex-shrink-0 ml-3">
+              {hasImages && onImagePreview && <div className="flex-shrink-0 ml-3">
                   <Button variant="outline" size="sm" onClick={onImagePreview}>
                     <Eye className="h-4 w-4 mr-2" />
                     View Images
                   </Button>
-                </div>
-              )}
+                </div>}
             </div>
 
-            {hasImages && (
-              <div className="space-y-2">
-                {imageIds.map((imageId, index) => (
-                  <div key={imageId} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+            {hasImages && <div className="space-y-2">
+                {imageIds.map((imageId, index) => <div key={imageId} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
                     <span className="text-sm text-gray-700 dark:text-gray-300">
                       Image {index + 1}
                     </span>
                     <div className="flex items-center space-x-2">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => onImageRemove?.(index)}
-                      >
+                      <Button variant="ghost" size="sm" onClick={() => onImageRemove?.(index)}>
                         <X className="h-4 w-4" />
                       </Button>
                     </div>
-                  </div>
-                ))}
-              </div>
-            )}
+                  </div>)}
+              </div>}
 
-            {imageIds.length < 2 && onImageUpload && (
-              <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-4 text-center">
-                <input
-                  type="file"
-                  accept="image/*"
-                  multiple
-                  onChange={(e) => e.target.files && onImageUpload(e.target.files)}
-                  className="hidden"
-                  id="image-upload"
-                  disabled={isUploadingImage}
-                />
+            {imageIds.length < 2 && onImageUpload && <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-4 text-center">
+                <input type="file" accept="image/*" multiple onChange={e => e.target.files && onImageUpload(e.target.files)} className="hidden" id="image-upload" disabled={isUploadingImage} />
                 <label htmlFor="image-upload">
                   <Button type="button" variant="outline" asChild disabled={isUploadingImage}>
                     <span>
@@ -135,11 +102,9 @@ export const VoucherCodeSection = ({
                     </span>
                   </Button>
                 </label>
-              </div>
-            )}
+              </div>}
           </div>
         </div>
       </CardContent>
-    </Card>
-  );
+    </Card>;
 };
