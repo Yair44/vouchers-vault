@@ -59,7 +59,7 @@ export const VoucherCodeSection = ({
                   onClick={onOfferForSale}
                   className="bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 border-red-400 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 dark:from-red-600 dark:to-orange-600 dark:hover:from-red-700 dark:hover:to-orange-700"
                 >
-                  <SaleTagIcon className="h-4 w-4" />
+                  <SaleTagIcon className="h-5 w-5" />
                 </Button>
               )}
             </div>

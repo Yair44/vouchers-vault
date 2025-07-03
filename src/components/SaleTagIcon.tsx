@@ -13,41 +13,37 @@ export const SaleTagIcon = ({ className = "h-4 w-4" }: SaleTagIconProps) => {
       xmlns="http://www.w3.org/2000/svg"
       className={className}
     >
-      {/* Tag shape */}
+      {/* Tag body - main rectangle */}
       <path
-        d="M20.41 4.94l-1.35-1.35c-.78-.78-2.05-.78-2.83 0L12 7.83 5.77 1.59c-.78-.78-2.05-.78-2.83 0L1.59 2.94c-.78.78-.78 2.05 0 2.83L7.83 12l-6.24 6.23c-.78.78-.78 2.05 0 2.83l1.35 1.35c.78.78 2.05.78 2.83 0L12 16.17l6.23 6.24c.78.78 2.05.78 2.83 0l1.35-1.35c.78-.78.78-2.05 0-2.83L16.17 12l6.24-6.23c.78-.78.78-2.05 0-2.83z"
+        d="M2 6C2 4.89543 2.89543 4 4 4H14L20 10V18C20 19.1046 19.1046 20 18 20H4C2.89543 20 2 19.1046 2 18V6Z"
         fill="currentColor"
-        fillOpacity="0.1"
         stroke="currentColor"
         strokeWidth="1.5"
+        strokeLinejoin="round"
       />
-      {/* Tag body - rounded rectangle */}
-      <rect
-        x="3"
-        y="8"
-        width="18"
-        height="8"
-        rx="2"
-        fill="currentColor"
-        fillOpacity="0.9"
+      {/* Tag corner fold */}
+      <path
+        d="M14 4V10H20"
+        fill="none"
+        stroke="white"
+        strokeWidth="1.5"
+        strokeLinejoin="round"
       />
       {/* Tag hole */}
       <circle
-        cx="18"
-        cy="6"
+        cx="7"
+        cy="9"
         r="1.5"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.5"
+        fill="white"
       />
       {/* SALE text */}
       <text
         x="12"
-        y="13"
+        y="15"
         textAnchor="middle"
         dominantBaseline="middle"
         fill="white"
-        fontSize="6"
+        fontSize="5"
         fontWeight="bold"
         fontFamily="Arial, sans-serif"
       >
