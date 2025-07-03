@@ -1,15 +1,21 @@
+
 import { useState } from 'react';
 import { Sidebar } from './Sidebar';
 import { Header } from './Header';
+import { AccessibilityButton } from './accessibility/AccessibilityButton';
 import { cn } from '@/lib/utils';
+
 interface LayoutProps {
   children: React.ReactNode;
 }
+
 export const Layout = ({
   children
 }: LayoutProps) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  return <div className="min-h-screen bg-background">
+  
+  return (
+    <div className="min-h-screen bg-background">
       {/* Mobile sidebar overlay */}
       {sidebarOpen && <div className="fixed inset-0 z-40 bg-black/50 lg:hidden" onClick={() => setSidebarOpen(false)} />}
       
@@ -24,5 +30,9 @@ export const Layout = ({
           {children}
         </main>
       </div>
-    </div>;
+      
+      {/* Accessibility Button */}
+      <AccessibilityButton />
+    </div>
+  );
 };

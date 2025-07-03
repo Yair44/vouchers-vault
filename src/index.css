@@ -54,6 +54,9 @@
     --sidebar-ring: 217.2 91.2% 59.8%;
 
     --chart-1: linear-gradient(135deg, #9333ea 0%, #ec4899 100%);
+
+    /* Accessibility variables */
+    --accessibility-font-size: 1rem;
   }
 
   .dark {
@@ -104,6 +107,7 @@
 
   body {
     @apply bg-background text-foreground;
+    font-size: var(--accessibility-font-size);
   }
 }
 
@@ -121,3 +125,81 @@
     @apply from-purple-900 to-pink-900 hover:from-purple-800 hover:to-pink-800 text-purple-200;
   }
 }
+
+/* Accessibility Styles */
+@layer base {
+  /* High Contrast Mode */
+  .accessibility-high-contrast {
+    --background: 0 0% 0%;
+    --foreground: 0 0% 100%;
+    --card: 0 0% 10%;
+    --card-foreground: 0 0% 100%;
+    --border: 0 0% 100%;
+    --input: 0 0% 20%;
+  }
+
+  /* Enhanced Focus Indicators */
+  .accessibility-enhanced-focus *:focus {
+    outline: 3px solid #fbbf24 !important;
+    outline-offset: 2px !important;
+  }
+
+  /* Motion Reduction */
+  .accessibility-motion-reduced *,
+  .accessibility-motion-reduced *::before,
+  .accessibility-motion-reduced *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  /* Color Blind Support Filters */
+  .accessibility-protanopia {
+    filter: url('#protanopia-filter');
+  }
+
+  .accessibility-deuteranopia {
+    filter: url('#deuteranopia-filter');
+  }
+
+  .accessibility-tritanopia {
+    filter: url('#tritanopia-filter');
+  }
+
+  /* Screen Reader Enhancements */
+  .accessibility-screen-reader-enhanced .sr-only {
+    position: static !important;
+    width: auto !important;
+    height: auto !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    overflow: visible !important;
+    clip: auto !important;
+    white-space: normal !important;
+  }
+}
+
+/* Color Blind Support SVG Filters */
+<svg style="position: absolute; width: 0; height: 0;" aria-hidden="true">
+  <defs>
+    <filter id="protanopia-filter">
+      <feColorMatrix values="0.567 0.433 0     0 0
+                            0.558 0.442 0     0 0
+                            0     0.242 0.758 0 0
+                            0     0     0     1 0"/>
+    </filter>
+    <filter id="deuteranopia-filter">
+      <feColorMatrix values="0.625 0.375 0   0 0
+                            0.7   0.3   0   0 0
+                            0     0.3   0.7 0 0
+                            0     0     0   1 0"/>
+    </filter>
+    <filter id="tritanopia-filter">
+      <feColorMatrix values="0.95 0.05  0     0 0
+                            0    0.433 0.567 0 0
+                            0    0.475 0.525 0 0
+                            0    0     0     1 0"/>
+    </filter>
+  </defs>
+</svg>
