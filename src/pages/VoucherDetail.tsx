@@ -16,6 +16,7 @@ import { OfferForSaleModal } from '@/components/OfferForSaleModal';
 import { toast } from '@/hooks/use-toast';
 import { compressImage, validateImageFile } from '@/lib/imageCompression';
 import { ImageStorage } from '@/lib/imageStorage';
+
 export const VoucherDetail = () => {
   const {
     id
@@ -31,6 +32,7 @@ export const VoucherDetail = () => {
   const [showSaleModal, setShowSaleModal] = useState(false);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
   const [loading, setLoading] = useState(true);
+
   useEffect(() => {
     if (!id) {
       navigate('/vouchers');
@@ -46,9 +48,11 @@ export const VoucherDetail = () => {
     setTransactions(voucherTransactions);
     setLoading(false);
   }, [id, navigate]);
+
   const handleVoucherUpdate = (updatedVoucher: Voucher) => {
     setVoucher(updatedVoucher);
   };
+
   const handleImageUpload = async (files: FileList) => {
     if (!voucher || !files) return;
     const imageIds = voucher.imageUrls || [];
@@ -81,6 +85,7 @@ export const VoucherDetail = () => {
       setIsUploadingImage(false);
     }
   };
+
   const handleImageRemove = async (index: number) => {
     if (!voucher) return;
     const imageIds = voucher.imageUrls || [];
@@ -97,15 +102,18 @@ export const VoucherDetail = () => {
       console.error('Failed to delete image:', error);
     }
   };
+
   if (loading || !voucher) {
     return <div className="flex items-center justify-center min-h-64">
         <div className="text-center">Loading...</div>
       </div>;
   }
+
   const daysUntilExpiry = Math.ceil((voucher.expiryDate.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
   const isExpiringSoon = daysUntilExpiry <= 30 && daysUntilExpiry > 0;
   const isExpired = daysUntilExpiry <= 0;
   const imageIds = voucher.imageUrls || (voucher.imageUrl ? [voucher.imageUrl] : []);
+
   const getCategoryColor = (category: string) => {
     switch (category) {
       case 'retail':
@@ -122,25 +130,19 @@ export const VoucherDetail = () => {
         return 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400';
     }
   };
+
   return <div className="space-y-6">
-      {/* Header with Edit Details button moved here */}
+      {/* Header with only Edit Details button */}
       <div className="flex items-center justify-between">
         <Button variant="ghost" onClick={() => navigate('/vouchers')}>
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back to Vouchers
         </Button>
         
-        <div className="flex items-center space-x-3">
-          <Button variant="outline" onClick={() => setShowEditModal(true)}>
-            <Edit className="h-4 w-4 mr-2" />
-            Edit Details
-          </Button>
-          
-          {voucher.balance > 0 && !isExpired && !voucher.offerForSale && <Button onClick={() => setShowSaleModal(true)} className="bg-green-600 hover:bg-green-700 text-white flex items-center shadow-md">
-              <DollarSign className="h-4 w-4 mr-2" />
-              Offer for Sale
-            </Button>}
-        </div>
+        <Button variant="outline" onClick={() => setShowEditModal(true)}>
+          <Edit className="h-4 w-4 mr-2" />
+          Edit Details
+        </Button>
       </div>
 
       {/* Voucher Name - Centered and Styled */}
@@ -150,7 +152,7 @@ export const VoucherDetail = () => {
         </h1>
       </div>
 
-      {/* Voucher Code and Images with Status Badge */}
+      {/* Voucher Code and Images with Status Badge and Sale Button */}
       <VoucherCodeSection 
         code={voucher.code} 
         imageIds={imageIds} 
@@ -160,7 +162,10 @@ export const VoucherDetail = () => {
         onImagePreview={imageIds.length > 0 ? () => setShowImagePreview(true) : undefined} 
         onImageUpload={handleImageUpload} 
         onImageRemove={handleImageRemove} 
-        isUploadingImage={isUploadingImage} 
+        isUploadingImage={isUploadingImage}
+        showSaleButton={voucher.balance > 0 && !isExpired && !voucher.offerForSale}
+        onOfferForSale={() => setShowSaleModal(true)}
+        canOfferForSale={voucher.balance > 0 && !isExpired && !voucher.offerForSale}
       />
 
       {/* Voucher Details */}

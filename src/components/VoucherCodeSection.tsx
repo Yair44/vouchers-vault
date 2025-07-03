@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Eye, Download, Upload, X } from 'lucide-react';
+import { Eye, Download, Upload, X, DollarSign } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { VoucherStatusBadge } from './VoucherStatusBadge';
 import { Voucher, Transaction } from '@/types';
@@ -17,6 +17,9 @@ interface VoucherCodeSectionProps {
   onImageUpload?: (files: FileList) => void;
   onImageRemove?: (index: number) => void;
   isUploadingImage?: boolean;
+  showSaleButton?: boolean;
+  onOfferForSale?: () => void;
+  canOfferForSale?: boolean;
   className?: string;
 }
 
@@ -30,6 +33,9 @@ export const VoucherCodeSection = ({
   onImageUpload,
   onImageRemove,
   isUploadingImage = false,
+  showSaleButton = false,
+  onOfferForSale,
+  canOfferForSale = false,
   className 
 }: VoucherCodeSectionProps) => {
   const hasImages = imageIds.length > 0;
@@ -38,16 +44,32 @@ export const VoucherCodeSection = ({
     <Card className={cn("overflow-hidden shadow-md", className)}>
       <CardContent className="p-6">
         <div className="space-y-4">
-          {/* Voucher Code with Status Badge */}
-          <div className="text-center">
-            <div className="flex items-center justify-center space-x-3 mb-2">
+          {/* Header Row with Status Badge and Sale Button */}
+          <div className="flex items-start justify-between">
+            <div className="flex-shrink-0">
               {voucher && (
                 <VoucherStatusBadge voucher={voucher} transactions={transactions} />
               )}
-              <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                Voucher Code
-              </h3>
             </div>
+            <div className="flex-shrink-0">
+              {showSaleButton && canOfferForSale && onOfferForSale && (
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={onOfferForSale}
+                  className="bg-green-50 hover:bg-green-100 border-green-200 text-green-700 dark:bg-green-900/20 dark:hover:bg-green-900/30 dark:border-green-700 dark:text-green-400"
+                >
+                  <DollarSign className="h-4 w-4" />
+                </Button>
+              )}
+            </div>
+          </div>
+
+          {/* Voucher Code Section - Centered */}
+          <div className="text-center">
+            <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">
+              Voucher Code
+            </h3>
             <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 border-2 border-dashed border-gray-200 dark:border-gray-700">
               <p className="text-xl font-mono font-bold text-gray-900 dark:text-gray-100 tracking-wider">
                 {code}
@@ -58,14 +80,18 @@ export const VoucherCodeSection = ({
           {/* Images Section */}
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <h4 className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                Images ({imageIds.length}/2)
-              </h4>
+              <div className="flex-1 text-center">
+                <h4 className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                  Images ({imageIds.length}/2)
+                </h4>
+              </div>
               {hasImages && onImagePreview && (
-                <Button variant="outline" size="sm" onClick={onImagePreview}>
-                  <Eye className="h-4 w-4 mr-2" />
-                  View Images
-                </Button>
+                <div className="flex-shrink-0 ml-3">
+                  <Button variant="outline" size="sm" onClick={onImagePreview}>
+                    <Eye className="h-4 w-4 mr-2" />
+                    View Images
+                  </Button>
+                </div>
               )}
             </div>
 
