@@ -1,6 +1,6 @@
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
-import { Calendar, Upload, Users, User, Ticket } from 'lucide-react';
+import { LayoutDashboard, Upload, Users, User, Ticket } from 'lucide-react';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -10,7 +10,7 @@ interface SidebarProps {
 const navigation = [{
   name: 'Dashboard',
   href: '/',
-  icon: Calendar
+  icon: LayoutDashboard
 }, {
   name: 'My Vouchers',
   href: '/vouchers',
@@ -45,7 +45,7 @@ export const Sidebar = ({
         <div className="flex items-center px-6 py-6 border-b border-gray-200 dark:border-gray-800">
           <div className="flex items-center space-x-2">
             <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-              <Calendar className="h-4 w-4 text-white" />
+              <LayoutDashboard className="h-4 w-4 text-white" />
             </div>
             <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
               VoucherVault
