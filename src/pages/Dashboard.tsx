@@ -1,5 +1,4 @@
-
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { StatsCard } from '@/components/StatsCard';
 import { Button } from '@/components/ui/button';
@@ -25,12 +24,33 @@ export const Dashboard = () => {
   const [showDataPopup, setShowDataPopup] = useState(false);
   const [popupData, setPopupData] = useState<{name: string, value: number} | null>(null);
   const [clickTimeout, setClickTimeout] = useState<NodeJS.Timeout | null>(null);
+  
+  // Animation control state
+  const hasAnimatedRef = useRef(false);
+  const [shouldAnimate, setShouldAnimate] = useState(true);
 
   const user = getCurrentUser();
   const navigate = useNavigate();
   const isMobile = useIsMobile();
 
-  // Scroll detection for mobile
+  // Reset animation state when component mounts (page visit/refresh)
+  useEffect(() => {
+    if (!hasAnimatedRef.current) {
+      setShouldAnimate(true);
+      // Set animation as completed after initial animation duration
+      const animationTimeout = setTimeout(() => {
+        hasAnimatedRef.current = true;
+        setShouldAnimate(false);
+      }, 1000); // Adjust timing based on your chart animation duration
+
+      return () => clearTimeout(animationTimeout);
+    } else {
+      // If already animated, don't animate again
+      setShouldAnimate(false);
+    }
+  }, []);
+
+  // Scroll detection for mobile (only for click prevention)
   const handleScroll = useCallback(() => {
     if (!isMobile) return;
     
@@ -239,7 +259,7 @@ export const Dashboard = () => {
                     onClick={handleBarInteraction}
                     style={{ cursor: 'pointer' }}
                     className="hover:opacity-80 transition-opacity"
-                    isAnimationActive={!isMobile || !isScrolling}
+                    isAnimationActive={shouldAnimate}
                   >
                     {voucherAnalytics.map((entry, index) => (
                       <Cell 
