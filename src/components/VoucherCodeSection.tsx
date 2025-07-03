@@ -60,7 +60,7 @@ export const VoucherCodeSection = ({
                   className="bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 border-red-400 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 dark:from-red-600 dark:to-orange-600 dark:hover:from-red-700 dark:hover:to-orange-700"
                 >
                   <img 
-                    src="/lovable-uploads/31dc181e-bc42-4af6-abf4-a03267a4d8df.png" 
+                    src="/lovable-uploads/39045fd1-d59d-4d89-a138-352063bb720d.png" 
                     className="h-4 w-4" 
                     alt="Sale" 
                   />
