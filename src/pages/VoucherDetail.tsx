@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -168,16 +169,16 @@ export const VoucherDetail = () => {
         canOfferForSale={voucher.balance > 0 && !isExpired && !voucher.offerForSale}
       />
 
-      {/* Voucher Details - New Layout */}
+      {/* Voucher Details - Corrected Layout */}
       <Card className="shadow-md">
         <CardContent className="space-y-6 p-6">
-          {/* Row 1: Original Value and Current Value */}
-          <div className="flex flex-col sm:flex-row sm:space-x-8 space-y-4 sm:space-y-0">
-            <div className="flex-1">
+          {/* Row 1: Original Value and Current Value side by side */}
+          <div className="grid grid-cols-2 gap-8">
+            <div>
               <label className="text-sm font-medium text-gray-500">Original Value</label>
               <p className="text-xl font-semibold">${voucher.originalBalance.toFixed(2)}</p>
             </div>
-            <div className="flex-1">
+            <div>
               <label className="text-sm font-medium text-gray-500">Current Value</label>
               <p className="text-xl font-semibold text-green-600">${voucher.balance.toFixed(2)}</p>
             </div>
@@ -186,13 +187,13 @@ export const VoucherDetail = () => {
           {/* Row 2: Progress Bar */}
           <VoucherProgress current={voucher.balance} original={voucher.originalBalance} />
 
-          {/* Row 3: Expiry Date and Category */}
-          <div className="flex flex-col sm:flex-row sm:space-x-8 space-y-4 sm:space-y-0">
-            <div className="flex-1">
+          {/* Row 3: Expiry Date and Category side by side */}
+          <div className="grid grid-cols-2 gap-8">
+            <div>
               <label className="text-sm font-medium text-gray-500">Expiry Date</label>
               <p className="text-lg">{voucher.expiryDate.toLocaleDateString()}</p>
             </div>
-            <div className="flex-1">
+            <div>
               {voucher.category && (
                 <>
                   <label className="text-sm font-medium text-gray-500">Category</label>
