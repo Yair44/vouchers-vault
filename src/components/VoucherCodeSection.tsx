@@ -57,7 +57,7 @@ export const VoucherCodeSection = ({
                   variant="outline" 
                   size="sm" 
                   onClick={onOfferForSale}
-                  className="bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 border-red-400 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 dark:from-red-600 dark:to-orange-600 dark:hover:from-red-700 dark:hover:to-orange-700"
+                  className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 border-purple-400 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 dark:from-purple-600 dark:to-pink-600 dark:hover:from-purple-700 dark:hover:to-pink-700"
                 >
                   List for sale
                 </Button>
