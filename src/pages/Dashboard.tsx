@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { StatsCard } from '@/components/StatsCard';
@@ -18,7 +19,7 @@ export const Dashboard = () => {
     expiringCount: 0,
     activeCount: 0
   });
-  const [voucherAnalytics, setVoucherAnalytics] = useState<Array<{name: string, value: number}>>([]);
+  const [voucherAnalytics, setVoucherAnalytics] = useState<Array<{name: string, value: number, fillColor: string}>>([]);
   const [isScrolling, setIsScrolling] = useState(false);
   const [selectedColumn, setSelectedColumn] = useState<string | null>(null);
   const [showDataPopup, setShowDataPopup] = useState(false);
@@ -123,7 +124,7 @@ export const Dashboard = () => {
       activeCount: activeVouchers.length
     });
 
-    // Calculate analytics - sum of values by voucher name
+    // Calculate analytics - sum of values by voucher name with dynamic fill colors
     const vouchersByName = activeVouchers.reduce((acc, voucher) => {
       if (acc[voucher.name]) {
         acc[voucher.name] += voucher.balance;
@@ -134,11 +135,15 @@ export const Dashboard = () => {
     }, {} as Record<string, number>);
 
     const analyticsData = Object.entries(vouchersByName)
-      .map(([name, value]) => ({ name, value }))
+      .map(([name, value]) => ({ 
+        name, 
+        value,
+        fillColor: selectedColumn === name ? "url(#gradient-purple-pink-selected)" : "url(#gradient-purple-pink)"
+      }))
       .sort((a, b) => b.value - a.value);
 
     setVoucherAnalytics(analyticsData);
-  }, [user.id]);
+  }, [user.id, selectedColumn]);
 
   const chartConfig = {
     value: {
@@ -212,6 +217,10 @@ export const Dashboard = () => {
                       <stop offset="0%" stopColor="#a855f7" />
                       <stop offset="100%" stopColor="#f472b6" />
                     </linearGradient>
+                    <linearGradient id="gradient-purple-pink-selected" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stopColor="#c084fc" />
+                      <stop offset="100%" stopColor="#fb7cc0" />
+                    </linearGradient>
                   </defs>
                   <XAxis 
                     dataKey="name" 
@@ -234,7 +243,7 @@ export const Dashboard = () => {
                   )}
                   <Bar 
                     dataKey="value" 
-                    fill="url(#gradient-purple-pink)"
+                    fill={(entry: any) => entry.fillColor}
                     radius={[4, 4, 0, 0]}
                     onClick={handleBarInteraction}
                     style={{ cursor: 'pointer' }}
