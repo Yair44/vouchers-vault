@@ -43,17 +43,17 @@ export const Sidebar = ({
     )}>
       <div className="flex flex-col h-full">
         {/* Logo */}
-        <div className="flex items-center justify-center px-6 py-4 border-b border-gray-200 dark:border-gray-800">
+        <div className="flex items-center justify-center px-4 py-6 border-b border-gray-200 dark:border-gray-800">
           <Link 
             to="/" 
-            className="flex-shrink-0 hover:opacity-80 transition-opacity"
+            className="flex-shrink-0 hover:opacity-80 transition-opacity w-full"
             aria-label="Voucher.co.il - Go to Dashboard"
             onClick={onClose}
           >
             <img 
               src="/lovable-uploads/dca40be2-4b8b-454e-8703-93bfde464786.png" 
               alt="Voucher.co.il Logo" 
-              className="h-12 w-auto max-w-full"
+              className="h-20 w-full object-contain"
             />
           </Link>
         </div>
