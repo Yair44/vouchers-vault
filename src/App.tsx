@@ -14,6 +14,7 @@ import { AddVoucher } from "@/pages/AddVoucher";
 import { VoucherDetail } from "@/pages/VoucherDetail";
 import { Admin } from "@/pages/Admin";
 import { Auth } from "@/pages/Auth";
+import { Profile } from "@/pages/Profile";
 import { SiteTerms } from "@/pages/SiteTerms";
 import { PrivacyPolicy } from "@/pages/PrivacyPolicy";
 import { AccessibilityStatement } from "@/pages/AccessibilityStatement";
@@ -41,7 +42,7 @@ const App = () => (
                     <Route path="/add" element={<ProtectedRoute><AddVoucher /></ProtectedRoute>} />
                     <Route path="/admin" element={<Admin />} />
                     <Route path="/shared" element={<ProtectedRoute><div className="text-center py-12"><h2 className="text-xl font-semibold">Shared Vouchers - Coming Soon!</h2><p className="text-muted-foreground mt-2">View vouchers shared with you by other users.</p></div></ProtectedRoute>} />
-                    <Route path="/profile" element={<ProtectedRoute><div className="text-center py-12"><h2 className="text-xl font-semibold">Profile Settings - Coming Soon!</h2><p className="text-muted-foreground mt-2">Manage your account settings and webhook notifications.</p></div></ProtectedRoute>} />
+                    <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
                     <Route path="/site-terms" element={<SiteTerms />} />
                     <Route path="/privacy-policy" element={<PrivacyPolicy />} />
                     <Route path="/accessibility-statement" element={<AccessibilityStatement />} />
