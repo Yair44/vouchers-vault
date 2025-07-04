@@ -51,9 +51,9 @@ export const Sidebar = ({
             onClick={onClose}
           >
             <img 
-              src="/lovable-uploads/dca40be2-4b8b-454e-8703-93bfde464786.png" 
+              src="/lovable-uploads/1875134f-912c-44be-b37c-9c3132cab02b.png" 
               alt="Voucher.co.il Logo" 
-              className="h-60 w-full object-contain"
+              className="h-20 w-full object-contain"
             />
           </Link>
         </div>
