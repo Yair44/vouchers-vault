@@ -17,6 +17,7 @@ import { OfferForSaleModal } from '@/components/OfferForSaleModal';
 import { toast } from '@/hooks/use-toast';
 import { compressImage, validateImageFile } from '@/lib/imageCompression';
 import { ImageStorage } from '@/lib/imageStorage';
+import { useFeatureFlags } from '@/hooks/useFeatureFlags';
 
 export const VoucherDetail = () => {
   const {
@@ -25,6 +26,7 @@ export const VoucherDetail = () => {
     id: string;
   }>();
   const navigate = useNavigate();
+  const { flags } = useFeatureFlags();
   const [voucher, setVoucher] = useState<Voucher | null>(null);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [showEditModal, setShowEditModal] = useState(false);
@@ -164,9 +166,9 @@ export const VoucherDetail = () => {
         onImageUpload={handleImageUpload} 
         onImageRemove={handleImageRemove} 
         isUploadingImage={isUploadingImage}
-        showSaleButton={voucher.balance > 0 && !isExpired && !voucher.offerForSale}
+        showSaleButton={voucher.balance > 0 && !isExpired && !voucher.offerForSale && flags.listForSaleEnabled}
         onOfferForSale={() => setShowSaleModal(true)}
-        canOfferForSale={voucher.balance > 0 && !isExpired && !voucher.offerForSale}
+        canOfferForSale={voucher.balance > 0 && !isExpired && !voucher.offerForSale && flags.listForSaleEnabled}
       />
 
       {/* Voucher Details - Corrected Layout */}
