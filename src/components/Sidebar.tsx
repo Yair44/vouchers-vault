@@ -42,6 +42,22 @@ export const Sidebar = ({
       isOpen ? "translate-x-0" : "-translate-x-full"
     )}>
       <div className="flex flex-col h-full">
+        {/* Logo */}
+        <div className="flex items-center justify-center px-6 py-8 border-b border-gray-200 dark:border-gray-800">
+          <Link 
+            to="/" 
+            className="flex-shrink-0 hover:opacity-80 transition-opacity"
+            aria-label="Voucher.co.il - Go to Dashboard"
+            onClick={onClose}
+          >
+            <img 
+              src="/lovable-uploads/dca40be2-4b8b-454e-8703-93bfde464786.png" 
+              alt="Voucher.co.il Logo" 
+              className="h-16 w-auto max-w-full"
+            />
+          </Link>
+        </div>
+
         {/* Navigation */}
         <nav className="flex-1 px-4 py-6 space-y-2">
           {navigation.map((item) => {
