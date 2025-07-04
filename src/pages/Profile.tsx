@@ -294,16 +294,6 @@ export const Profile = () => {
                   {formatDate(profile.created_at)}
                 </span>
               </div>
-
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <User className="h-4 w-4" />
-                  <span className="text-sm font-medium">Account ID</span>
-                </div>
-                <code className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded">
-                  {user.id.slice(0, 8)}...
-                </code>
-              </div>
             </div>
 
             <Separator />
