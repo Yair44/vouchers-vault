@@ -1,3 +1,4 @@
+
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { LayoutDashboard, Upload, Users, User, Ticket } from 'lucide-react';
@@ -42,15 +43,19 @@ export const Sidebar = ({
     )}>
       <div className="flex flex-col h-full">
         {/* Logo */}
-        <div className="flex items-center px-6 py-6 border-b border-gray-200 dark:border-gray-800">
-          <div className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-              <LayoutDashboard className="h-4 w-4 text-white" />
-            </div>
-            <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              VoucherVault
-            </span>
-          </div>
+        <div className="flex items-center justify-center px-6 py-6 border-b border-gray-200 dark:border-gray-800">
+          <Link 
+            to="/" 
+            className="flex-shrink-0 hover:opacity-80 transition-opacity"
+            aria-label="Voucher.co.il - Go to Dashboard"
+            onClick={onClose}
+          >
+            <img 
+              src="/lovable-uploads/31cd7b53-574f-4d6c-8e24-a56cdad25ec9.png" 
+              alt="Voucher.co.il Logo" 
+              className="h-12 w-auto"
+            />
+          </Link>
         </div>
 
         {/* Navigation */}
