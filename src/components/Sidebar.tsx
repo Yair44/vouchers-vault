@@ -1,3 +1,4 @@
+
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { LayoutDashboard, Upload, Users, User, Ticket } from 'lucide-react';
@@ -42,7 +43,7 @@ export const Sidebar = ({
     )}>
       <div className="flex flex-col h-full">
         {/* Logo */}
-        <div className="flex items-center justify-center px-6 py-8 border-b border-gray-200 dark:border-gray-800 overflow-hidden">
+        <div className="flex items-center justify-center px-6 py-4 border-b border-gray-200 dark:border-gray-800">
           <Link 
             to="/" 
             className="flex-shrink-0 hover:opacity-80 transition-opacity"
@@ -52,7 +53,7 @@ export const Sidebar = ({
             <img 
               src="/lovable-uploads/dca40be2-4b8b-454e-8703-93bfde464786.png" 
               alt="Voucher.co.il Logo" 
-              className="h-80 w-auto max-w-none -my-16"
+              className="h-12 w-auto max-w-full"
             />
           </Link>
         </div>
