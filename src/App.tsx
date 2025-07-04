@@ -10,6 +10,7 @@ import { Dashboard } from "@/pages/Dashboard";
 import { Vouchers } from "@/pages/Vouchers";
 import { AddVoucher } from "@/pages/AddVoucher";
 import { VoucherDetail } from "@/pages/VoucherDetail";
+import { Admin } from "@/pages/Admin";
 import { SiteTerms } from "@/pages/SiteTerms";
 import { PrivacyPolicy } from "@/pages/PrivacyPolicy";
 import { AccessibilityStatement } from "@/pages/AccessibilityStatement";
@@ -31,6 +32,7 @@ const App = () => (
               <Route path="/vouchers" element={<Vouchers />} />
               <Route path="/voucher/:id" element={<VoucherDetail />} />
               <Route path="/add" element={<AddVoucher />} />
+              <Route path="/admin" element={<Admin />} />
               <Route path="/shared" element={<div className="text-center py-12"><h2 className="text-xl font-semibold">Shared Vouchers - Coming Soon!</h2><p className="text-gray-600 dark:text-gray-400 mt-2">View vouchers shared with you by other users.</p></div>} />
               <Route path="/profile" element={<div className="text-center py-12"><h2 className="text-xl font-semibold">Profile Settings - Coming Soon!</h2><p className="text-gray-600 dark:text-gray-400 mt-2">Manage your account settings and webhook notifications.</p></div>} />
               <Route path="/site-terms" element={<SiteTerms />} />
