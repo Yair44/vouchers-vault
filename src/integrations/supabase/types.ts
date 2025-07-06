@@ -33,6 +33,103 @@ export type Database = {
         }
         Relationships: []
       }
+      family_groups: {
+        Row: {
+          created_at: string | null
+          created_by: string
+          id: string
+          name: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by: string
+          id?: string
+          name: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string
+          id?: string
+          name?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      family_invitations: {
+        Row: {
+          created_at: string | null
+          family_id: string
+          id: string
+          invited_by: string
+          invited_email: string
+          invited_user_id: string | null
+          status: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          family_id: string
+          id?: string
+          invited_by: string
+          invited_email: string
+          invited_user_id?: string | null
+          status?: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          family_id?: string
+          id?: string
+          invited_by?: string
+          invited_email?: string
+          invited_user_id?: string | null
+          status?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "family_invitations_family_id_fkey"
+            columns: ["family_id"]
+            isOneToOne: false
+            referencedRelation: "family_groups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      family_members: {
+        Row: {
+          family_id: string
+          id: string
+          joined_at: string | null
+          role: string
+          user_id: string
+        }
+        Insert: {
+          family_id: string
+          id?: string
+          joined_at?: string | null
+          role?: string
+          user_id: string
+        }
+        Update: {
+          family_id?: string
+          id?: string
+          joined_at?: string | null
+          role?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "family_members_family_id_fkey"
+            columns: ["family_id"]
+            isOneToOne: false
+            referencedRelation: "family_groups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       feature_flags: {
         Row: {
           created_at: string
@@ -87,6 +184,89 @@ export type Database = {
         }
         Relationships: []
       }
+      shared_vouchers: {
+        Row: {
+          created_at: string | null
+          family_id: string
+          id: string
+          permission: string
+          shared_by: string
+          voucher_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          family_id: string
+          id?: string
+          permission?: string
+          shared_by: string
+          voucher_id: string
+        }
+        Update: {
+          created_at?: string | null
+          family_id?: string
+          id?: string
+          permission?: string
+          shared_by?: string
+          voucher_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shared_vouchers_family_id_fkey"
+            columns: ["family_id"]
+            isOneToOne: false
+            referencedRelation: "family_groups"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "shared_vouchers_voucher_id_fkey"
+            columns: ["voucher_id"]
+            isOneToOne: false
+            referencedRelation: "vouchers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      transactions: {
+        Row: {
+          amount: number
+          created_at: string | null
+          description: string
+          id: string
+          new_balance: number
+          previous_balance: number
+          purchase_date: string | null
+          voucher_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string | null
+          description: string
+          id?: string
+          new_balance: number
+          previous_balance: number
+          purchase_date?: string | null
+          voucher_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string | null
+          description?: string
+          id?: string
+          new_balance?: number
+          previous_balance?: number
+          purchase_date?: string | null
+          voucher_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "transactions_voucher_id_fkey"
+            columns: ["voucher_id"]
+            isOneToOne: false
+            referencedRelation: "vouchers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -105,6 +285,69 @@ export type Database = {
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
           user_id?: string
+        }
+        Relationships: []
+      }
+      vouchers: {
+        Row: {
+          balance: number
+          category: string | null
+          code: string
+          contact_info: string | null
+          created_at: string | null
+          eligible_businesses_url: string | null
+          expiry_date: string
+          id: string
+          image_urls: string[] | null
+          is_active: boolean
+          name: string
+          notes: string | null
+          offer_for_sale: boolean | null
+          original_balance: number
+          sale_price: number | null
+          updated_at: string | null
+          user_id: string
+          voucher_url: string | null
+        }
+        Insert: {
+          balance?: number
+          category?: string | null
+          code: string
+          contact_info?: string | null
+          created_at?: string | null
+          eligible_businesses_url?: string | null
+          expiry_date: string
+          id?: string
+          image_urls?: string[] | null
+          is_active?: boolean
+          name: string
+          notes?: string | null
+          offer_for_sale?: boolean | null
+          original_balance?: number
+          sale_price?: number | null
+          updated_at?: string | null
+          user_id: string
+          voucher_url?: string | null
+        }
+        Update: {
+          balance?: number
+          category?: string | null
+          code?: string
+          contact_info?: string | null
+          created_at?: string | null
+          eligible_businesses_url?: string | null
+          expiry_date?: string
+          id?: string
+          image_urls?: string[] | null
+          is_active?: boolean
+          name?: string
+          notes?: string | null
+          offer_for_sale?: boolean | null
+          original_balance?: number
+          sale_price?: number | null
+          updated_at?: string | null
+          user_id?: string
+          voucher_url?: string | null
         }
         Relationships: []
       }

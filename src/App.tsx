@@ -20,6 +20,7 @@ import { PrivacyPolicy } from "@/pages/PrivacyPolicy";
 import { AccessibilityStatement } from "@/pages/AccessibilityStatement";
 import { ContactUs } from "@/pages/ContactUs";
 import NotFound from "./pages/NotFound";
+import { FamilyShare } from "@/pages/FamilyShare";
 
 const queryClient = new QueryClient();
 
@@ -41,7 +42,7 @@ const App = () => (
                     <Route path="/voucher/:id" element={<ProtectedRoute><VoucherDetail /></ProtectedRoute>} />
                     <Route path="/add" element={<ProtectedRoute><AddVoucher /></ProtectedRoute>} />
                     <Route path="/admin" element={<Admin />} />
-                    <Route path="/shared" element={<ProtectedRoute><div className="text-center py-12"><h2 className="text-xl font-semibold">Shared Vouchers - Coming Soon!</h2><p className="text-muted-foreground mt-2">View vouchers shared with you by other users.</p></div></ProtectedRoute>} />
+                    <Route path="/shared" element={<ProtectedRoute><FamilyShare /></ProtectedRoute>} />
                     <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
                     <Route path="/site-terms" element={<SiteTerms />} />
                     <Route path="/privacy-policy" element={<PrivacyPolicy />} />
