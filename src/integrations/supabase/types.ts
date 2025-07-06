@@ -356,11 +356,19 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_user_family_ids: {
+        Args: { _user_id: string }
+        Returns: string[]
+      }
       has_role: {
         Args: {
           _user_id: string
           _role: Database["public"]["Enums"]["app_role"]
         }
+        Returns: boolean
+      }
+      is_family_admin: {
+        Args: { _user_id: string; _family_id: string }
         Returns: boolean
       }
     }
