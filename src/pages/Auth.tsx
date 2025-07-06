@@ -13,7 +13,7 @@ export const Auth = () => {
   const [isInIframe, setIsInIframe] = useState(false);
   
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, isPreviewMode } = useAuth();
 
   useEffect(() => {
     if (user) {
@@ -25,6 +25,13 @@ export const Auth = () => {
     // Check if running in iframe/embedded context
     setIsInIframe(window !== window.top);
   }, []);
+
+  useEffect(() => {
+    // In preview mode, automatically redirect since user will be auto-authenticated
+    if (isPreviewMode) {
+      navigate('/');
+    }
+  }, [isPreviewMode, navigate]);
 
   const getRedirectUrl = () => {
     // Handle different environments for redirect URL

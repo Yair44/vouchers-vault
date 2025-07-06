@@ -7,6 +7,7 @@ interface AuthContextType {
   session: Session | null;
   isLoading: boolean;
   isAdmin: boolean;
+  isPreviewMode: boolean;
   signOut: () => Promise<void>;
 }
 
@@ -30,6 +31,10 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [isLoading, setIsLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
 
+  // Detect if we're in Lovable preview environment
+  const isPreviewMode = window.location.hostname.includes('lovableproject.com') || 
+                       window.location.hostname.includes('lovable.app');
+
   const checkAdminStatus = async (userId: string) => {
     try {
       const { data } = await supabase
@@ -47,7 +52,9 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   const signOut = async () => {
     try {
-      await supabase.auth.signOut();
+      if (!isPreviewMode) {
+        await supabase.auth.signOut();
+      }
       setUser(null);
       setSession(null);
       setIsAdmin(false);
@@ -57,7 +64,39 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   };
 
   useEffect(() => {
-    // Set up auth state listener
+    // In preview mode, create a mock user session
+    if (isPreviewMode) {
+      const mockUser = {
+        id: 'preview-user-123',
+        email: 'preview@example.com',
+        user_metadata: { full_name: 'Preview User' },
+        app_metadata: {},
+        aud: 'authenticated',
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        email_confirmed_at: new Date().toISOString(),
+        last_sign_in_at: new Date().toISOString(),
+        role: 'authenticated',
+        confirmed_at: new Date().toISOString(),
+      } as User;
+
+      const mockSession = {
+        access_token: 'mock-access-token',
+        token_type: 'bearer',
+        expires_in: 3600,
+        expires_at: Math.floor(Date.now() / 1000) + 3600,
+        refresh_token: 'mock-refresh-token',
+        user: mockUser,
+      } as Session;
+
+      setUser(mockUser);
+      setSession(mockSession);
+      setIsAdmin(true); // Grant admin privileges in preview mode
+      setIsLoading(false);
+      return;
+    }
+
+    // Set up auth state listener for production
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         setSession(session);
@@ -89,7 +128,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     });
 
     return () => subscription.unsubscribe();
-  }, []);
+  }, [isPreviewMode]);
 
   return (
     <AuthContext.Provider value={{
@@ -97,6 +136,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       session,
       isLoading,
       isAdmin,
+      isPreviewMode,
       signOut
     }}>
       {children}
