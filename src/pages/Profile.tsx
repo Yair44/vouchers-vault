@@ -32,7 +32,7 @@ interface UserProfile {
 }
 
 export const Profile = () => {
-  const { user, isLoading, isAdmin, isPreviewMode, signOut } = useAuth();
+  const { user, isLoading, isAdmin, signOut } = useAuth();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [profileLoading, setProfileLoading] = useState(true);
   const [editingName, setEditingName] = useState(false);
@@ -63,12 +63,12 @@ export const Profile = () => {
         setProfile(data);
         setNewDisplayName(data.full_name || '');
       } else {
-        // Handle preview mode - create mock profile if no profile exists
+        // Create mock profile for users without database profiles
         const mockProfile = {
           id: user.id,
           user_id: user.id,
-          email: user.email || 'preview@example.com',
-          full_name: user.user_metadata?.full_name || 'Preview User',
+          email: user.email || 'user@example.com',
+          full_name: user.user_metadata?.full_name || 'User',
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
         };

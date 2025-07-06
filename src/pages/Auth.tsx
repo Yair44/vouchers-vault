@@ -13,7 +13,7 @@ export const Auth = () => {
   const [isInIframe, setIsInIframe] = useState(false);
   
   const navigate = useNavigate();
-  const { user, isPreviewMode } = useAuth();
+  const { user } = useAuth();
 
   useEffect(() => {
     if (user) {
@@ -25,13 +25,6 @@ export const Auth = () => {
     // Check if running in iframe/embedded context
     setIsInIframe(window !== window.top);
   }, []);
-
-  useEffect(() => {
-    // In preview mode, automatically redirect since user will be auto-authenticated
-    if (isPreviewMode) {
-      navigate('/');
-    }
-  }, [isPreviewMode, navigate]);
 
   const getRedirectUrl = () => {
     // Handle different environments for redirect URL
@@ -51,42 +44,13 @@ export const Auth = () => {
     return `${currentOrigin}/`;
   };
 
-  const cleanupAuthState = () => {
-    // Remove all Supabase auth keys from localStorage
-    Object.keys(localStorage).forEach((key) => {
-      if (key.startsWith('supabase.auth.') || key.includes('sb-')) {
-        localStorage.removeItem(key);
-      }
-    });
-    
-    // Remove from sessionStorage if in use
-    Object.keys(sessionStorage || {}).forEach((key) => {
-      if (key.startsWith('supabase.auth.') || key.includes('sb-')) {
-        sessionStorage.removeItem(key);
-      }
-    });
-  };
-
   const handleGoogleSignIn = async () => {
     setLoading(true);
     setError('');
 
     try {
-      // Clean up any existing auth state first
-      cleanupAuthState();
-      
-      // Attempt to sign out any existing session
-      try {
-        await supabase.auth.signOut({ scope: 'global' });
-      } catch (err) {
-        // Continue even if this fails
-        console.warn('Global signout failed:', err);
-      }
-
       const redirectUrl = getRedirectUrl();
       console.log('Using redirect URL:', redirectUrl);
-      console.log('Current window location:', window.location.href);
-      console.log('Is in iframe:', window !== window.top);
 
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
