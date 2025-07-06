@@ -62,6 +62,18 @@ export const Profile = () => {
       if (data) {
         setProfile(data);
         setNewDisplayName(data.full_name || '');
+      } else {
+        // Handle preview mode - create mock profile if no profile exists
+        const mockProfile = {
+          id: user.id,
+          user_id: user.id,
+          email: user.email || 'preview@example.com',
+          full_name: user.user_metadata?.full_name || 'Preview User',
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        };
+        setProfile(mockProfile);
+        setNewDisplayName(mockProfile.full_name || '');
       }
     } catch (error: any) {
       toast({
