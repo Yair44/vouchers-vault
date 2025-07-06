@@ -31,9 +31,25 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [isLoading, setIsLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
 
-  // Detect if we're in Lovable preview environment
-  const isPreviewMode = window.location.hostname.includes('lovableproject.com') || 
-                       window.location.hostname.includes('lovable.app');
+  // Detect if we're in Lovable preview environment - very restrictive to prevent production activation
+  const isPreviewMode = (() => {
+    const hostname = window.location.hostname;
+    const href = window.location.href;
+    
+    // Only activate for exact Lovable preview patterns and never for custom domains
+    const isLovablePreview = (
+      // Lovable project preview URLs
+      hostname.endsWith('.lovableproject.com') ||
+      hostname.endsWith('.lovable.app') ||
+      // Lovable editor preview (with UUID pattern)
+      (hostname.includes('lovableproject.com') && href.includes('a0a4cadc-30e3-4451-b806-4ee4b9f085b0'))
+    );
+    
+    // Additional safety check - never activate if hostname looks like a custom domain
+    const isCustomDomain = !hostname.includes('lovable') && !hostname.includes('localhost');
+    
+    return isLovablePreview && !isCustomDomain;
+  })();
 
   const checkAdminStatus = async (userId: string) => {
     try {
