@@ -68,6 +68,11 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   const signOut = async () => {
     try {
+      // First, clear all local state immediately
+      setUser(null);
+      setSession(null);
+      setIsAdmin(false);
+      
       if (!isPreviewMode) {
         // Clean up local storage
         Object.keys(localStorage).forEach((key) => {
@@ -82,18 +87,17 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         } catch (err) {
           console.warn('Global signout failed:', err);
         }
-      } else {
-        // For preview mode, clear state
-        setUser(null);
-        setSession(null);
-        setIsAdmin(false);
       }
       
-      // Always redirect to auth page after sign out
-      window.location.href = '/auth';
+      // Force immediate redirect to auth page with a full page reload
+      window.location.replace('/auth');
     } catch (error) {
       console.error('Error signing out:', error);
-      throw error;
+      // Even if there's an error, clear state and redirect
+      setUser(null);
+      setSession(null);
+      setIsAdmin(false);
+      window.location.replace('/auth');
     }
   };
 
