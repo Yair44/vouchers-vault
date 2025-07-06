@@ -69,13 +69,32 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const signOut = async () => {
     try {
       if (!isPreviewMode) {
-        await supabase.auth.signOut();
+        // Clean up local storage
+        Object.keys(localStorage).forEach((key) => {
+          if (key.startsWith('supabase.auth.') || key.includes('sb-')) {
+            localStorage.removeItem(key);
+          }
+        });
+        
+        // Attempt global sign out
+        try {
+          await supabase.auth.signOut({ scope: 'global' });
+        } catch (err) {
+          console.warn('Global signout failed:', err);
+        }
+        
+        // Navigate to auth page for production
+        window.location.href = '/auth';
+      } else {
+        // For preview mode, just clear state and navigate to home
+        setUser(null);
+        setSession(null);
+        setIsAdmin(false);
+        window.location.href = '/';
       }
-      setUser(null);
-      setSession(null);
-      setIsAdmin(false);
     } catch (error) {
       console.error('Error signing out:', error);
+      throw error;
     }
   };
 

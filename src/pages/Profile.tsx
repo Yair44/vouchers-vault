@@ -32,7 +32,7 @@ interface UserProfile {
 }
 
 export const Profile = () => {
-  const { user, isLoading, isAdmin, signOut } = useAuth();
+  const { user, isLoading, isAdmin, isPreviewMode, signOut } = useAuth();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [profileLoading, setProfileLoading] = useState(true);
   const [editingName, setEditingName] = useState(false);
@@ -116,37 +116,9 @@ export const Profile = () => {
     }
   };
 
-  const cleanupAuthState = () => {
-    // Remove all Supabase auth keys from localStorage
-    Object.keys(localStorage).forEach((key) => {
-      if (key.startsWith('supabase.auth.') || key.includes('sb-')) {
-        localStorage.removeItem(key);
-      }
-    });
-    
-    // Remove from sessionStorage if in use
-    Object.keys(sessionStorage || {}).forEach((key) => {
-      if (key.startsWith('supabase.auth.') || key.includes('sb-')) {
-        sessionStorage.removeItem(key);
-      }
-    });
-  };
-
   const handleSignOut = async () => {
     try {
-      // Clean up auth state first
-      cleanupAuthState();
-      
-      // Attempt global sign out
-      try {
-        await supabase.auth.signOut({ scope: 'global' });
-      } catch (err) {
-        // Continue even if this fails
-        console.warn('Global signout failed:', err);
-      }
-      
-      // Force page reload for a clean state
-      window.location.href = '/auth';
+      await signOut();
     } catch (error: any) {
       toast({
         title: "Error",
