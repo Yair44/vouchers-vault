@@ -83,7 +83,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     // In preview mode, create a mock user session
     if (isPreviewMode) {
       const mockUser = {
-        id: 'preview-user-123',
+        id: 'a0a4cadc-30e3-4451-b806-4ee4b9f085b0',
         email: 'preview@example.com',
         user_metadata: { full_name: 'Preview User' },
         app_metadata: {},
