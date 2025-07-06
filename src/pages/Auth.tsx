@@ -20,21 +20,87 @@ export const Auth = () => {
     }
   }, [user, navigate]);
 
+  const getRedirectUrl = () => {
+    // Handle different environments for redirect URL
+    const currentOrigin = window.location.origin;
+    
+    // For Lovable preview environments, use the current origin
+    if (currentOrigin.includes('lovable.app') || currentOrigin.includes('lovableproject.com')) {
+      return `${currentOrigin}/`;
+    }
+    
+    // For localhost development
+    if (currentOrigin.includes('localhost')) {
+      return `${currentOrigin}/`;
+    }
+    
+    // Fallback to current origin
+    return `${currentOrigin}/`;
+  };
+
+  const cleanupAuthState = () => {
+    // Remove all Supabase auth keys from localStorage
+    Object.keys(localStorage).forEach((key) => {
+      if (key.startsWith('supabase.auth.') || key.includes('sb-')) {
+        localStorage.removeItem(key);
+      }
+    });
+    
+    // Remove from sessionStorage if in use
+    Object.keys(sessionStorage || {}).forEach((key) => {
+      if (key.startsWith('supabase.auth.') || key.includes('sb-')) {
+        sessionStorage.removeItem(key);
+      }
+    });
+  };
+
   const handleGoogleSignIn = async () => {
     setLoading(true);
     setError('');
 
     try {
+      // Clean up any existing auth state first
+      cleanupAuthState();
+      
+      // Attempt to sign out any existing session
+      try {
+        await supabase.auth.signOut({ scope: 'global' });
+      } catch (err) {
+        // Continue even if this fails
+        console.warn('Global signout failed:', err);
+      }
+
+      const redirectUrl = getRedirectUrl();
+      console.log('Using redirect URL:', redirectUrl);
+
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/`
+          redirectTo: redirectUrl,
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'consent',
+          }
         }
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error('OAuth error:', error);
+        throw error;
+      }
     } catch (error: any) {
-      setError(error.message || 'An error occurred during sign in');
+      console.error('Sign in error:', error);
+      let errorMessage = 'An error occurred during sign in';
+      
+      if (error.message?.includes('unauthorized_client')) {
+        errorMessage = 'Google sign-in is not properly configured. Please check the authentication settings.';
+      } else if (error.message?.includes('refused to connect')) {
+        errorMessage = 'Unable to connect to Google. Please check your internet connection and try again.';
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
+      setError(errorMessage);
       setLoading(false);
     }
   };
