@@ -21,7 +21,7 @@ const navigation = [{
   href: '/add',
   icon: Upload
 }, {
-  name: 'Shared with Me',
+  name: 'Family Share',
   href: '/shared',
   icon: Users
 }, {
