@@ -82,16 +82,15 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         } catch (err) {
           console.warn('Global signout failed:', err);
         }
-        
-        // Navigate to auth page for production
-        window.location.href = '/auth';
       } else {
-        // For preview mode, just clear state and navigate to home
+        // For preview mode, clear state
         setUser(null);
         setSession(null);
         setIsAdmin(false);
-        window.location.href = '/';
       }
+      
+      // Always redirect to auth page after sign out
+      window.location.href = '/auth';
     } catch (error) {
       console.error('Error signing out:', error);
       throw error;
