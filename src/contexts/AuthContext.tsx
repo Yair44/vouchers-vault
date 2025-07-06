@@ -68,35 +68,44 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   const signOut = async () => {
     try {
-      // First, clear all local state immediately
+      // Clear all authentication state first
       setUser(null);
       setSession(null);
       setIsAdmin(false);
       
       if (!isPreviewMode) {
-        // Clean up local storage
+        // Clear ALL storage items (including Google auth tokens)
+        localStorage.clear();
+        sessionStorage.clear();
+        
+        // Clear specific Supabase auth items if localStorage.clear() is too aggressive
         Object.keys(localStorage).forEach((key) => {
-          if (key.startsWith('supabase.auth.') || key.includes('sb-')) {
+          if (key.includes('supabase') || key.includes('sb-') || key.includes('auth')) {
             localStorage.removeItem(key);
           }
         });
         
-        // Attempt global sign out
-        try {
-          await supabase.auth.signOut({ scope: 'global' });
-        } catch (err) {
-          console.warn('Global signout failed:', err);
-        }
+        // Perform global sign out from Supabase
+        await supabase.auth.signOut({ scope: 'global' });
+        
+        // Additional cleanup - clear cookies if any
+        document.cookie.split(";").forEach((c) => {
+          document.cookie = c
+            .replace(/^ +/, "")
+            .replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
+        });
       }
       
-      // Force immediate redirect to auth page with a full page reload
+      // Force complete page reload to auth page (bypasses any cached state)
       window.location.replace('/auth');
     } catch (error) {
       console.error('Error signing out:', error);
-      // Even if there's an error, clear state and redirect
+      // Even if sign out fails, clear everything and redirect
       setUser(null);
       setSession(null);
       setIsAdmin(false);
+      localStorage.clear();
+      sessionStorage.clear();
       window.location.replace('/auth');
     }
   };
