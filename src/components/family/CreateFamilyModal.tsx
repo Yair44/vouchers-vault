@@ -28,22 +28,24 @@ export const CreateFamilyModal = ({ open, onOpenChange, onSuccess }: CreateFamil
       return;
     }
 
-    try {
-      createFamily(name.trim());
-      toast({
-        title: "Success",
-        description: "Family created successfully",
-      });
-      setName('');
-      onOpenChange(false);
-      onSuccess();
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to create family",
-        variant: "destructive",
-      });
-    }
+    createFamily(name.trim(), {
+      onSuccess: () => {
+        toast({
+          title: "Success",
+          description: "Family created successfully",
+        });
+        setName('');
+        onOpenChange(false);
+        onSuccess();
+      },
+      onError: () => {
+        toast({
+          title: "Error",
+          description: "Failed to create family",
+          variant: "destructive",
+        });
+      }
+    });
   };
 
   return (
