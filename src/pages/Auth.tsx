@@ -10,6 +10,7 @@ import { Loader2 } from 'lucide-react';
 export const Auth = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [isInIframe, setIsInIframe] = useState(false);
   
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -19,6 +20,11 @@ export const Auth = () => {
       navigate('/');
     }
   }, [user, navigate]);
+
+  useEffect(() => {
+    // Check if running in iframe/embedded context
+    setIsInIframe(window !== window.top);
+  }, []);
 
   const getRedirectUrl = () => {
     // Handle different environments for redirect URL
@@ -72,6 +78,8 @@ export const Auth = () => {
 
       const redirectUrl = getRedirectUrl();
       console.log('Using redirect URL:', redirectUrl);
+      console.log('Current window location:', window.location.href);
+      console.log('Is in iframe:', window !== window.top);
 
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
@@ -95,7 +103,7 @@ export const Auth = () => {
       if (error.message?.includes('unauthorized_client')) {
         errorMessage = 'Google sign-in is not properly configured. Please check the authentication settings.';
       } else if (error.message?.includes('refused to connect')) {
-        errorMessage = 'Unable to connect to Google. Please check your internet connection and try again.';
+        errorMessage = 'Google OAuth cannot run in this embedded preview environment. Try opening the app in a new tab: ' + window.location.href.replace(/\?.*$/, '');
       } else if (error.message) {
         errorMessage = error.message;
       }
@@ -144,6 +152,21 @@ export const Auth = () => {
               </>
             )}
           </Button>
+
+          {isInIframe && (
+            <>
+              <div className="text-center text-sm text-muted-foreground">
+                Having trouble signing in? Google OAuth may not work in embedded preview.
+              </div>
+              <Button 
+                variant="outline"
+                className="w-full" 
+                onClick={() => window.open(window.location.href.replace(/\?.*$/, ''), '_blank')}
+              >
+                Open in New Tab
+              </Button>
+            </>
+          )}
 
           <p className="text-sm text-muted-foreground text-center">
             Your first sign-in will automatically grant you admin privileges
