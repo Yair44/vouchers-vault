@@ -214,6 +214,22 @@ export const db = {
       };
       transactions.push(transaction);
       return transaction;
+    },
+    update: (id: string, updates: Partial<Transaction>) => {
+      const index = transactions.findIndex(t => t.id === id);
+      if (index !== -1) {
+        transactions[index] = { ...transactions[index], ...updates };
+        return transactions[index];
+      }
+      return null;
+    },
+    delete: (id: string) => {
+      const index = transactions.findIndex(t => t.id === id);
+      if (index !== -1) {
+        transactions.splice(index, 1);
+        return true;
+      }
+      return false;
     }
   }
 };
