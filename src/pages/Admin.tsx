@@ -74,36 +74,34 @@ const AdminContent = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <Button variant="ghost" onClick={() => navigate('/profile')}>
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Profile
-          </Button>
-          
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2">
-              <Shield className="h-5 w-5 text-green-600" />
-              <Badge variant="secondary">Admin</Badge>
-            </div>
-            <Button variant="outline" size="sm" onClick={handleSignOut}>
-              Sign Out
-            </Button>
-          </div>
-        </div>
+      <div className="flex items-center justify-between">
+        <Button variant="ghost" onClick={() => navigate('/profile')}>
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          Back to Profile
+        </Button>
         
-        {/* User email display - positioned far left with plenty of space */}
-        <div className="flex items-center gap-2 justify-start w-full max-w-lg">
-          <User className="h-4 w-4 flex-shrink-0 text-muted-foreground" />
-          <span className="text-sm font-medium text-left break-all" title={user?.email}>
-            Logged in as: {user?.email}
-          </span>
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2">
+            <Shield className="h-5 w-5 text-green-600" />
+            <Badge variant="secondary">Admin</Badge>
+          </div>
+          <Button variant="outline" size="sm" onClick={handleSignOut}>
+            Sign Out
+          </Button>
         </div>
       </div>
 
       <div className="flex items-center gap-2 mb-6">
         <Settings className="h-6 w-6" />
         <h1 className="text-3xl font-bold">Admin Panel</h1>
+      </div>
+
+      {/* User email display - positioned below Admin Panel title */}
+      <div className="flex items-center gap-2 mb-6 -mt-2">
+        <User className="h-4 w-4 flex-shrink-0 text-muted-foreground" />
+        <span className="text-sm font-medium" title={user?.email}>
+          Logged in as: {user?.email}
+        </span>
       </div>
 
       {/* Feature Flags Card */}
