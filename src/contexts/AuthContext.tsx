@@ -37,10 +37,11 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         .select('role')
         .eq('user_id', userId)
         .eq('role', 'admin')
-        .single();
+        .maybeSingle();
       
       setIsAdmin(!!data);
     } catch (error) {
+      console.error('Error checking admin status:', error);
       setIsAdmin(false);
     }
   };
@@ -75,10 +76,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         setUser(session?.user ?? null);
         
         if (session?.user) {
-          // Check admin status after setting user
-          setTimeout(() => {
-            checkAdminStatus(session.user.id);
-          }, 0);
+          // Check admin status immediately without timeout
+          checkAdminStatus(session.user.id);
         } else {
           setIsAdmin(false);
         }

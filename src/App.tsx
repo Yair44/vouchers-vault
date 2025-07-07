@@ -41,7 +41,7 @@ const App = () => (
                     <Route path="/vouchers" element={<ProtectedRoute><Vouchers /></ProtectedRoute>} />
                     <Route path="/voucher/:id" element={<ProtectedRoute><VoucherDetail /></ProtectedRoute>} />
                     <Route path="/add" element={<ProtectedRoute><AddVoucher /></ProtectedRoute>} />
-                    <Route path="/admin" element={<Admin />} />
+                    <Route path="/admin" element={<ProtectedRoute requireAdmin={true}><Admin /></ProtectedRoute>} />
                     <Route path="/shared" element={<ProtectedRoute><FamilyShare /></ProtectedRoute>} />
                     <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
                     <Route path="/site-terms" element={<SiteTerms />} />

@@ -12,6 +12,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { Loader2 } from 'lucide-react';
+import { handleSecureError } from '@/lib/errorHandler';
+import { validateAndSanitizeInput } from '@/lib/sanitize';
 
 // Form validation schemas
 const signInSchema = z.object({
@@ -102,18 +104,8 @@ export const Auth = () => {
 
       // Success - user will be redirected by the useEffect
     } catch (error: any) {
-      console.error('Sign in error:', error);
-      let errorMessage = 'An error occurred during sign in';
-      
-      if (error.message?.includes('Invalid login credentials')) {
-        errorMessage = 'Invalid email or password. Please check your credentials.';
-      } else if (error.message?.includes('Email not confirmed')) {
-        errorMessage = 'Please check your email and click the confirmation link before signing in.';
-      } else if (error.message) {
-        errorMessage = error.message;
-      }
-      
-      setError(errorMessage);
+      const secureError = handleSecureError(error, 'auth');
+      setError(secureError.message);
     } finally {
       setLoading(false);
     }
@@ -142,17 +134,11 @@ export const Auth = () => {
       // Show success message or redirect
       alert('Check your email for a confirmation link!');
     } catch (error: any) {
-      console.error('Sign up error:', error);
-      let errorMessage = 'An error occurred during sign up';
-      
-      if (error.message?.includes('User already registered')) {
-        errorMessage = 'An account with this email already exists. Please sign in instead.';
+      const secureError = handleSecureError(error, 'auth');
+      if (secureError.code === 'USER_EXISTS') {
         setActiveTab('signin');
-      } else if (error.message) {
-        errorMessage = error.message;
       }
-      
-      setError(errorMessage);
+      setError(secureError.message);
     } finally {
       setLoading(false);
     }
@@ -182,20 +168,16 @@ export const Auth = () => {
         throw error;
       }
     } catch (error: any) {
-      console.error('Google sign in error:', error);
-      let errorMessage = 'An error occurred during Google sign in';
+      const secureError = handleSecureError(error, 'auth');
       
-      if (error.message?.includes('unauthorized_client')) {
-        errorMessage = 'Google sign-in is not properly configured. Please check the authentication settings.';
-      } else if (error.message?.includes('refused to connect')) {
-        errorMessage = 'Google OAuth cannot run in this embedded preview environment. Try opening the app in a new tab: ' + window.location.href.replace(/\?.*$/, '');
-      } else if (error.message?.includes('provider is not enabled') || error.message?.includes('Unsupported provider')) {
-        errorMessage = 'Google sign-in is currently disabled. Please use email and password to sign in.';
-      } else if (error.message) {
-        errorMessage = error.message;
+      // Handle specific OAuth issues that need special messaging
+      if (error.message?.includes('refused to connect')) {
+        setError('Google OAuth cannot run in this embedded preview environment. Try opening the app in a new tab: ' + window.location.href.replace(/\?.*$/, ''));
+      } else if (error.message?.includes('provider is not enabled')) {
+        setError('Google sign-in is currently disabled. Please use email and password to sign in.');
+      } else {
+        setError(secureError.message);
       }
-      
-      setError(errorMessage);
     } finally {
       setLoading(false);
     }

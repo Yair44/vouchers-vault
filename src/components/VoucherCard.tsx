@@ -7,6 +7,7 @@ import { Voucher } from '@/types';
 import { cn } from '@/lib/utils';
 import { VoucherProgress } from './VoucherProgress';
 import { VoucherStatusBadge } from './VoucherStatusBadge';
+import { SafeText } from './SafeText';
 import { getVoucherStatus } from '@/types';
 import { useNavigate } from 'react-router-dom';
 interface VoucherCardProps {
@@ -46,7 +47,7 @@ export const VoucherCard = ({
         <div className="flex items-start justify-between">
           <div className="flex-1">
             <h3 className="font-semibold text-lg mb-1 line-clamp-2">
-              {voucher.name}
+              <SafeText>{voucher.name}</SafeText>
             </h3>
           </div>
           <div className="flex items-center space-x-2">

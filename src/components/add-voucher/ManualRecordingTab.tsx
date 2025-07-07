@@ -10,6 +10,7 @@ import { Settings, Upload, X } from 'lucide-react';
 import { compressImage, validateImageFile } from '@/lib/imageCompression';
 import { ImageStorage } from '@/lib/imageStorage';
 import { toast } from '@/hooks/use-toast';
+import { validateAndSanitizeInput } from '@/lib/sanitize';
 
 interface ManualRecordingTabProps {
   formData: {
@@ -159,8 +160,9 @@ export const ManualRecordingTab = ({ formData, onInputChange, isLoading, onSubmi
             <Input
               id="name"
               value={formData.name}
-              onChange={(e) => onInputChange('name', e.target.value)}
+              onChange={(e) => onInputChange('name', validateAndSanitizeInput(e.target.value, 100))}
               placeholder="e.g., Amazon Gift Card"
+              maxLength={100}
               required
             />
           </div>
@@ -169,8 +171,9 @@ export const ManualRecordingTab = ({ formData, onInputChange, isLoading, onSubmi
             <Input
               id="code"
               value={formData.code}
-              onChange={(e) => onInputChange('code', e.target.value)}
+              onChange={(e) => onInputChange('code', validateAndSanitizeInput(e.target.value, 50))}
               placeholder="e.g., ABCD-1234-EFGH"
+              maxLength={50}
             />
           </div>
         </div>
@@ -270,8 +273,9 @@ export const ManualRecordingTab = ({ formData, onInputChange, isLoading, onSubmi
           <Textarea
             id="notes"
             value={formData.notes}
-            onChange={(e) => onInputChange('notes', e.target.value)}
+            onChange={(e) => onInputChange('notes', validateAndSanitizeInput(e.target.value, 500))}
             placeholder="Add any additional notes or details about this voucher..."
+            maxLength={500}
             rows={3}
           />
         </div>
