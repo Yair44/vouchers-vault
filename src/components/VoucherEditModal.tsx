@@ -540,10 +540,7 @@ export const VoucherEditModal = ({
                                 />
                               </div>
                             </div>
-                            <div className="flex justify-between items-center pt-2">
-                              <div className="text-sm text-muted-foreground">
-                                Balance After: <span className="font-medium">${transaction.newBalance.toFixed(2)}</span>
-                              </div>
+                            <div className="flex justify-end pt-2">
                               <div className="flex space-x-2">
                                 <Button
                                   variant="outline"
@@ -565,11 +562,11 @@ export const VoucherEditModal = ({
                             </div>
                           </div>
                         ) : (
-                          // View mode - compact layout without description
+                          // View mode - compact layout without description and balance
                           <div className="space-y-3">
                             <div className="flex justify-between items-start">
                               <div className="space-y-2 flex-1">
-                                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-sm">
+                                <div className="grid grid-cols-2 gap-3 text-sm">
                                   <div>
                                     <Label className="text-xs text-muted-foreground">Date</Label>
                                     <div className="font-medium">
@@ -581,10 +578,6 @@ export const VoucherEditModal = ({
                                     <div className="font-medium text-red-600">
                                       -${Math.abs(transaction.amount).toFixed(2)}
                                     </div>
-                                  </div>
-                                  <div>
-                                    <Label className="text-xs text-muted-foreground">Balance After</Label>
-                                    <div className="font-medium">${transaction.newBalance.toFixed(2)}</div>
                                   </div>
                                 </div>
                               </div>
