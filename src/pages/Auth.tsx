@@ -189,13 +189,14 @@ export const Auth = () => {
         errorMessage = 'Google sign-in is not properly configured. Please check the authentication settings.';
       } else if (error.message?.includes('refused to connect')) {
         errorMessage = 'Google OAuth cannot run in this embedded preview environment. Try opening the app in a new tab: ' + window.location.href.replace(/\?.*$/, '');
-      } else if (error.message?.includes('provider is not enabled')) {
+      } else if (error.message?.includes('provider is not enabled') || error.message?.includes('Unsupported provider')) {
         errorMessage = 'Google sign-in is currently disabled. Please use email and password to sign in.';
       } else if (error.message) {
         errorMessage = error.message;
       }
       
       setError(errorMessage);
+    } finally {
       setLoading(false);
     }
   };
