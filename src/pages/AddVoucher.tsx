@@ -133,24 +133,27 @@ or just upload a screenshot</p>
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="manual" className="w-full">
-            <TabsList className="mb-6">
+            <TabsList className="mb-6 grid grid-cols-3 w-full">
               <TabsTrigger 
                 value="manual" 
-                className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500 data-[state=active]:to-pink-400 data-[state=active]:text-white"
+                className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500 data-[state=active]:to-pink-400 data-[state=active]:text-white whitespace-nowrap text-xs sm:text-sm px-2 sm:px-4"
               >
-                Manual Recording
+                <span className="hidden sm:inline">Manual Recording</span>
+                <span className="sm:hidden">Manual</span>
               </TabsTrigger>
               <TabsTrigger 
                 value="image" 
-                className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500 data-[state=active]:to-pink-400 data-[state=active]:text-white"
+                className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500 data-[state=active]:to-pink-400 data-[state=active]:text-white whitespace-nowrap text-xs sm:text-sm px-2 sm:px-4"
               >
-                Image Upload
+                <span className="hidden sm:inline">Image Upload</span>
+                <span className="sm:hidden">Image</span>
               </TabsTrigger>
               <TabsTrigger 
                 value="text" 
-                className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500 data-[state=active]:to-pink-400 data-[state=active]:text-white"
+                className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500 data-[state=active]:to-pink-400 data-[state=active]:text-white whitespace-nowrap text-xs sm:text-sm px-2 sm:px-4"
               >
-                Text Extraction
+                <span className="hidden sm:inline">Text Extraction</span>
+                <span className="sm:hidden">Text</span>
               </TabsTrigger>
             </TabsList>
             
