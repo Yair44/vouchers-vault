@@ -263,15 +263,6 @@ export const VoucherEditModal = ({
       return;
     }
 
-    if (!newTransaction.description.trim()) {
-      toast({
-        title: "Missing Description",
-        description: "Please enter a description for the transaction.",
-        variant: "destructive"
-      });
-      return;
-    }
-
     const previousBalance = voucher.balance;
     const newBalance = previousBalance - amount;
 
@@ -289,7 +280,7 @@ export const VoucherEditModal = ({
       amount: -amount, // Negative for purchase
       previousBalance,
       newBalance,
-      description: newTransaction.description,
+      description: 'Purchase',
       purchaseDate: new Date(newTransaction.purchaseDate)
     });
 
@@ -460,16 +451,7 @@ export const VoucherEditModal = ({
               {showAddTransaction && (
                 <div className="border rounded-lg p-3 sm:p-4 space-y-4 bg-muted/30">
                   <h4 className="font-medium">Add New Purchase</h4>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                    <div>
-                      <Label htmlFor="new-description">Description</Label>
-                      <Input
-                        id="new-description"
-                        value={newTransaction.description}
-                        onChange={(e) => setNewTransaction(prev => ({ ...prev, description: e.target.value }))}
-                        placeholder="Purchase description"
-                      />
-                    </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <Label htmlFor="new-amount">Amount</Label>
                       <Input
@@ -528,7 +510,7 @@ export const VoucherEditModal = ({
                     .map((transaction) => (
                       <div key={transaction.id} className="border rounded-lg p-4 space-y-4">
                         {editingTransaction?.id === transaction.id ? (
-                          // Edit mode - vertical layout
+                          // Edit mode - compact layout without description
                           <div className="space-y-4">
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                               <div>
@@ -558,17 +540,6 @@ export const VoucherEditModal = ({
                                 />
                               </div>
                             </div>
-                            <div>
-                              <Label htmlFor={`edit-description-${transaction.id}`}>Description</Label>
-                              <Input
-                                id={`edit-description-${transaction.id}`}
-                                value={editingTransaction.description}
-                                onChange={(e) => setEditingTransaction(prev => 
-                                  prev ? { ...prev, description: e.target.value } : null
-                                )}
-                                placeholder="Purchase description"
-                              />
-                            </div>
                             <div className="flex justify-between items-center pt-2">
                               <div className="text-sm text-muted-foreground">
                                 Balance After: <span className="font-medium">${transaction.newBalance.toFixed(2)}</span>
@@ -594,31 +565,27 @@ export const VoucherEditModal = ({
                             </div>
                           </div>
                         ) : (
-                          // View mode - vertical layout
+                          // View mode - compact layout without description
                           <div className="space-y-3">
                             <div className="flex justify-between items-start">
                               <div className="space-y-2 flex-1">
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-sm">
                                   <div>
                                     <Label className="text-xs text-muted-foreground">Date</Label>
-                                    <div className="text-sm font-medium">
+                                    <div className="font-medium">
                                       {(transaction.purchaseDate || transaction.createdAt).toLocaleDateString()}
                                     </div>
                                   </div>
                                   <div>
                                     <Label className="text-xs text-muted-foreground">Amount</Label>
-                                    <div className="text-sm font-medium text-red-600">
+                                    <div className="font-medium text-red-600">
                                       -${Math.abs(transaction.amount).toFixed(2)}
                                     </div>
                                   </div>
-                                </div>
-                                <div>
-                                  <Label className="text-xs text-muted-foreground">Description</Label>
-                                  <div className="text-sm">{transaction.description}</div>
-                                </div>
-                                <div>
-                                  <Label className="text-xs text-muted-foreground">Balance After</Label>
-                                  <div className="text-sm font-medium">${transaction.newBalance.toFixed(2)}</div>
+                                  <div>
+                                    <Label className="text-xs text-muted-foreground">Balance After</Label>
+                                    <div className="font-medium">${transaction.newBalance.toFixed(2)}</div>
+                                  </div>
                                 </div>
                               </div>
                               <div className="flex space-x-2 ml-4">
