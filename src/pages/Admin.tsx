@@ -92,11 +92,11 @@ const AdminContent = () => {
           </div>
         </div>
         
-        {/* User email display - moved down and left */}
-        <div className="flex items-center gap-2 ml-0">
-          <User className="h-4 w-4 flex-shrink-0" />
-          <span className="text-sm font-medium truncate max-w-md" title={user?.email}>
-            {user?.email}
+        {/* User email display - positioned far left with plenty of space */}
+        <div className="flex items-center gap-2 justify-start w-full max-w-lg">
+          <User className="h-4 w-4 flex-shrink-0 text-muted-foreground" />
+          <span className="text-sm font-medium text-left break-all" title={user?.email}>
+            Logged in as: {user?.email}
           </span>
         </div>
       </div>
