@@ -24,8 +24,11 @@ interface AccessibilityProviderProps {
 
 export const AccessibilityProvider = ({ children }: AccessibilityProviderProps) => {
   const [settings, setSettings] = useState<AccessibilitySettings>(() => {
-    const stored = localStorage.getItem('accessibility-settings');
-    return stored ? JSON.parse(stored) : defaultAccessibilitySettings;
+    if (typeof window !== 'undefined') {
+      const stored = localStorage.getItem('accessibility-settings');
+      return stored ? JSON.parse(stored) : defaultAccessibilitySettings;
+    }
+    return defaultAccessibilitySettings;
   });
 
   const updateSettings = (newSettings: Partial<AccessibilitySettings>) => {
@@ -37,7 +40,9 @@ export const AccessibilityProvider = ({ children }: AccessibilityProviderProps) 
   };
 
   useEffect(() => {
-    localStorage.setItem('accessibility-settings', JSON.stringify(settings));
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('accessibility-settings', JSON.stringify(settings));
+    }
     applyAccessibilitySettings(settings);
   }, [settings]);
 
