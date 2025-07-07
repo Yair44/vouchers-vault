@@ -29,10 +29,15 @@ export const useFamilyGroups = () => {
 
   const createFamily = useMutation({
     mutationFn: async (name: string) => {
-      const { data: user } = await supabase.auth.getUser();
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      
+      if (authError || !user) {
+        throw new Error('User not authenticated');
+      }
+
       const { data, error } = await supabase
         .from('family_groups')
-        .insert({ name, created_by: user.user?.id })
+        .insert({ name, created_by: user.id })
         .select()
         .single();
 
@@ -43,7 +48,7 @@ export const useFamilyGroups = () => {
         .from('family_members')
         .insert({
           family_id: data.id,
-          user_id: (await supabase.auth.getUser()).data.user?.id,
+          user_id: user.id,
           role: 'admin'
         });
 
