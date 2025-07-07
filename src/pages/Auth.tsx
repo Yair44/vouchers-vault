@@ -1,19 +1,61 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { Loader2 } from 'lucide-react';
+
+// Form validation schemas
+const signInSchema = z.object({
+  email: z.string().email('Please enter a valid email address'),
+  password: z.string().min(1, 'Password is required'),
+});
+
+const signUpSchema = z.object({
+  email: z.string().email('Please enter a valid email address'),
+  password: z.string().min(6, 'Password must be at least 6 characters'),
+  confirmPassword: z.string().min(6, 'Please confirm your password'),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Passwords don't match",
+  path: ["confirmPassword"],
+});
+
+type SignInForm = z.infer<typeof signInSchema>;
+type SignUpForm = z.infer<typeof signUpSchema>;
 
 export const Auth = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [isInIframe, setIsInIframe] = useState(false);
+  const [activeTab, setActiveTab] = useState('signin');
   
   const navigate = useNavigate();
   const { user } = useAuth();
+
+  const signInForm = useForm<SignInForm>({
+    resolver: zodResolver(signInSchema),
+    defaultValues: {
+      email: '',
+      password: '',
+    },
+  });
+
+  const signUpForm = useForm<SignUpForm>({
+    resolver: zodResolver(signUpSchema),
+    defaultValues: {
+      email: '',
+      password: '',
+      confirmPassword: '',
+    },
+  });
 
   useEffect(() => {
     if (user) {
@@ -44,6 +86,78 @@ export const Auth = () => {
     return `${currentOrigin}/`;
   };
 
+  const handleEmailSignIn = async (data: SignInForm) => {
+    setLoading(true);
+    setError('');
+
+    try {
+      const { error } = await supabase.auth.signInWithPassword({
+        email: data.email,
+        password: data.password,
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      // Success - user will be redirected by the useEffect
+    } catch (error: any) {
+      console.error('Sign in error:', error);
+      let errorMessage = 'An error occurred during sign in';
+      
+      if (error.message?.includes('Invalid login credentials')) {
+        errorMessage = 'Invalid email or password. Please check your credentials.';
+      } else if (error.message?.includes('Email not confirmed')) {
+        errorMessage = 'Please check your email and click the confirmation link before signing in.';
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
+      setError(errorMessage);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleEmailSignUp = async (data: SignUpForm) => {
+    setLoading(true);
+    setError('');
+
+    try {
+      const redirectUrl = getRedirectUrl();
+      
+      const { error } = await supabase.auth.signUp({
+        email: data.email,
+        password: data.password,
+        options: {
+          emailRedirectTo: redirectUrl,
+        },
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      setError('');
+      // Show success message or redirect
+      alert('Check your email for a confirmation link!');
+    } catch (error: any) {
+      console.error('Sign up error:', error);
+      let errorMessage = 'An error occurred during sign up';
+      
+      if (error.message?.includes('User already registered')) {
+        errorMessage = 'An account with this email already exists. Please sign in instead.';
+        setActiveTab('signin');
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
+      setError(errorMessage);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleGoogleSignIn = async () => {
     setLoading(true);
     setError('');
@@ -68,13 +182,15 @@ export const Auth = () => {
         throw error;
       }
     } catch (error: any) {
-      console.error('Sign in error:', error);
-      let errorMessage = 'An error occurred during sign in';
+      console.error('Google sign in error:', error);
+      let errorMessage = 'An error occurred during Google sign in';
       
       if (error.message?.includes('unauthorized_client')) {
         errorMessage = 'Google sign-in is not properly configured. Please check the authentication settings.';
       } else if (error.message?.includes('refused to connect')) {
         errorMessage = 'Google OAuth cannot run in this embedded preview environment. Try opening the app in a new tab: ' + window.location.href.replace(/\?.*$/, '');
+      } else if (error.message?.includes('provider is not enabled')) {
+        errorMessage = 'Google sign-in is currently disabled. Please use email and password to sign in.';
       } else if (error.message) {
         errorMessage = error.message;
       }
@@ -90,7 +206,7 @@ export const Auth = () => {
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl text-center">VoucherVault</CardTitle>
           <CardDescription className="text-center">
-            Sign in with your Google account to manage your vouchers and gift cards securely
+            Sign in or create an account to manage your vouchers and gift cards securely
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -100,8 +216,115 @@ export const Auth = () => {
             </Alert>
           )}
 
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="signin">Sign In</TabsTrigger>
+              <TabsTrigger value="signup">Sign Up</TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="signin" className="space-y-4">
+              <form onSubmit={signInForm.handleSubmit(handleEmailSignIn)} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="signin-email">Email</Label>
+                  <Input
+                    id="signin-email"
+                    type="email"
+                    placeholder="Enter your email"
+                    {...signInForm.register('email')}
+                  />
+                  {signInForm.formState.errors.email && (
+                    <p className="text-sm text-destructive">{signInForm.formState.errors.email.message}</p>
+                  )}
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="signin-password">Password</Label>
+                  <Input
+                    id="signin-password"
+                    type="password"
+                    placeholder="Enter your password"
+                    {...signInForm.register('password')}
+                  />
+                  {signInForm.formState.errors.password && (
+                    <p className="text-sm text-destructive">{signInForm.formState.errors.password.message}</p>
+                  )}
+                </div>
+                <Button type="submit" className="w-full" disabled={loading}>
+                  {loading ? (
+                    <>
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      Signing in...
+                    </>
+                  ) : (
+                    'Sign In'
+                  )}
+                </Button>
+              </form>
+            </TabsContent>
+            
+            <TabsContent value="signup" className="space-y-4">
+              <form onSubmit={signUpForm.handleSubmit(handleEmailSignUp)} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="signup-email">Email</Label>
+                  <Input
+                    id="signup-email"
+                    type="email"
+                    placeholder="Enter your email"
+                    {...signUpForm.register('email')}
+                  />
+                  {signUpForm.formState.errors.email && (
+                    <p className="text-sm text-destructive">{signUpForm.formState.errors.email.message}</p>
+                  )}
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="signup-password">Password</Label>
+                  <Input
+                    id="signup-password"
+                    type="password"
+                    placeholder="Enter your password (min. 6 characters)"
+                    {...signUpForm.register('password')}
+                  />
+                  {signUpForm.formState.errors.password && (
+                    <p className="text-sm text-destructive">{signUpForm.formState.errors.password.message}</p>
+                  )}
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="signup-confirm-password">Confirm Password</Label>
+                  <Input
+                    id="signup-confirm-password"
+                    type="password"
+                    placeholder="Confirm your password"
+                    {...signUpForm.register('confirmPassword')}
+                  />
+                  {signUpForm.formState.errors.confirmPassword && (
+                    <p className="text-sm text-destructive">{signUpForm.formState.errors.confirmPassword.message}</p>
+                  )}
+                </div>
+                <Button type="submit" className="w-full" disabled={loading}>
+                  {loading ? (
+                    <>
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      Creating account...
+                    </>
+                  ) : (
+                    'Create Account'
+                  )}
+                </Button>
+              </form>
+            </TabsContent>
+          </Tabs>
+
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <span className="w-full border-t" />
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-background px-2 text-muted-foreground">Or continue with</span>
+            </div>
+          </div>
+
           <Button 
             onClick={handleGoogleSignIn} 
+            variant="outline"
             className="w-full" 
             disabled={loading}
             size="lg"
