@@ -1,13 +1,18 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { FamilyGroup, FamilyMember } from '@/types/family';
+import { useAuth } from '@/contexts/AuthContext';
+import { toast } from '@/hooks/use-toast';
 
 export const useFamilyGroups = () => {
   const queryClient = useQueryClient();
+  const { user } = useAuth();
 
   const { data: families, isLoading, error, refetch } = useQuery({
     queryKey: ['familyGroups'],
     queryFn: async () => {
+      if (!user) throw new Error('User not authenticated');
+
       const { data, error } = await supabase
         .from('family_groups')
         .select(`
@@ -25,19 +30,20 @@ export const useFamilyGroups = () => {
       if (error) throw error;
       return data as (FamilyGroup & { members: FamilyMember[] })[];
     },
+    enabled: !!user,
   });
 
   const createFamily = useMutation({
     mutationFn: async (name: string) => {
-      const { data: { user }, error: authError } = await supabase.auth.getUser();
-      
-      if (authError || !user) {
-        throw new Error('User not authenticated');
-      }
+      if (!user) throw new Error('User not authenticated');
 
+      // Create the family group with proper user authentication
       const { data, error } = await supabase
         .from('family_groups')
-        .insert({ name, created_by: user.id })
+        .insert({ 
+          name, 
+          created_by: user.id  // This is crucial for RLS policy
+        })
         .select()
         .single();
 
@@ -52,11 +58,27 @@ export const useFamilyGroups = () => {
           role: 'admin'
         });
 
-      if (memberError) throw memberError;
+      if (memberError) {
+        console.error('Error adding creator as member:', memberError);
+        // Don't throw here since family was created successfully
+      }
+
       return data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['familyGroups'] });
+      toast({
+        title: "Success",
+        description: "Family group created successfully",
+      });
+    },
+    onError: (error: any) => {
+      console.error('Error creating family:', error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to create family group",
+        variant: "destructive",
+      });
     },
   });
 
@@ -74,6 +96,17 @@ export const useFamilyGroups = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['familyGroups'] });
+      toast({
+        title: "Success",
+        description: "Family updated successfully",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to update family",
+        variant: "destructive",
+      });
     },
   });
 
@@ -88,6 +121,17 @@ export const useFamilyGroups = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['familyGroups'] });
+      toast({
+        title: "Success",
+        description: "Family deleted successfully",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to delete family",
+        variant: "destructive",
+      });
     },
   });
 

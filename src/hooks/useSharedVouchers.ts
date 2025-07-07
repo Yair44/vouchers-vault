@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { DatabaseVoucher } from '@/types/family';
 import { useAuth } from '@/contexts/AuthContext';
+import { toast } from '@/hooks/use-toast';
 
 export const useSharedVouchers = (filter?: string, familyId?: string) => {
   const queryClient = useQueryClient();
@@ -10,6 +11,8 @@ export const useSharedVouchers = (filter?: string, familyId?: string) => {
   const { data: sharedVouchers, isLoading, error, refetch } = useQuery({
     queryKey: ['sharedVouchers', filter, familyId],
     queryFn: async () => {
+      if (!user) throw new Error('User not authenticated');
+
       let query = supabase
         .from('vouchers')
         .select(`
@@ -48,13 +51,15 @@ export const useSharedVouchers = (filter?: string, familyId?: string) => {
       familyId: string; 
       permission: 'view' | 'edit' 
     }) => {
+      if (!user) throw new Error('User not authenticated');
+
       const { data, error } = await supabase
         .from('shared_vouchers')
         .insert({
           voucher_id: voucherId,
           family_id: familyId,
           permission,
-          shared_by: user?.id
+          shared_by: user.id
         })
         .select()
         .single();
@@ -64,6 +69,17 @@ export const useSharedVouchers = (filter?: string, familyId?: string) => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['sharedVouchers'] });
+      toast({
+        title: "Success",
+        description: "Voucher shared successfully",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to share voucher",
+        variant: "destructive",
+      });
     },
   });
 
@@ -79,6 +95,17 @@ export const useSharedVouchers = (filter?: string, familyId?: string) => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['sharedVouchers'] });
+      toast({
+        title: "Success",
+        description: "Voucher unshared successfully",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to unshare voucher",
+        variant: "destructive",
+      });
     },
   });
 

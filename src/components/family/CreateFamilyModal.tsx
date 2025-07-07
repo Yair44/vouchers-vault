@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useFamilyGroups } from '@/hooks/useFamilyGroups';
-import { toast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface CreateFamilyModalProps {
   open: boolean;
@@ -15,35 +15,25 @@ interface CreateFamilyModalProps {
 export const CreateFamilyModal = ({ open, onOpenChange, onSuccess }: CreateFamilyModalProps) => {
   const [name, setName] = useState('');
   const { createFamily, isCreating } = useFamilyGroups();
+  const { user } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    if (!user) {
+      console.error('User not authenticated');
+      return;
+    }
+
     if (!name.trim()) {
-      toast({
-        title: "Error",
-        description: "Please enter a family name",
-        variant: "destructive",
-      });
       return;
     }
 
     createFamily(name.trim(), {
       onSuccess: () => {
-        toast({
-          title: "Success",
-          description: "Family created successfully",
-        });
         setName('');
         onOpenChange(false);
         onSuccess();
-      },
-      onError: () => {
-        toast({
-          title: "Error",
-          description: "Failed to create family",
-          variant: "destructive",
-        });
       }
     });
   };
@@ -63,13 +53,14 @@ export const CreateFamilyModal = ({ open, onOpenChange, onSuccess }: CreateFamil
               onChange={(e) => setName(e.target.value)}
               placeholder="Enter family name (e.g., The Smiths)"
               disabled={isCreating}
+              required
             />
           </div>
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               Cancel
             </Button>
-            <Button type="submit" disabled={isCreating}>
+            <Button type="submit" disabled={isCreating || !user}>
               {isCreating ? 'Creating...' : 'Create Family'}
             </Button>
           </DialogFooter>

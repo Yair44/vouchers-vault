@@ -2,8 +2,7 @@ import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Badge } from '@/components/ui/badge';
-import { Users, Plus, UserPlus, Share2, Eye, Edit, Clock } from 'lucide-react';
+import { Users, Plus, UserPlus, Share2 } from 'lucide-react';
 import { CreateFamilyModal } from '@/components/family/CreateFamilyModal';
 import { InviteMemberModal } from '@/components/family/InviteMemberModal';
 import { FamilyGroupCard } from '@/components/family/FamilyGroupCard';
@@ -17,12 +16,10 @@ export const FamilyShare = () => {
   const [createFamilyOpen, setCreateFamilyOpen] = useState(false);
   const [inviteMemberOpen, setInviteMemberOpen] = useState(false);
   const [selectedFamilyId, setSelectedFamilyId] = useState<string>('');
-  const [activeFilter, setActiveFilter] = useState<'all' | 'my-shared' | 'shared-with-me'>('all');
-  const [selectedFamily, setSelectedFamily] = useState<string>('');
 
   const { families, isLoading: familiesLoading, refetch: refetchFamilies } = useFamilyGroups();
   const { invitations, isLoading: invitationsLoading, respondToInvitation } = useFamilyInvitations(); 
-  const { sharedVouchers, isLoading: vouchersLoading, refetch: refetchVouchers } = useSharedVouchers(activeFilter, selectedFamily);
+  const { sharedVouchers, isLoading: vouchersLoading } = useSharedVouchers();
 
   const handleInviteMember = (familyId: string) => {
     setSelectedFamilyId(familyId);
@@ -35,8 +32,6 @@ export const FamilyShare = () => {
   };
 
   const pendingInvitations = invitations?.filter(inv => inv.status === 'pending') || [];
-
-  const filteredVouchers = sharedVouchers || [];
 
   return (
     <div className="container mx-auto p-6 space-y-6">
@@ -53,7 +48,7 @@ export const FamilyShare = () => {
         </Button>
       </div>
 
-      {/* Pending Invitations Alert */}
+      {/* Pending Invitations */}
       {pendingInvitations.length > 0 && (
         <Card className="bg-blue-50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-800">
           <CardHeader>
@@ -124,51 +119,6 @@ export const FamilyShare = () => {
         </TabsContent>
 
         <TabsContent value="vouchers" className="space-y-4">
-          {/* Filters */}
-          <div className="flex flex-wrap gap-4 items-center">
-            <div className="flex gap-2">
-              <Button
-                variant={activeFilter === 'all' ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setActiveFilter('all')}
-              >
-                All Shared
-              </Button>
-              <Button
-                variant={activeFilter === 'my-shared' ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setActiveFilter('my-shared')}
-              >
-                <Share2 className="h-4 w-4 mr-2" />
-                My Shared
-              </Button>
-              <Button
-                variant={activeFilter === 'shared-with-me' ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setActiveFilter('shared-with-me')}
-              >
-                <Eye className="h-4 w-4 mr-2" />
-                Shared with Me
-              </Button>
-            </div>
-
-            {families && families.length > 0 && (
-              <select
-                value={selectedFamily}
-                onChange={(e) => setSelectedFamily(e.target.value)}
-                className="px-3 py-2 border rounded-md text-sm bg-background"
-              >
-                <option value="">All Families</option>
-                {families.map((family) => (
-                  <option key={family.id} value={family.id}>
-                    {family.name}
-                  </option>
-                ))}
-              </select>
-            )}
-          </div>
-
-          {/* Vouchers Grid */}
           {vouchersLoading ? (
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               {Array.from({ length: 6 }).map((_, i) => (
@@ -187,13 +137,13 @@ export const FamilyShare = () => {
                 </Card>
               ))}
             </div>
-          ) : filteredVouchers.length > 0 ? (
+          ) : sharedVouchers && sharedVouchers.length > 0 ? (
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {filteredVouchers.map((voucher) => (
+              {sharedVouchers.map((voucher) => (
                 <SharedVoucherCard
                   key={voucher.id}
                   voucher={voucher}
-                  onUpdate={refetchVouchers}
+                  onUpdate={() => {}}
                 />
               ))}
             </div>
@@ -203,18 +153,11 @@ export const FamilyShare = () => {
                 <Share2 className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
                 <h3 className="text-lg font-semibold mb-2">No Shared Vouchers</h3>
                 <p className="text-muted-foreground mb-4">
-                  {activeFilter === 'my-shared' 
-                    ? "You haven't shared any vouchers yet."
-                    : activeFilter === 'shared-with-me'
-                    ? "No vouchers have been shared with you yet."
-                    : "No shared vouchers found."
-                  }
+                  Share vouchers with your family members to see them here.
                 </p>
-                {activeFilter !== 'shared-with-me' && (
-                  <Button asChild>
-                    <a href="/vouchers">Go to My Vouchers</a>
-                  </Button>
-                )}
+                <Button asChild>
+                  <a href="/vouchers">Go to My Vouchers</a>
+                </Button>
               </CardContent>
             </Card>
           )}

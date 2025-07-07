@@ -3,8 +3,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useFamilyInvitations } from '@/hooks/useFamilyInvitations';
 import { toast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface InviteMemberModalProps {
   open: boolean;
@@ -15,34 +16,45 @@ interface InviteMemberModalProps {
 
 export const InviteMemberModal = ({ open, onOpenChange, familyId, onSuccess }: InviteMemberModalProps) => {
   const [email, setEmail] = useState('');
-  const { sendInvitation, isSending } = useFamilyInvitations();
+  const [isInviting, setIsInviting] = useState(false);
+  const { user } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!email.trim() || !email.includes('@')) {
-      toast({
-        title: "Error",
-        description: "Please enter a valid email address",
-        variant: "destructive",
-      });
+    if (!user || !email.trim()) {
       return;
     }
 
+    setIsInviting(true);
+
     try {
-      sendInvitation({ familyId, email: email.trim() });
+      const { error } = await supabase
+        .from('family_invitations')
+        .insert({
+          family_id: familyId,
+          invited_by: user.id,
+          invited_email: email.trim()
+        });
+
+      if (error) throw error;
+
       toast({
         title: "Success",
         description: "Invitation sent successfully",
       });
+
       setEmail('');
+      onOpenChange(false);
       onSuccess();
-    } catch (error) {
+    } catch (error: any) {
       toast({
         title: "Error",
-        description: "Failed to send invitation",
+        description: error.message || "Failed to send invitation",
         variant: "destructive",
       });
+    } finally {
+      setIsInviting(false);
     }
   };
 
@@ -54,25 +66,23 @@ export const InviteMemberModal = ({ open, onOpenChange, familyId, onSuccess }: I
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="member-email">Email Address</Label>
+            <Label htmlFor="email">Email Address</Label>
             <Input
-              id="member-email"
+              id="email"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Enter email address"
-              disabled={isSending}
+              disabled={isInviting}
+              required
             />
-            <p className="text-sm text-muted-foreground">
-              The person must have an account to receive the invitation.
-            </p>
           </div>
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               Cancel
             </Button>
-            <Button type="submit" disabled={isSending}>
-              {isSending ? 'Sending...' : 'Send Invitation'}
+            <Button type="submit" disabled={isInviting}>
+              {isInviting ? 'Sending...' : 'Send Invitation'}
             </Button>
           </DialogFooter>
         </form>
