@@ -316,18 +316,18 @@ export const VoucherEditModal = ({
   return (
     <>
       <Dialog open={open} onOpenChange={onClose}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-5xl w-[95vw] max-h-[95vh] overflow-y-auto p-4 sm:p-6">
           <DialogHeader>
             <DialogTitle>Edit Voucher - {voucher.name}</DialogTitle>
           </DialogHeader>
 
-          <Tabs defaultValue="details" className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
+          <Tabs defaultValue="details" className="w-full mt-4">
+            <TabsList className="grid w-full grid-cols-2 mb-4">
               <TabsTrigger value="details">Voucher Details</TabsTrigger>
               <TabsTrigger value="history">Purchase History</TabsTrigger>
             </TabsList>
 
-            <TabsContent value="details" className="space-y-4">
+            <TabsContent value="details" className="space-y-4 mt-0">
               <form onSubmit={handleSubmit} className="space-y-4">
             {/* Basic Details */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -444,7 +444,7 @@ export const VoucherEditModal = ({
               </form>
             </TabsContent>
 
-            <TabsContent value="history" className="space-y-4">
+            <TabsContent value="history" className="space-y-4 mt-0">
               <div className="flex justify-between items-center">
                 <h3 className="text-lg font-semibold">Purchase History</h3>
                 <Button
@@ -458,9 +458,9 @@ export const VoucherEditModal = ({
               </div>
 
               {showAddTransaction && (
-                <div className="border rounded-lg p-4 space-y-4 bg-muted/30">
+                <div className="border rounded-lg p-3 sm:p-4 space-y-4 bg-muted/30">
                   <h4 className="font-medium">Add New Purchase</h4>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     <div>
                       <Label htmlFor="new-description">Description</Label>
                       <Input
@@ -517,139 +517,149 @@ export const VoucherEditModal = ({
                 </div>
               )}
 
-              <div className="border rounded-lg">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Date</TableHead>
-                      <TableHead>Description</TableHead>
-                      <TableHead>Amount</TableHead>
-                      <TableHead>Balance After</TableHead>
-                      <TableHead className="w-24">Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {transactions.length === 0 ? (
+              <div className="border rounded-lg overflow-hidden">
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
                       <TableRow>
-                        <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
-                          No purchase history yet
-                        </TableCell>
+                        <TableHead className="min-w-[100px]">Date</TableHead>
+                        <TableHead className="min-w-[120px]">Description</TableHead>
+                        <TableHead className="min-w-[80px]">Amount</TableHead>
+                        <TableHead className="min-w-[100px]">Balance After</TableHead>
+                        <TableHead className="w-20">Actions</TableHead>
                       </TableRow>
-                    ) : (
-                      transactions
-                        .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
-                        .map((transaction) => (
-                          <TableRow key={transaction.id}>
-                            <TableCell>
-                              {editingTransaction?.id === transaction.id ? (
-                                <Input
-                                  type="date"
-                                  value={editingTransaction.purchaseDate}
-                                  onChange={(e) => setEditingTransaction(prev => 
-                                    prev ? { ...prev, purchaseDate: e.target.value } : null
-                                  )}
-                                  max={new Date().toISOString().split('T')[0]}
-                                />
-                              ) : (
-                                (transaction.purchaseDate || transaction.createdAt).toLocaleDateString()
-                              )}
-                            </TableCell>
-                            <TableCell>
-                              {editingTransaction?.id === transaction.id ? (
-                                <Input
-                                  value={editingTransaction.description}
-                                  onChange={(e) => setEditingTransaction(prev => 
-                                    prev ? { ...prev, description: e.target.value } : null
-                                  )}
-                                  placeholder="Purchase description"
-                                />
-                              ) : (
-                                transaction.description
-                              )}
-                            </TableCell>
-                            <TableCell>
-                              {editingTransaction?.id === transaction.id ? (
-                                <Input
-                                  type="number"
-                                  step="0.01"
-                                  min="0"
-                                  value={editingTransaction.amount}
-                                  onChange={(e) => setEditingTransaction(prev => 
-                                    prev ? { ...prev, amount: e.target.value } : null
-                                  )}
-                                  placeholder="0.00"
-                                />
-                              ) : (
-                                <span className="text-red-600 font-medium">
-                                  -${Math.abs(transaction.amount).toFixed(2)}
-                                </span>
-                              )}
-                            </TableCell>
-                            <TableCell>
-                              <span className="font-medium">
-                                ${transaction.newBalance.toFixed(2)}
-                              </span>
-                            </TableCell>
-                            <TableCell>
-                              <div className="flex space-x-1">
+                    </TableHeader>
+                    <TableBody>
+                      {transactions.length === 0 ? (
+                        <TableRow>
+                          <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
+                            No purchase history yet
+                          </TableCell>
+                        </TableRow>
+                      ) : (
+                        transactions
+                          .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+                          .map((transaction) => (
+                            <TableRow key={transaction.id}>
+                              <TableCell className="min-w-[100px]">
                                 {editingTransaction?.id === transaction.id ? (
-                                  <>
-                                    <Button
-                                      variant="ghost"
-                                      size="sm"
-                                      onClick={handleSaveTransaction}
-                                    >
-                                      <Save className="h-3 w-3" />
-                                    </Button>
-                                    <Button
-                                      variant="ghost"
-                                      size="sm"
-                                      onClick={() => setEditingTransaction(null)}
-                                    >
-                                      <X className="h-3 w-3" />
-                                    </Button>
-                                  </>
+                                  <Input
+                                    type="date"
+                                    value={editingTransaction.purchaseDate}
+                                    onChange={(e) => setEditingTransaction(prev => 
+                                      prev ? { ...prev, purchaseDate: e.target.value } : null
+                                    )}
+                                    max={new Date().toISOString().split('T')[0]}
+                                    className="text-xs"
+                                  />
                                 ) : (
-                                  <>
-                                    <Button
-                                      variant="ghost"
-                                      size="sm"
-                                      onClick={() => handleEditTransaction(transaction)}
-                                    >
-                                      <Edit2 className="h-3 w-3" />
-                                    </Button>
-                                    <AlertDialog>
-                                      <AlertDialogTrigger asChild>
-                                        <Button variant="ghost" size="sm">
-                                          <Trash2 className="h-3 w-3" />
-                                        </Button>
-                                      </AlertDialogTrigger>
-                                      <AlertDialogContent>
-                                        <AlertDialogHeader>
-                                          <AlertDialogTitle>Delete Transaction</AlertDialogTitle>
-                                          <AlertDialogDescription>
-                                            Are you sure you want to delete this transaction? This action cannot be undone and will recalculate the voucher balance.
-                                          </AlertDialogDescription>
-                                        </AlertDialogHeader>
-                                        <AlertDialogFooter>
-                                          <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                          <AlertDialogAction
-                                            onClick={() => handleDeleteTransaction(transaction.id)}
-                                          >
-                                            Delete
-                                          </AlertDialogAction>
-                                        </AlertDialogFooter>
-                                      </AlertDialogContent>
-                                    </AlertDialog>
-                                  </>
+                                  <span className="text-sm">
+                                    {(transaction.purchaseDate || transaction.createdAt).toLocaleDateString()}
+                                  </span>
                                 )}
-                              </div>
-                            </TableCell>
-                          </TableRow>
-                        ))
-                    )}
-                  </TableBody>
-                </Table>
+                              </TableCell>
+                              <TableCell className="min-w-[120px]">
+                                {editingTransaction?.id === transaction.id ? (
+                                  <Input
+                                    value={editingTransaction.description}
+                                    onChange={(e) => setEditingTransaction(prev => 
+                                      prev ? { ...prev, description: e.target.value } : null
+                                    )}
+                                    placeholder="Purchase description"
+                                    className="text-xs"
+                                  />
+                                ) : (
+                                  <span className="text-sm">{transaction.description}</span>
+                                )}
+                              </TableCell>
+                              <TableCell className="min-w-[80px]">
+                                {editingTransaction?.id === transaction.id ? (
+                                  <Input
+                                    type="number"
+                                    step="0.01"
+                                    min="0"
+                                    value={editingTransaction.amount}
+                                    onChange={(e) => setEditingTransaction(prev => 
+                                      prev ? { ...prev, amount: e.target.value } : null
+                                    )}
+                                    placeholder="0.00"
+                                    className="text-xs"
+                                  />
+                                ) : (
+                                  <span className="text-red-600 font-medium text-sm">
+                                    -${Math.abs(transaction.amount).toFixed(2)}
+                                  </span>
+                                )}
+                              </TableCell>
+                              <TableCell className="min-w-[100px]">
+                                <span className="font-medium text-sm">
+                                  ${transaction.newBalance.toFixed(2)}
+                                </span>
+                              </TableCell>
+                              <TableCell className="w-20">
+                                <div className="flex space-x-1">
+                                  {editingTransaction?.id === transaction.id ? (
+                                    <>
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={handleSaveTransaction}
+                                        className="h-7 w-7 p-0"
+                                      >
+                                        <Save className="h-3 w-3" />
+                                      </Button>
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() => setEditingTransaction(null)}
+                                        className="h-7 w-7 p-0"
+                                      >
+                                        <X className="h-3 w-3" />
+                                      </Button>
+                                    </>
+                                  ) : (
+                                    <>
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() => handleEditTransaction(transaction)}
+                                        className="h-7 w-7 p-0"
+                                      >
+                                        <Edit2 className="h-3 w-3" />
+                                      </Button>
+                                      <AlertDialog>
+                                        <AlertDialogTrigger asChild>
+                                          <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
+                                            <Trash2 className="h-3 w-3" />
+                                          </Button>
+                                        </AlertDialogTrigger>
+                                        <AlertDialogContent className="max-w-md">
+                                          <AlertDialogHeader>
+                                            <AlertDialogTitle>Delete Transaction</AlertDialogTitle>
+                                            <AlertDialogDescription>
+                                              Are you sure you want to delete this transaction? This action cannot be undone and will recalculate the voucher balance.
+                                            </AlertDialogDescription>
+                                          </AlertDialogHeader>
+                                          <AlertDialogFooter>
+                                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                            <AlertDialogAction
+                                              onClick={() => handleDeleteTransaction(transaction.id)}
+                                            >
+                                              Delete
+                                            </AlertDialogAction>
+                                          </AlertDialogFooter>
+                                        </AlertDialogContent>
+                                      </AlertDialog>
+                                    </>
+                                  )}
+                                </div>
+                              </TableCell>
+                            </TableRow>
+                          ))
+                      )}
+                    </TableBody>
+                  </Table>
+                </div>
               </div>
 
               <div className="flex justify-end pt-4">
