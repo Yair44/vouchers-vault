@@ -1,32 +1,56 @@
 
 // Service Worker for PWA functionality
-// TODO: Implement full offline caching strategy
-
 const CACHE_NAME = 'vouchervault-v1';
-const urlsToCache = [
-  '/',
-  '/static/js/bundle.js',
-  '/static/css/main.css',
-  '/manifest.json'
-];
 
+// Install event - cache essential resources
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then((cache) => {
-        return cache.addAll(urlsToCache);
+        // Only cache the root and manifest
+        return cache.addAll([
+          '/',
+          '/manifest.json'
+        ]);
+      })
+      .catch((error) => {
+        console.error('Failed to cache during install:', error);
       })
   );
 });
 
+// Fetch event - implement runtime caching strategy
 self.addEventListener('fetch', (event) => {
   event.respondWith(
     caches.match(event.request)
       .then((response) => {
-        // Return cached version or fetch from network
-        return response || fetch(event.request);
-      }
-    )
+        // Return cached version if available
+        if (response) {
+          return response;
+        }
+        
+        // Otherwise fetch from network and cache for future
+        return fetch(event.request).then((response) => {
+          // Don't cache non-successful responses
+          if (!response || response.status !== 200 || response.type !== 'basic') {
+            return response;
+          }
+          
+          // Clone the response before caching
+          const responseToCache = response.clone();
+          
+          caches.open(CACHE_NAME)
+            .then((cache) => {
+              cache.put(event.request, responseToCache);
+            });
+          
+          return response;
+        });
+      })
+      .catch(() => {
+        // Return offline fallback if available
+        return caches.match('/');
+      })
   );
 });
 
