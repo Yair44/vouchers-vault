@@ -74,26 +74,30 @@ const AdminContent = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <Button variant="ghost" onClick={() => navigate('/profile')}>
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          Back to Profile
-        </Button>
-        
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2">
-            <Shield className="h-5 w-5 text-green-600" />
-            <Badge variant="secondary">Admin</Badge>
-          </div>
-          <div className="flex items-center gap-2 max-w-xs">
-            <User className="h-4 w-4 flex-shrink-0" />
-            <span className="text-sm font-medium truncate" title={user?.email}>
-              {user?.email}
-            </span>
-          </div>
-          <Button variant="outline" size="sm" onClick={handleSignOut}>
-            Sign Out
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <Button variant="ghost" onClick={() => navigate('/profile')}>
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back to Profile
           </Button>
+          
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2">
+              <Shield className="h-5 w-5 text-green-600" />
+              <Badge variant="secondary">Admin</Badge>
+            </div>
+            <Button variant="outline" size="sm" onClick={handleSignOut}>
+              Sign Out
+            </Button>
+          </div>
+        </div>
+        
+        {/* User email display - moved down and left */}
+        <div className="flex items-center gap-2 ml-0">
+          <User className="h-4 w-4 flex-shrink-0" />
+          <span className="text-sm font-medium truncate max-w-md" title={user?.email}>
+            {user?.email}
+          </span>
         </div>
       </div>
 
