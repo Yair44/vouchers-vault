@@ -6,8 +6,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Cell } from 'recharts';
 import { Plus, Ticket, DollarSign, Clock, X } from 'lucide-react';
-import { db, getCurrentUser } from '@/lib/db';
 import { Voucher, VoucherStats } from '@/types';
+import { useAuth } from '@/contexts/AuthContext';
+import { voucherService } from '@/services/supabase';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 export const Dashboard = () => {
@@ -24,12 +25,13 @@ export const Dashboard = () => {
   const [showDataPopup, setShowDataPopup] = useState(false);
   const [popupData, setPopupData] = useState<{name: string, value: number} | null>(null);
   const [clickTimeout, setClickTimeout] = useState<NodeJS.Timeout | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   
   // Animation control state
   const hasAnimatedRef = useRef(false);
   const [shouldAnimate, setShouldAnimate] = useState(true);
 
-  const user = getCurrentUser();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const isMobile = useIsMobile();
 
@@ -125,41 +127,57 @@ export const Dashboard = () => {
   };
 
   useEffect(() => {
-    // Load user's vouchers
-    const userVouchers = db.vouchers.findByUserId(user.id);
-    setVouchers(userVouchers);
-
-    // Calculate stats
-    const now = new Date();
-    const thirtyDaysFromNow = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
-    
-    const activeVouchers = userVouchers.filter(v => v.isActive && v.expiryDate > now);
-    const expiringVouchers = activeVouchers.filter(v => v.expiryDate <= thirtyDaysFromNow);
-    const totalValue = activeVouchers.reduce((sum, v) => sum + v.balance, 0);
-
-    setStats({
-      totalVouchers: userVouchers.length,
-      totalValue,
-      expiringCount: expiringVouchers.length,
-      activeCount: activeVouchers.length
-    });
-
-    // Calculate analytics - sum of values by voucher name
-    const vouchersByName = activeVouchers.reduce((acc, voucher) => {
-      if (acc[voucher.name]) {
-        acc[voucher.name] += voucher.balance;
-      } else {
-        acc[voucher.name] = voucher.balance;
+    const loadDashboardData = async () => {
+      if (!user) {
+        setIsLoading(false);
+        return;
       }
-      return acc;
-    }, {} as Record<string, number>);
 
-    const analyticsData = Object.entries(vouchersByName)
-      .map(([name, value]) => ({ name, value }))
-      .sort((a, b) => b.value - a.value);
+      setIsLoading(true);
+      try {
+        // Load user's vouchers
+        const userVouchers = await voucherService.getVouchersByUserId(user.id);
+        setVouchers(userVouchers);
 
-    setVoucherAnalytics(analyticsData);
-  }, [user.id]);
+        // Calculate stats
+        const now = new Date();
+        const thirtyDaysFromNow = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
+        
+        const activeVouchers = userVouchers.filter(v => v.isActive && v.expiryDate > now);
+        const expiringVouchers = activeVouchers.filter(v => v.expiryDate <= thirtyDaysFromNow);
+        const totalValue = activeVouchers.reduce((sum, v) => sum + v.balance, 0);
+
+        setStats({
+          totalVouchers: userVouchers.length,
+          totalValue,
+          expiringCount: expiringVouchers.length,
+          activeCount: activeVouchers.length
+        });
+
+        // Calculate analytics - sum of values by voucher name
+        const vouchersByName = activeVouchers.reduce((acc, voucher) => {
+          if (acc[voucher.name]) {
+            acc[voucher.name] += voucher.balance;
+          } else {
+            acc[voucher.name] = voucher.balance;
+          }
+          return acc;
+        }, {} as Record<string, number>);
+
+        const analyticsData = Object.entries(vouchersByName)
+          .map(([name, value]) => ({ name, value }))
+          .sort((a, b) => b.value - a.value);
+
+        setVoucherAnalytics(analyticsData);
+      } catch (error) {
+        console.error('Error loading dashboard data:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadDashboardData();
+  }, [user]);
 
   const chartConfig = {
     value: {
@@ -167,6 +185,26 @@ export const Dashboard = () => {
       color: "url(#gradient-purple-pink)",
     },
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-64">
+        <div className="text-center">
+          <div className="text-lg">Loading dashboard...</div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div className="flex items-center justify-center min-h-64">
+        <div className="text-center">
+          <div className="text-lg">Please sign in to view your dashboard.</div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

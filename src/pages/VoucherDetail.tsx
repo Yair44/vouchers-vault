@@ -5,8 +5,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ArrowLeft, DollarSign, Calendar, Clock, ExternalLink, Upload, Edit } from 'lucide-react';
-import { db } from '@/lib/db';
 import { Voucher, Transaction, getVoucherStatus } from '@/types';
+import { useAuth } from '@/contexts/AuthContext';
+import { voucherService, transactionService } from '@/services/supabase';
 import { VoucherProgress } from '@/components/VoucherProgress';
 import { VoucherEditModal } from '@/components/VoucherEditModal';
 import { VoucherCodeSection } from '@/components/VoucherCodeSection';
@@ -27,6 +28,7 @@ export const VoucherDetail = () => {
   }>();
   const navigate = useNavigate();
   const { flags } = useFeatureFlags();
+  const { user } = useAuth();
   const [voucher, setVoucher] = useState<Voucher | null>(null);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [showEditModal, setShowEditModal] = useState(false);
@@ -37,23 +39,55 @@ export const VoucherDetail = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!id) {
-      navigate('/vouchers');
-      return;
-    }
-    const voucherData = db.vouchers.findById(id);
-    if (!voucherData) {
-      navigate('/vouchers');
-      return;
-    }
-    const voucherTransactions = db.transactions.findByVoucherId(id);
-    setVoucher(voucherData);
-    setTransactions(voucherTransactions);
-    setLoading(false);
-  }, [id, navigate]);
+    const loadVoucherDetail = async () => {
+      if (!id) {
+        navigate('/vouchers');
+        return;
+      }
 
-  const handleVoucherUpdate = (updatedVoucher: Voucher) => {
+      if (!user) {
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const voucherData = await voucherService.getVoucherById(id);
+        if (!voucherData) {
+          navigate('/vouchers');
+          return;
+        }
+
+        // Check if the voucher belongs to the current user (basic security check)
+        if (voucherData.userId !== user.id) {
+          navigate('/vouchers');
+          return;
+        }
+
+        const voucherTransactions = await transactionService.getTransactionsByVoucherId(id);
+        setVoucher(voucherData);
+        setTransactions(voucherTransactions);
+      } catch (error) {
+        console.error('Error loading voucher detail:', error);
+        navigate('/vouchers');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadVoucherDetail();
+  }, [id, navigate, user]);
+
+  const handleVoucherUpdate = async (updatedVoucher: Voucher) => {
     setVoucher(updatedVoucher);
+    // Refresh transactions in case they were affected
+    if (updatedVoucher.id) {
+      try {
+        const refreshedTransactions = await transactionService.getTransactionsByVoucherId(updatedVoucher.id);
+        setTransactions(refreshedTransactions);
+      } catch (error) {
+        console.error('Error refreshing transactions:', error);
+      }
+    }
   };
 
   const handleImageUpload = async (files: FileList) => {
@@ -71,7 +105,7 @@ export const VoucherDetail = () => {
           maxSizeKB: 500
         });
         const imageId = await ImageStorage.uploadImage(compressedImage, voucher.id);
-        const updatedVoucher = db.vouchers.update(voucher.id, {
+        const updatedVoucher = await voucherService.updateVoucher(voucher.id, {
           imageUrls: [...imageIds, imageId]
         });
         if (updatedVoucher) {
@@ -95,7 +129,7 @@ export const VoucherDetail = () => {
     const imageId = imageIds[index];
     try {
       await ImageStorage.deleteImage(imageId);
-      const updatedVoucher = db.vouchers.update(voucher.id, {
+      const updatedVoucher = await voucherService.updateVoucher(voucher.id, {
         imageUrls: imageIds.filter((_, i) => i !== index)
       });
       if (updatedVoucher) {

@@ -7,8 +7,9 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Search, Upload, Calendar, Download } from 'lucide-react';
-import { db, getCurrentUser } from '@/lib/db';
 import { Voucher } from '@/types';
+import { useAuth } from '@/contexts/AuthContext';
+import { voucherService } from '@/services/supabase';
 import { Link } from 'react-router-dom';
 import { exportVouchersToExcel } from '@/lib/excelExport';
 import { toast } from '@/hooks/use-toast';
@@ -20,9 +21,10 @@ export const Vouchers = () => {
   const [filterType, setFilterType] = useState<string>('all');
   const [sortBy, setSortBy] = useState<string>('updated');
   const [isExporting, setIsExporting] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [searchParams] = useSearchParams();
 
-  const user = getCurrentUser();
+  const { user } = useAuth();
 
   const handleExportToExcel = async () => {
     setIsExporting(true);
@@ -44,10 +46,31 @@ export const Vouchers = () => {
   };
 
   useEffect(() => {
-    const userVouchers = db.vouchers.findByUserId(user.id);
-    setVouchers(userVouchers);
-    setFilteredVouchers(userVouchers);
-  }, [user.id]);
+    const loadVouchers = async () => {
+      if (!user) {
+        setIsLoading(false);
+        return;
+      }
+
+      setIsLoading(true);
+      try {
+        const userVouchers = await voucherService.getVouchersByUserId(user.id);
+        setVouchers(userVouchers);
+        setFilteredVouchers(userVouchers);
+      } catch (error) {
+        console.error('Error loading vouchers:', error);
+        toast({
+          title: "Error",
+          description: "Failed to load vouchers. Please try again.",
+          variant: "destructive"
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadVouchers();
+  }, [user]);
 
   // Handle URL search parameter on component mount
   useEffect(() => {
@@ -101,6 +124,26 @@ export const Vouchers = () => {
 
     setFilteredVouchers(filtered);
   }, [vouchers, searchTerm, filterType, sortBy]);
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-64">
+        <div className="text-center">
+          <div className="text-lg">Loading vouchers...</div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div className="flex items-center justify-center min-h-64">
+        <div className="text-center">
+          <div className="text-lg">Please sign in to view your vouchers.</div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

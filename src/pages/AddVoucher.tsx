@@ -5,15 +5,16 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Calendar } from 'lucide-react';
-import { db, getCurrentUser } from '@/lib/db';
 import { toast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
+import { voucherService } from '@/services/supabase';
 import { ManualRecordingTab } from '@/components/add-voucher/ManualRecordingTab';
 import { ImageUploadTab } from '@/components/add-voucher/ImageUploadTab';
 import { TextExtractionTab } from '@/components/add-voucher/TextExtractionTab';
 
 export const AddVoucher = () => {
   const navigate = useNavigate();
-  const user = getCurrentUser();
+  const { user } = useAuth();
   const [formData, setFormData] = useState({
     name: '',
     code: '',
@@ -28,6 +29,16 @@ export const AddVoucher = () => {
   
   const handleSubmit = async (e: React.FormEvent, imageIds?: string[]) => {
     e.preventDefault();
+    
+    if (!user) {
+      toast({
+        title: "Authentication Required",
+        description: "Please sign in to add vouchers.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     setIsLoading(true);
     try {
       const balance = parseFloat(formData.balance);
@@ -37,6 +48,7 @@ export const AddVoucher = () => {
           description: "Please enter a valid balance amount.",
           variant: "destructive"
         });
+        setIsLoading(false);
         return;
       }
       const expiryDate = new Date(formData.expiryDate);
@@ -46,6 +58,7 @@ export const AddVoucher = () => {
           description: "Expiry date must be in the future.",
           variant: "destructive"
         });
+        setIsLoading(false);
         return;
       }
 
@@ -65,6 +78,7 @@ export const AddVoucher = () => {
           description: "Please enter a valid URL for eligible businesses.",
           variant: "destructive"
         });
+        setIsLoading(false);
         return;
       }
       if (!validateUrl(formData.voucherUrl)) {
@@ -73,12 +87,12 @@ export const AddVoucher = () => {
           description: "Please enter a valid voucher URL.",
           variant: "destructive"
         });
+        setIsLoading(false);
         return;
       }
 
-      // Create voucher with optional category
-      const voucher = db.vouchers.create({
-        userId: user.id,
+      // Create voucher with Supabase
+      const voucher = await voucherService.createVoucher(user.id, {
         name: formData.name,
         code: formData.code,
         category: formData.category || undefined,
@@ -91,13 +105,18 @@ export const AddVoucher = () => {
         imageUrls: imageIds && imageIds.length > 0 ? imageIds : undefined,
         isActive: true
       });
-      
-      toast({
-        title: "Voucher Added",
-        description: `${voucher.name} has been added successfully.`
-      });
-      navigate('/vouchers');
+
+      if (voucher) {
+        toast({
+          title: "Voucher Added",
+          description: `${voucher.name} has been added successfully.`
+        });
+        navigate('/vouchers');
+      } else {
+        throw new Error('Failed to create voucher');
+      }
     } catch (error) {
+      console.error('Error creating voucher:', error);
       toast({
         title: "Error",
         description: "Failed to add voucher. Please try again.",
