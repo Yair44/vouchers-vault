@@ -42,13 +42,10 @@ export const useFamilyGroups = () => {
 
       console.log('Creating family with user:', { userId: user.id, email: user.email });
 
-      // Create the family group with proper user authentication
+      // Create the family group - created_by will be set automatically via DEFAULT auth.uid()
       const { data, error } = await supabase
         .from('family_groups')
-        .insert({ 
-          name, 
-          created_by: user.id  // This is crucial for RLS policy
-        })
+        .insert({ name })
         .select()
         .single();
 
