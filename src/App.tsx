@@ -5,7 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Layout } from "@/components/Layout";
-
+import { AccessibilityProvider } from "@/components/accessibility/AccessibilityProvider";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { Dashboard } from "@/pages/Dashboard";
@@ -21,7 +21,6 @@ import { AccessibilityStatement } from "@/pages/AccessibilityStatement";
 import { ContactUs } from "@/pages/ContactUs";
 import NotFound from "./pages/NotFound";
 import { FamilyShare } from "@/pages/FamilyShare";
-import { InviteAccept } from "@/pages/InviteAccept";
 
 const queryClient = new QueryClient();
 
@@ -34,7 +33,6 @@ const App = () => (
         <BrowserRouter>
           <Routes>
             <Route path="/auth" element={<Auth />} />
-            <Route path="/invite/:token" element={<InviteAccept />} />
             <Route path="/*" element={
               <Layout>
                 <Routes>
@@ -43,7 +41,7 @@ const App = () => (
                   <Route path="/voucher/:id" element={<ProtectedRoute><VoucherDetail /></ProtectedRoute>} />
                   <Route path="/add" element={<ProtectedRoute><AddVoucher /></ProtectedRoute>} />
                   <Route path="/admin" element={<ProtectedRoute requireAdmin={true}><Admin /></ProtectedRoute>} />
-                  <Route path="/family-share" element={<ProtectedRoute><FamilyShare /></ProtectedRoute>} />
+                  <Route path="/shared" element={<ProtectedRoute><FamilyShare /></ProtectedRoute>} />
                   <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
                   <Route path="/site-terms" element={<SiteTerms />} />
                   <Route path="/privacy-policy" element={<PrivacyPolicy />} />

@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Voucher } from '@/types';
-import { voucherService } from '@/services/supabase/vouchers';
+import { db } from '@/lib/db';
 import { toast } from '@/hooks/use-toast';
 
 interface OfferForSaleModalProps {
@@ -64,7 +64,7 @@ export const OfferForSaleModal = ({
         notes
       });
 
-      const updatedVoucher = await voucherService.updateVoucher(voucher.id, {
+      const updatedVoucher = db.vouchers.update(voucher.id, {
         offerForSale: true,
         salePrice: salePriceNum,
         contactInfo
@@ -83,8 +83,6 @@ export const OfferForSaleModal = ({
         setEmail('');
         setNotes('');
         onClose();
-      } else {
-        throw new Error('Failed to update voucher');
       }
     } catch (error) {
       toast({

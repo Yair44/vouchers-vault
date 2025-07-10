@@ -67,7 +67,6 @@ export type Database = {
           created_at: string | null
           family_id: string
           id: string
-          invite_token: string | null
           invited_by: string
           invited_email: string
           invited_user_id: string | null
@@ -78,7 +77,6 @@ export type Database = {
           created_at?: string | null
           family_id: string
           id?: string
-          invite_token?: string | null
           invited_by: string
           invited_email: string
           invited_user_id?: string | null
@@ -89,7 +87,6 @@ export type Database = {
           created_at?: string | null
           family_id?: string
           id?: string
-          invite_token?: string | null
           invited_by?: string
           invited_email?: string
           invited_user_id?: string | null

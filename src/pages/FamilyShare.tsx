@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -8,7 +8,6 @@ import { InviteMemberModal } from '@/components/family/InviteMemberModal';
 import { FamilyGroupCard } from '@/components/family/FamilyGroupCard';
 import { SharedVoucherCard } from '@/components/family/SharedVoucherCard';
 import { InvitationCard } from '@/components/family/InvitationCard';
-import { SentInvitationCard } from '@/components/family/SentInvitationCard';
 import { useFamilyGroups } from '@/hooks/useFamilyGroups';
 import { useFamilyInvitations } from '@/hooks/useFamilyInvitations';
 import { useSharedVouchers } from '@/hooks/useSharedVouchers';
@@ -19,14 +18,7 @@ export const FamilyShare = () => {
   const [selectedFamilyId, setSelectedFamilyId] = useState<string>('');
 
   const { families, isLoading: familiesLoading, refetch: refetchFamilies } = useFamilyGroups();
-  const { 
-    receivedInvitations, 
-    sentInvitations, 
-    isLoading: invitationsLoading, 
-    respondToInvitation,
-    cancelInvitation,
-    isCancelling 
-  } = useFamilyInvitations(); 
+  const { invitations, isLoading: invitationsLoading, respondToInvitation } = useFamilyInvitations(); 
   const { sharedVouchers, isLoading: vouchersLoading } = useSharedVouchers();
 
   const handleInviteMember = (familyId: string) => {
@@ -39,8 +31,7 @@ export const FamilyShare = () => {
     refetchFamilies();
   };
 
-  const pendingReceivedInvitations = receivedInvitations?.filter(inv => inv.status === 'pending') || [];
-  const pendingSentInvitations = sentInvitations?.filter(inv => inv.status === 'pending') || [];
+  const pendingInvitations = invitations?.filter(inv => inv.status === 'pending') || [];
 
   return (
     <div className="container mx-auto p-6 space-y-6">
@@ -57,43 +48,21 @@ export const FamilyShare = () => {
         </Button>
       </div>
 
-      {/* Pending Received Invitations */}
-      {pendingReceivedInvitations.length > 0 && (
+      {/* Pending Invitations */}
+      {pendingInvitations.length > 0 && (
         <Card className="bg-blue-50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-800">
           <CardHeader>
             <CardTitle className="text-blue-800 dark:text-blue-300 flex items-center gap-2">
               <UserPlus className="h-5 w-5" />
-              Pending Invitations ({pendingReceivedInvitations.length})
+              Pending Invitations ({pendingInvitations.length})
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
-            {pendingReceivedInvitations.map((invitation) => (
+            {pendingInvitations.map((invitation) => (
               <InvitationCard
                 key={invitation.id}
                 invitation={invitation}
                 onRespond={handleInvitationResponse}
-              />
-            ))}
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Sent Invitations */}
-      {pendingSentInvitations.length > 0 && (
-        <Card className="bg-amber-50 dark:bg-amber-950/20 border-amber-200 dark:border-amber-800">
-          <CardHeader>
-            <CardTitle className="text-amber-800 dark:text-amber-300 flex items-center gap-2">
-              <UserPlus className="h-5 w-5" />
-              Sent Invitations ({pendingSentInvitations.length})
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            {pendingSentInvitations.map((invitation) => (
-              <SentInvitationCard
-                key={invitation.id}
-                invitation={invitation}
-                onCancel={cancelInvitation}
-                isCancelling={isCancelling}
               />
             ))}
           </CardContent>

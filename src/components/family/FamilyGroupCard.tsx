@@ -1,4 +1,3 @@
-import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -34,7 +33,7 @@ export const FamilyGroupCard = ({ family, onInviteMember, onUpdate }: FamilyGrou
         </div>
         
         <div className="flex gap-2">
-          <Button size="sm" onClick={onInviteMember} className="flex-1" variant="default">
+          <Button size="sm" onClick={onInviteMember} className="flex-1">
             <UserPlus className="h-4 w-4 mr-1" />
             Invite
           </Button>

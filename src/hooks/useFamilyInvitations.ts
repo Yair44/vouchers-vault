@@ -8,7 +8,7 @@ export const useFamilyInvitations = () => {
   const queryClient = useQueryClient();
   const { user } = useAuth();
 
-  const { data: allInvitations, isLoading } = useQuery({
+  const { data: invitations, isLoading } = useQuery({
     queryKey: ['familyInvitations'],
     queryFn: async () => {
       if (!user) throw new Error('User not authenticated');
@@ -30,15 +30,6 @@ export const useFamilyInvitations = () => {
     },
     enabled: !!user,
   });
-
-  // Separate invitations into sent and received
-  const receivedInvitations = allInvitations?.filter(inv => 
-    inv.invited_user_id === user?.id || inv.invited_email === user?.email
-  ) || [];
-  
-  const sentInvitations = allInvitations?.filter(inv => 
-    inv.invited_by === user?.id
-  ) || [];
 
   const respondToInvitation = useMutation({
     mutationFn: async ({ invitationId, action }: { invitationId: string; action: 'accept' | 'reject' }) => {
@@ -95,44 +86,11 @@ export const useFamilyInvitations = () => {
     },
   });
 
-  const cancelInvitation = useMutation({
-    mutationFn: async (invitationId: string) => {
-      if (!user) throw new Error('User not authenticated');
-
-      const { error } = await supabase
-        .from('family_invitations')
-        .delete()
-        .eq('id', invitationId)
-        .eq('invited_by', user.id);
-
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['familyInvitations'] });
-      
-      toast({
-        title: "Success",
-        description: "Invitation cancelled successfully",
-      });
-    },
-    onError: (error: any) => {
-      toast({
-        title: "Error",
-        description: error.message || "Failed to cancel invitation",
-        variant: "destructive",
-      });
-    },
-  });
-
   return {
-    receivedInvitations,
-    sentInvitations,
+    invitations,
     isLoading,
     respondToInvitation: (invitationId: string, action: 'accept' | 'reject') => 
       respondToInvitation.mutate({ invitationId, action }),
     isResponding: respondToInvitation.isPending,
-    cancelInvitation: (invitationId: string) => 
-      cancelInvitation.mutate(invitationId),
-    isCancelling: cancelInvitation.isPending,
   };
 };

@@ -23,7 +23,6 @@ export interface FamilyInvitation {
   invited_by: string;
   invited_email: string;
   invited_user_id?: string;
-  invite_token?: string;
   status: 'pending' | 'accepted' | 'rejected';
   created_at: string;
   updated_at: string;
