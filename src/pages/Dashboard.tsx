@@ -134,6 +134,17 @@ export const Dashboard = () => {
       }
 
       setIsLoading(true);
+      
+      // Clear any existing data first
+      setVouchers([]);
+      setVoucherAnalytics([]);
+      setStats({
+        totalVouchers: 0,
+        totalValue: 0,
+        expiringCount: 0,
+        activeCount: 0
+      });
+      
       try {
         // Load user's vouchers
         const userVouchers = await voucherService.getVouchersByUserId(user.id);
