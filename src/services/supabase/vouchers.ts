@@ -5,13 +5,23 @@ import { Voucher } from '@/types';
 export const voucherService = {
   async getVouchersByUserId(userId: string): Promise<Voucher[]> {
     try {
+      // Check if user is authenticated
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        console.warn('No authenticated user found');
+        return [];
+      }
+
       const { data, error } = await supabase
         .from('vouchers')
         .select('*')
         .eq('user_id', userId)
         .order('updated_at', { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase error:', error);
+        throw error;
+      }
 
       return (data || []).map(voucher => ({
         id: voucher.id,
@@ -34,6 +44,7 @@ export const voucherService = {
         updatedAt: new Date(voucher.updated_at || '')
       }));
     } catch (error) {
+      console.error('Error in getVouchersByUserId:', error);
       handleSecureError(error, 'database');
       return [];
     }
@@ -41,13 +52,23 @@ export const voucherService = {
 
   async getVoucherById(id: string): Promise<Voucher | null> {
     try {
+      // Check if user is authenticated
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        console.warn('No authenticated user found');
+        return null;
+      }
+
       const { data, error } = await supabase
         .from('vouchers')
         .select('*')
         .eq('id', id)
         .maybeSingle();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase error:', error);
+        throw error;
+      }
       if (!data) return null;
 
       return {
@@ -71,6 +92,7 @@ export const voucherService = {
         updatedAt: new Date(data.updated_at || '')
       };
     } catch (error) {
+      console.error('Error in getVoucherById:', error);
       handleSecureError(error, 'database');
       return null;
     }
