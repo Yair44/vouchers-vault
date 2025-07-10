@@ -3,8 +3,6 @@ import { useState } from 'react';
 import { Sidebar } from './Sidebar';
 import { Header } from './Header';
 import { Footer } from './Footer';
-import { AccessibilityButton } from './accessibility/AccessibilityButton';
-import { ColorBlindFilters } from './accessibility/ColorBlindFilters';
 import { cn } from '@/lib/utils';
 
 interface LayoutProps {
@@ -35,12 +33,6 @@ export const Layout = ({
         {/* Footer */}
         <Footer />
       </div>
-      
-      {/* Accessibility Button */}
-      <AccessibilityButton />
-      
-      {/* Color Blind Support SVG Filters */}
-      <ColorBlindFilters />
     </div>
   );
 };

@@ -10,7 +10,8 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { CalendarIcon } from 'lucide-react';
 import { format } from 'date-fns';
 import { Voucher } from '@/types';
-import { db } from '@/lib/db';
+import { voucherService } from '@/services/supabase/vouchers';
+import { transactionService } from '@/services/supabase/transactions';
 import { toast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 
@@ -57,19 +58,25 @@ export const PurchaseRecordModal = ({
         return;
       }
 
+      const newBalance = voucher.balance - purchaseAmount;
+
       // Create transaction record
-      const transaction = db.transactions.create({
+      const transaction = await transactionService.createTransaction({
         voucherId: voucher.id,
         amount: -purchaseAmount, // Negative for expenditure
         previousBalance: voucher.balance,
-        newBalance: voucher.balance - purchaseAmount,
+        newBalance: newBalance,
         description: description || 'Purchase recorded',
         purchaseDate
       });
 
+      if (!transaction) {
+        throw new Error('Failed to create transaction');
+      }
+
       // Update voucher balance
-      const updatedVoucher = db.vouchers.update(voucher.id, {
-        balance: voucher.balance - purchaseAmount
+      const updatedVoucher = await voucherService.updateVoucher(voucher.id, {
+        balance: newBalance
       });
 
       if (updatedVoucher) {
@@ -84,6 +91,8 @@ export const PurchaseRecordModal = ({
         setDescription('');
         setPurchaseDate(new Date());
         onClose();
+      } else {
+        throw new Error('Failed to update voucher');
       }
     } catch (error) {
       toast({
