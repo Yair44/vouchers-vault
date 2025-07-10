@@ -22,7 +22,7 @@ const navigation = [{
   icon: Upload
 }, {
   name: 'Family Share',
-  href: '/shared',
+  href: '/family-share',
   icon: Users
 }, {
   name: 'Profile',
