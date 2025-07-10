@@ -33,7 +33,7 @@ export const FamilyGroupCard = ({ family, onInviteMember, onUpdate }: FamilyGrou
         </div>
         
         <div className="flex gap-2">
-          <Button size="sm" onClick={onInviteMember} className="flex-1">
+          <Button size="sm" onClick={onInviteMember} className="flex-1" variant="default">
             <UserPlus className="h-4 w-4 mr-1" />
             Invite
           </Button>
