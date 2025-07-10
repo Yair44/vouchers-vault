@@ -137,6 +137,7 @@ export const Dashboard = () => {
       try {
         // Load user's vouchers
         const userVouchers = await voucherService.getVouchersByUserId(user.id);
+        console.log('Dashboard: Loaded vouchers from DB:', userVouchers);
         setVouchers(userVouchers);
 
         // Calculate stats
