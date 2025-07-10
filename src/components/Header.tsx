@@ -3,14 +3,14 @@ import { Search, Menu, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Link } from 'react-router-dom';
-import { getCurrentUser } from '@/lib/db';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface HeaderProps {
   onMenuClick: () => void;
 }
 
 export const Header = ({ onMenuClick }: HeaderProps) => {
-  const user = getCurrentUser();
+  const { user } = useAuth();
 
   return (
     <header className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 sticky top-0 z-30">
@@ -55,7 +55,7 @@ export const Header = ({ onMenuClick }: HeaderProps) => {
         <div className="flex items-center space-x-4">
           <div className="hidden sm:flex items-center space-x-2">
             <User className="h-4 w-4 text-gray-500" />
-            <span className="text-sm font-medium">{user.name}</span>
+            <span className="text-sm font-medium">{user?.email || 'Guest'}</span>
           </div>
         </div>
       </div>

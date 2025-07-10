@@ -10,7 +10,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { CalendarIcon } from 'lucide-react';
 import { format } from 'date-fns';
 import { Voucher } from '@/types';
-import { db } from '@/lib/db';
+import { voucherService, transactionService } from '@/services/supabase';
 import { toast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 
@@ -58,7 +58,7 @@ export const PurchaseRecordModal = ({
       }
 
       // Create transaction record
-      const transaction = db.transactions.create({
+      const transaction = await transactionService.createTransaction({
         voucherId: voucher.id,
         amount: -purchaseAmount, // Negative for expenditure
         previousBalance: voucher.balance,
@@ -68,7 +68,7 @@ export const PurchaseRecordModal = ({
       });
 
       // Update voucher balance
-      const updatedVoucher = db.vouchers.update(voucher.id, {
+      const updatedVoucher = await voucherService.updateVoucher(voucher.id, {
         balance: voucher.balance - purchaseAmount
       });
 

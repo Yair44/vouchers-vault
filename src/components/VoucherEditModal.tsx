@@ -10,7 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Voucher, Transaction } from '@/types';
-import { db } from '@/lib/db';
+import { voucherService, transactionService } from '@/services/supabase';
 import { toast } from '@/hooks/use-toast';
 import { useVoucherCategories } from '@/hooks/useVoucherCategories';
 import { VoucherDeleteModal } from './VoucherDeleteModal';
@@ -61,8 +61,11 @@ export const VoucherEditModal = ({
 
   useEffect(() => {
     if (open) {
-      const voucherTransactions = db.transactions.findByVoucherId(voucher.id);
-      setTransactions(voucherTransactions);
+      const loadTransactions = async () => {
+        const voucherTransactions = await transactionService.getTransactionsByVoucherId(voucher.id);
+        setTransactions(voucherTransactions);
+      };
+      loadTransactions();
     }
   }, [open, voucher.id]);
 
@@ -104,7 +107,7 @@ export const VoucherEditModal = ({
         return;
       }
 
-      const updatedVoucher = db.vouchers.update(voucher.id, {
+      const updatedVoucher = await voucherService.updateVoucher(voucher.id, {
         name: formData.name,
         code: formData.code,
         category: formData.category,
@@ -133,8 +136,8 @@ export const VoucherEditModal = ({
     }
   };
 
-  const handleDeleteVoucher = () => {
-    const success = db.vouchers.delete(voucher.id);
+  const handleDeleteVoucher = async () => {
+    const success = await voucherService.deleteVoucher(voucher.id);
     if (success) {
       toast({
         title: "Voucher Deleted",
@@ -167,7 +170,7 @@ export const VoucherEditModal = ({
     });
   };
 
-  const handleSaveTransaction = () => {
+  const handleSaveTransaction = async () => {
     if (!editingTransaction) return;
 
     const amount = parseFloat(editingTransaction.amount);
@@ -183,76 +186,69 @@ export const VoucherEditModal = ({
     const transaction = transactions.find(t => t.id === editingTransaction.id);
     if (!transaction) return;
 
-    const updatedTransaction = db.transactions.update(editingTransaction.id, {
-      description: editingTransaction.description,
-      amount: -amount, // Negative because it's a purchase
-      purchaseDate: new Date(editingTransaction.purchaseDate)
-    });
-
-    if (updatedTransaction) {
-      // Recalculate all balances after this transaction
-      const sortedTransactions = db.transactions.findByVoucherId(voucher.id)
-        .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
-      
-      let runningBalance = voucher.originalBalance;
-      sortedTransactions.forEach(t => {
-        const previousBalance = runningBalance;
-        runningBalance += t.amount;
-        db.transactions.update(t.id, {
-          previousBalance,
-          newBalance: runningBalance
-        });
+    try {
+      // Update the transaction
+      const updatedTransaction = await transactionService.updateTransaction(editingTransaction.id, {
+        description: editingTransaction.description,
+        amount: -amount, // Negative because it's a purchase
+        purchaseDate: new Date(editingTransaction.purchaseDate)
       });
 
-      // Update voucher balance
-      const newBalance = calculateNewBalance(sortedTransactions);
-      const updatedVoucher = db.vouchers.update(voucher.id, { balance: newBalance });
-      if (updatedVoucher) {
-        onVoucherUpdated(updatedVoucher);
-      }
+      if (updatedTransaction) {
+        // Refresh transactions and recalculate voucher balance
+        const allTransactions = await transactionService.getTransactionsByVoucherId(voucher.id);
+        const newBalance = allTransactions.reduce((balance, t) => balance + t.amount, voucher.originalBalance);
+        
+        const updatedVoucher = await voucherService.updateVoucher(voucher.id, { balance: newBalance });
+        if (updatedVoucher) {
+          onVoucherUpdated(updatedVoucher);
+        }
 
-      setTransactions(db.transactions.findByVoucherId(voucher.id));
-      setEditingTransaction(null);
+        setTransactions(allTransactions);
+        setEditingTransaction(null);
+        toast({
+          title: "Transaction Updated",
+          description: "Transaction has been updated successfully."
+        });
+      }
+    } catch (error) {
       toast({
-        title: "Transaction Updated",
-        description: "Transaction has been updated successfully."
+        title: "Update Failed",
+        description: "Failed to update transaction. Please try again.",
+        variant: "destructive"
       });
     }
   };
 
-  const handleDeleteTransaction = (transactionId: string) => {
-    const success = db.transactions.delete(transactionId);
-    if (success) {
-      // Recalculate balances
-      const remainingTransactions = db.transactions.findByVoucherId(voucher.id)
-        .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
-      
-      let runningBalance = voucher.originalBalance;
-      remainingTransactions.forEach(t => {
-        const previousBalance = runningBalance;
-        runningBalance += t.amount;
-        db.transactions.update(t.id, {
-          previousBalance,
-          newBalance: runningBalance
+  const handleDeleteTransaction = async (transactionId: string) => {
+    try {
+      const success = await transactionService.deleteTransaction(transactionId);
+      if (success) {
+        // Refresh transactions and recalculate voucher balance
+        const remainingTransactions = await transactionService.getTransactionsByVoucherId(voucher.id);
+        const newBalance = remainingTransactions.reduce((balance, t) => balance + t.amount, voucher.originalBalance);
+        
+        const updatedVoucher = await voucherService.updateVoucher(voucher.id, { balance: newBalance });
+        if (updatedVoucher) {
+          onVoucherUpdated(updatedVoucher);
+        }
+
+        setTransactions(remainingTransactions);
+        toast({
+          title: "Transaction Deleted",
+          description: "Transaction has been deleted successfully."
         });
-      });
-
-      // Update voucher balance
-      const newBalance = calculateNewBalance(remainingTransactions);
-      const updatedVoucher = db.vouchers.update(voucher.id, { balance: newBalance });
-      if (updatedVoucher) {
-        onVoucherUpdated(updatedVoucher);
       }
-
-      setTransactions(remainingTransactions);
+    } catch (error) {
       toast({
-        title: "Transaction Deleted",
-        description: "Transaction has been deleted successfully."
+        title: "Delete Failed",
+        description: "Failed to delete transaction. Please try again.",
+        variant: "destructive"
       });
     }
   };
 
-  const handleAddTransaction = () => {
+  const handleAddTransaction = async () => {
     const amount = parseFloat(newTransaction.amount);
     if (isNaN(amount) || amount <= 0) {
       toast({
@@ -275,31 +271,40 @@ export const VoucherEditModal = ({
       return;
     }
 
-    const transaction = db.transactions.create({
-      voucherId: voucher.id,
-      amount: -amount, // Negative for purchase
-      previousBalance,
-      newBalance,
-      description: 'Purchase',
-      purchaseDate: new Date(newTransaction.purchaseDate)
-    });
-
-    if (transaction) {
-      const updatedVoucher = db.vouchers.update(voucher.id, { balance: newBalance });
-      if (updatedVoucher) {
-        onVoucherUpdated(updatedVoucher);
-      }
-
-      setTransactions(db.transactions.findByVoucherId(voucher.id));
-      setNewTransaction({
-        description: '',
-        amount: '',
-        purchaseDate: new Date().toISOString().split('T')[0]
+    try {
+      const transaction = await transactionService.createTransaction({
+        voucherId: voucher.id,
+        amount: -amount, // Negative for purchase
+        previousBalance,
+        newBalance,
+        description: newTransaction.description || 'Purchase',
+        purchaseDate: new Date(newTransaction.purchaseDate)
       });
-      setShowAddTransaction(false);
+
+      if (transaction) {
+        const updatedVoucher = await voucherService.updateVoucher(voucher.id, { balance: newBalance });
+        if (updatedVoucher) {
+          onVoucherUpdated(updatedVoucher);
+        }
+
+        const allTransactions = await transactionService.getTransactionsByVoucherId(voucher.id);
+        setTransactions(allTransactions);
+        setNewTransaction({
+          description: '',
+          amount: '',
+          purchaseDate: new Date().toISOString().split('T')[0]
+        });
+        setShowAddTransaction(false);
+        toast({
+          title: "Transaction Added",
+          description: "Purchase has been recorded successfully."
+        });
+      }
+    } catch (error) {
       toast({
-        title: "Transaction Added",
-        description: "Purchase has been recorded successfully."
+        title: "Add Failed",
+        description: "Failed to add transaction. Please try again.",
+        variant: "destructive"
       });
     }
   };
@@ -451,7 +456,16 @@ export const VoucherEditModal = ({
               {showAddTransaction && (
                 <div className="border rounded-lg p-3 sm:p-4 space-y-4 bg-muted/30">
                   <h4 className="font-medium">Add New Purchase</h4>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div>
+                      <Label htmlFor="new-description">Description</Label>
+                      <Input
+                        id="new-description"
+                        value={newTransaction.description}
+                        onChange={(e) => setNewTransaction(prev => ({ ...prev, description: e.target.value }))}
+                        placeholder="Purchase description"
+                      />
+                    </div>
                     <div>
                       <Label htmlFor="new-amount">Amount</Label>
                       <Input
