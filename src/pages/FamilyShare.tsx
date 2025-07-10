@@ -11,6 +11,7 @@ import { InvitationCard } from '@/components/family/InvitationCard';
 import { useFamilyGroups } from '@/hooks/useFamilyGroups';
 import { useFamilyInvitations } from '@/hooks/useFamilyInvitations';
 import { useSharedVouchers } from '@/hooks/useSharedVouchers';
+import { useAuth } from '@/contexts/AuthContext';
 
 export const FamilyShare = () => {
   const [createFamilyOpen, setCreateFamilyOpen] = useState(false);
@@ -20,6 +21,7 @@ export const FamilyShare = () => {
   const { families, isLoading: familiesLoading, refetch: refetchFamilies } = useFamilyGroups();
   const { invitations, isLoading: invitationsLoading, respondToInvitation } = useFamilyInvitations(); 
   const { sharedVouchers, isLoading: vouchersLoading } = useSharedVouchers();
+  const { user } = useAuth();
 
   const handleInviteMember = (familyId: string) => {
     setSelectedFamilyId(familyId);
@@ -31,7 +33,11 @@ export const FamilyShare = () => {
     refetchFamilies();
   };
 
-  const pendingInvitations = invitations?.filter(inv => inv.status === 'pending') || [];
+  // Only show invitations where the current user is the invitee (not the inviter)
+  const pendingInvitations = invitations?.filter(inv => 
+    inv.status === 'pending' && 
+    (inv.invited_user_id === user?.id || inv.invited_email === user?.email)
+  ) || [];
 
   return (
     <div className="container mx-auto p-6 space-y-6">
