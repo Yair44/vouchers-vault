@@ -35,7 +35,12 @@ export const useFamilyGroups = () => {
 
   const createFamily = useMutation({
     mutationFn: async (name: string) => {
-      if (!user) throw new Error('User not authenticated');
+      if (!user) {
+        console.error('User not authenticated:', { user, session: null });
+        throw new Error('User not authenticated');
+      }
+
+      console.log('Creating family with user:', { userId: user.id, email: user.email });
 
       // Create the family group with proper user authentication
       const { data, error } = await supabase
@@ -46,6 +51,8 @@ export const useFamilyGroups = () => {
         })
         .select()
         .single();
+
+      console.log('Family creation result:', { data, error });
 
       if (error) throw error;
 
