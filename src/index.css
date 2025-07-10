@@ -102,6 +102,10 @@
     --sidebar-ring: 217.2 91.2% 59.8%;
 
     --chart-1: linear-gradient(135deg, #a855f7 0%, #f472b6 100%);
+    
+    /* Toast colors for dark mode */
+    --toast-pink: 330 81% 60%;
+    --toast-pink-foreground: 0 0% 100%;
   }
 }
 

@@ -26,37 +26,35 @@ const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <AccessibilityProvider>
-      <AuthProvider>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <Routes>
-              <Route path="/auth" element={<Auth />} />
-              <Route path="/*" element={
-                <Layout>
-                  <Routes>
-                    <Route path="/" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-                    <Route path="/vouchers" element={<ProtectedRoute><Vouchers /></ProtectedRoute>} />
-                    <Route path="/voucher/:id" element={<ProtectedRoute><VoucherDetail /></ProtectedRoute>} />
-                    <Route path="/add" element={<ProtectedRoute><AddVoucher /></ProtectedRoute>} />
-                    <Route path="/admin" element={<ProtectedRoute requireAdmin={true}><Admin /></ProtectedRoute>} />
-                    <Route path="/shared" element={<ProtectedRoute><FamilyShare /></ProtectedRoute>} />
-                    <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
-                    <Route path="/site-terms" element={<SiteTerms />} />
-                    <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-                    <Route path="/accessibility-statement" element={<AccessibilityStatement />} />
-                    <Route path="/contact-us" element={<ContactUs />} />
-                    <Route path="*" element={<NotFound />} />
-                  </Routes>
-                </Layout>
-              } />
-            </Routes>
-          </BrowserRouter>
-        </TooltipProvider>
-      </AuthProvider>
-    </AccessibilityProvider>
+    <AuthProvider>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <Routes>
+            <Route path="/auth" element={<Auth />} />
+            <Route path="/*" element={
+              <Layout>
+                <Routes>
+                  <Route path="/" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+                  <Route path="/vouchers" element={<ProtectedRoute><Vouchers /></ProtectedRoute>} />
+                  <Route path="/voucher/:id" element={<ProtectedRoute><VoucherDetail /></ProtectedRoute>} />
+                  <Route path="/add" element={<ProtectedRoute><AddVoucher /></ProtectedRoute>} />
+                  <Route path="/admin" element={<ProtectedRoute requireAdmin={true}><Admin /></ProtectedRoute>} />
+                  <Route path="/shared" element={<ProtectedRoute><FamilyShare /></ProtectedRoute>} />
+                  <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+                  <Route path="/site-terms" element={<SiteTerms />} />
+                  <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+                  <Route path="/accessibility-statement" element={<AccessibilityStatement />} />
+                  <Route path="/contact-us" element={<ContactUs />} />
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </Layout>
+            } />
+          </Routes>
+        </BrowserRouter>
+      </TooltipProvider>
+    </AuthProvider>
   </QueryClientProvider>
 );
 
