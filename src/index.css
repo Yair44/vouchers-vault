@@ -55,6 +55,10 @@
 
     --chart-1: linear-gradient(135deg, #9333ea 0%, #ec4899 100%);
 
+    /* Toast colors */
+    --toast-pink: 330 81% 60%;
+    --toast-pink-foreground: 0 0% 100%;
+
     /* Accessibility variables */
     --accessibility-font-size: 1rem;
     --accessibility-font-scale: 1;
