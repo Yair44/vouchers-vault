@@ -21,7 +21,6 @@ import { AccessibilityStatement } from "@/pages/AccessibilityStatement";
 import { ContactUs } from "@/pages/ContactUs";
 import NotFound from "./pages/NotFound";
 import { FamilyShare } from "@/pages/FamilyShare";
-import { FamilyInvite } from "@/pages/FamilyInvite";
 
 const queryClient = new QueryClient();
 
@@ -35,7 +34,6 @@ const App = () => (
           <BrowserRouter>
             <Routes>
               <Route path="/auth" element={<Auth />} />
-              <Route path="/family-invite/:token" element={<FamilyInvite />} />
               <Route path="/*" element={
                 <Layout>
                   <Routes>

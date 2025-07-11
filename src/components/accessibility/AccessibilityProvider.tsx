@@ -1,5 +1,5 @@
 
-import { createContext, useContext, useEffect, useState, ReactNode, useMemo, useCallback } from 'react';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 import { AccessibilitySettings, defaultAccessibilitySettings } from '@/types/accessibility';
 
 interface AccessibilityContextType {
@@ -12,14 +12,14 @@ const AccessibilityContext = createContext<AccessibilityContextType | undefined>
 
 export const useAccessibility = () => {
   const context = useContext(AccessibilityContext);
-  if (context === undefined) {
+  if (!context) {
     throw new Error('useAccessibility must be used within AccessibilityProvider');
   }
   return context;
 };
 
 interface AccessibilityProviderProps {
-  children: ReactNode;
+  children: React.ReactNode;
 }
 
 export const AccessibilityProvider = ({ children }: AccessibilityProviderProps) => {
@@ -31,13 +31,13 @@ export const AccessibilityProvider = ({ children }: AccessibilityProviderProps) 
     return defaultAccessibilitySettings;
   });
 
-  const updateSettings = useCallback((newSettings: Partial<AccessibilitySettings>) => {
+  const updateSettings = (newSettings: Partial<AccessibilitySettings>) => {
     setSettings(prev => ({ ...prev, ...newSettings }));
-  }, []);
+  };
 
-  const resetSettings = useCallback(() => {
+  const resetSettings = () => {
     setSettings(defaultAccessibilitySettings);
-  }, []);
+  };
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -80,14 +80,8 @@ export const AccessibilityProvider = ({ children }: AccessibilityProviderProps) 
     root.classList.toggle('accessibility-screen-reader-enhanced', settings.screenReaderEnhanced);
   };
 
-  const contextValue = useMemo(() => ({
-    settings,
-    updateSettings,
-    resetSettings
-  }), [settings, updateSettings, resetSettings]);
-
   return (
-    <AccessibilityContext.Provider value={contextValue}>
+    <AccessibilityContext.Provider value={{ settings, updateSettings, resetSettings }}>
       {children}
     </AccessibilityContext.Provider>
   );

@@ -1,5 +1,5 @@
 
-import { useState, ReactNode } from 'react';
+import { useState } from 'react';
 import { Sidebar } from './Sidebar';
 import { Header } from './Header';
 import { Footer } from './Footer';
@@ -8,7 +8,7 @@ import { ColorBlindFilters } from './accessibility/ColorBlindFilters';
 import { cn } from '@/lib/utils';
 
 interface LayoutProps {
-  children: ReactNode;
+  children: React.ReactNode;
 }
 
 export const Layout = ({

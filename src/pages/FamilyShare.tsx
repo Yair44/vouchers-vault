@@ -8,11 +8,9 @@ import { InviteMemberModal } from '@/components/family/InviteMemberModal';
 import { FamilyGroupCard } from '@/components/family/FamilyGroupCard';
 import { SharedVoucherCard } from '@/components/family/SharedVoucherCard';
 import { InvitationCard } from '@/components/family/InvitationCard';
-import { InvitationStatusCard } from '@/components/family/InvitationStatusCard';
 import { useFamilyGroups } from '@/hooks/useFamilyGroups';
 import { useFamilyInvitations } from '@/hooks/useFamilyInvitations';
 import { useSharedVouchers } from '@/hooks/useSharedVouchers';
-import { useAuth } from '@/contexts/AuthContext';
 
 export const FamilyShare = () => {
   const [createFamilyOpen, setCreateFamilyOpen] = useState(false);
@@ -22,7 +20,6 @@ export const FamilyShare = () => {
   const { families, isLoading: familiesLoading, refetch: refetchFamilies } = useFamilyGroups();
   const { invitations, isLoading: invitationsLoading, respondToInvitation } = useFamilyInvitations(); 
   const { sharedVouchers, isLoading: vouchersLoading } = useSharedVouchers();
-  const { user } = useAuth();
 
   const handleInviteMember = (familyId: string) => {
     setSelectedFamilyId(familyId);
@@ -34,17 +31,7 @@ export const FamilyShare = () => {
     refetchFamilies();
   };
 
-  // Only show invitations where the current user is the invitee (not the inviter)
-  const pendingInvitations = invitations?.filter(inv => 
-    inv.status === 'pending' && 
-    (inv.invited_user_id === user?.id || inv.invited_email === user?.email)
-  ) || [];
-
-  // Show invitations sent by the current user (for viewing status)
-  const sentInvitations = invitations?.filter(inv => 
-    inv.status === 'pending' && 
-    inv.invited_by === user?.id
-  ) || [];
+  const pendingInvitations = invitations?.filter(inv => inv.status === 'pending') || [];
 
   return (
     <div className="container mx-auto p-6 space-y-6">
@@ -61,7 +48,7 @@ export const FamilyShare = () => {
         </Button>
       </div>
 
-      {/* Pending Invitations Received */}
+      {/* Pending Invitations */}
       {pendingInvitations.length > 0 && (
         <Card className="bg-blue-50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-800">
           <CardHeader>
@@ -76,41 +63,10 @@ export const FamilyShare = () => {
                 key={invitation.id}
                 invitation={invitation}
                 onRespond={handleInvitationResponse}
-                currentUserId={user?.id}
               />
             ))}
           </CardContent>
         </Card>
-      )}
-
-      {/* Sent Invitations */}
-      {sentInvitations.length > 0 && (
-        <Card className="bg-orange-50 dark:bg-orange-950/20 border-orange-200 dark:border-orange-800">
-          <CardHeader>
-            <CardTitle className="text-orange-800 dark:text-orange-300 flex items-center gap-2">
-              <UserPlus className="h-5 w-5" />
-              Sent Invitations ({sentInvitations.length})
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            {sentInvitations.map((invitation) => (
-              <InvitationCard
-                key={invitation.id}
-                invitation={invitation}
-                onRespond={handleInvitationResponse}
-                currentUserId={user?.id}
-              />
-            ))}
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Invitation Status Card */}
-      {invitations && invitations.length > 0 && (
-        <InvitationStatusCard 
-          invitations={invitations} 
-          currentUserId={user?.id}
-        />
       )}
 
       <Tabs defaultValue="families" className="space-y-6">
