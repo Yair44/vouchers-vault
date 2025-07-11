@@ -1,5 +1,5 @@
 
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { AccessibilitySettings, defaultAccessibilitySettings } from '@/types/accessibility';
 
 interface AccessibilityContextType {
@@ -19,7 +19,7 @@ export const useAccessibility = () => {
 };
 
 interface AccessibilityProviderProps {
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
 export const AccessibilityProvider = ({ children }: AccessibilityProviderProps) => {
