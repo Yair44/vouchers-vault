@@ -3,7 +3,6 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Navigate } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Loader2 } from 'lucide-react';
-import { Layout } from './Layout';
 
 interface ProtectedRouteProps {
   children: ReactNode;
@@ -45,5 +44,5 @@ export const ProtectedRoute = ({ children, requireAdmin = false }: ProtectedRout
     );
   }
 
-  return <Layout>{children}</Layout>;
+  return <>{children}</>;
 };
