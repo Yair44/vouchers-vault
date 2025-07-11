@@ -13,6 +13,8 @@ const AccessibilityContext = createContext<AccessibilityContextType | undefined>
 export const useAccessibility = () => {
   const context = useContext(AccessibilityContext);
   if (!context) {
+    console.error('useAccessibility called outside of AccessibilityProvider context');
+    console.trace('Call stack for useAccessibility error');
     throw new Error('useAccessibility must be used within AccessibilityProvider');
   }
   return context;

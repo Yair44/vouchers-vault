@@ -160,6 +160,7 @@ export const PurchaseRecordModal = ({
                   onSelect={(date) => date && setPurchaseDate(date)}
                   disabled={(date) => date > new Date()}
                   initialFocus
+                  className="pointer-events-auto"
                 />
               </PopoverContent>
             </Popover>
