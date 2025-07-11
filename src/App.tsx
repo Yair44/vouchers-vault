@@ -34,24 +34,18 @@ const App = () => (
           <BrowserRouter>
             <Routes>
               <Route path="/auth" element={<Auth />} />
-              <Route path="/*" element={
-                <Layout>
-                  <Routes>
-                    <Route path="/" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-                    <Route path="/vouchers" element={<ProtectedRoute><Vouchers /></ProtectedRoute>} />
-                    <Route path="/voucher/:id" element={<ProtectedRoute><VoucherDetail /></ProtectedRoute>} />
-                    <Route path="/add" element={<ProtectedRoute><AddVoucher /></ProtectedRoute>} />
-                    <Route path="/admin" element={<ProtectedRoute requireAdmin={true}><Admin /></ProtectedRoute>} />
-                    <Route path="/shared" element={<ProtectedRoute><FamilyShare /></ProtectedRoute>} />
-                    <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
-                    <Route path="/site-terms" element={<SiteTerms />} />
-                    <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-                    <Route path="/accessibility-statement" element={<AccessibilityStatement />} />
-                    <Route path="/contact-us" element={<ContactUs />} />
-                    <Route path="*" element={<NotFound />} />
-                  </Routes>
-                </Layout>
-              } />
+              <Route path="/" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+              <Route path="/vouchers" element={<ProtectedRoute><Vouchers /></ProtectedRoute>} />
+              <Route path="/voucher/:id" element={<ProtectedRoute><VoucherDetail /></ProtectedRoute>} />
+              <Route path="/add" element={<ProtectedRoute><AddVoucher /></ProtectedRoute>} />
+              <Route path="/admin" element={<ProtectedRoute requireAdmin={true}><Admin /></ProtectedRoute>} />
+              <Route path="/shared" element={<ProtectedRoute><FamilyShare /></ProtectedRoute>} />
+              <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+              <Route path="/site-terms" element={<Layout><SiteTerms /></Layout>} />
+              <Route path="/privacy-policy" element={<Layout><PrivacyPolicy /></Layout>} />
+              <Route path="/accessibility-statement" element={<Layout><AccessibilityStatement /></Layout>} />
+              <Route path="/contact-us" element={<Layout><ContactUs /></Layout>} />
+              <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
         </TooltipProvider>
