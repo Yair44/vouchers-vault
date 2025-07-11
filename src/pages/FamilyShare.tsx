@@ -8,6 +8,7 @@ import { InviteMemberModal } from '@/components/family/InviteMemberModal';
 import { FamilyGroupCard } from '@/components/family/FamilyGroupCard';
 import { SharedVoucherCard } from '@/components/family/SharedVoucherCard';
 import { InvitationCard } from '@/components/family/InvitationCard';
+import { InvitationStatusCard } from '@/components/family/InvitationStatusCard';
 import { useFamilyGroups } from '@/hooks/useFamilyGroups';
 import { useFamilyInvitations } from '@/hooks/useFamilyInvitations';
 import { useSharedVouchers } from '@/hooks/useSharedVouchers';
@@ -102,6 +103,14 @@ export const FamilyShare = () => {
             ))}
           </CardContent>
         </Card>
+      )}
+
+      {/* Invitation Status Card */}
+      {invitations && invitations.length > 0 && (
+        <InvitationStatusCard 
+          invitations={invitations} 
+          currentUserId={user?.id}
+        />
       )}
 
       <Tabs defaultValue="families" className="space-y-6">
